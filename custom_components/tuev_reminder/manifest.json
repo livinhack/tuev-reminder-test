@@ -1,10 +1,11 @@
 {
   "domain": "tuev_reminder",
   "name": "TÜV Reminder",
-  "version": "0.0.1",
-  "documentation": "https://example.com",
+  "version": "0.1.0",
+  "documentation": "https://github.com/livinhack/tuev-reminder-test",
+  "issue_tracker": "https://github.com/livinhack/tuev-reminder-test/issues",
   "dependencies": [],
-  "codeowners": [],
+  "codeowners": ["@livinhack"],
   "requirements": [],
   "iot_class": "local_push",
   "config_flow": true
