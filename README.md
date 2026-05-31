@@ -118,6 +118,12 @@ Anschließend die Integration hinzufügen:
 Einstellungen → Geräte & Dienste → Integration hinzufügen → TÜV Reminder
 ```
 
+## Dashboard Card
+
+Diese Integration ist für die Verwendung mit der separaten TÜV Card Lovelace Card vorgesehen.
+
+Die Card zeigt eine dynamische TÜV-/HU-Plakette an und bietet bei Fälligkeit eine Bestätigungsmöglichkeit.
+
 ## Hinweis
 
 Dieses Projekt befindet sich aktuell in einer frühen Testphase.
