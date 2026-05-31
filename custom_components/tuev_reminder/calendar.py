@@ -20,6 +20,9 @@ from .helpers import (
 )
 
 
+CALENDAR_OWNER_KEY = "calendar_owner_entry_id"
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -27,10 +30,17 @@ async def async_setup_entry(
 ):
     hass.data.setdefault(DOMAIN, {})
 
-    if hass.data[DOMAIN].get("calendar_added"):
+    if hass.data[DOMAIN].get(CALENDAR_OWNER_KEY):
         return
 
-    hass.data[DOMAIN]["calendar_added"] = True
+    hass.data[DOMAIN][CALENDAR_OWNER_KEY] = entry.entry_id
+
+    def _clear_calendar_owner():
+        if hass.data.get(DOMAIN, {}).get(CALENDAR_OWNER_KEY) == entry.entry_id:
+            hass.data[DOMAIN].pop(CALENDAR_OWNER_KEY, None)
+
+    entry.async_on_unload(_clear_calendar_owner)
+
     async_add_entities([TuevReminderCalendar(hass)])
 
 
@@ -100,12 +110,12 @@ class TuevReminderCalendar(CalendarEntity):
             end=end,
             summary=f"TÜV / HU: {vehicle_name}",
             description=(
-                f"Fahrzeug: {vehicle_name}\n"
-                f"Kennzeichen: {plate}\n"
-                f"HU-Fälligkeit: {month:02d}/{year}\n"
-                f"Fällig bis: {due_date.isoformat()}\n"
-                f"Intervall: {interval} Jahr(e)\n\n"
-                "Eine Woche vor Ende des Fälligkeitsmonats."
+                f"Vehicle: {vehicle_name}\n"
+                f"License plate: {plate}\n"
+                f"Inspection due: {month:02d}/{year}\n"
+                f"Due until: {due_date.isoformat()}\n"
+                f"Interval: {interval} year(s)\n\n"
+                "One week before the end of the due month."
             ),
             uid=f"{entry.entry_id}-tuev-reminder",
         )
