@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fahrzeug hinzufügen",
+        "description": "Lege ein Fahrzeug und dessen nächste HU-Fälligkeit an.",
+        "data": {
+          "vehicle_name": "Fahrzeugname",
+          "plate": "Kennzeichen",
+          "month": "HU-Monat",
+          "year": "HU-Jahr",
+          "interval": "Intervall"
+        }
+      }
+    }
+  }
+}

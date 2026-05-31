@@ -1,0 +1,11 @@
+confirm_passed:
+  name: TÜV bestanden bestätigen
+  description: Aktualisiert die nächste HU-Fälligkeit anhand des aktuellen Monats und des hinterlegten Intervalls.
+  fields:
+    entity_id:
+      name: Entität
+      description: TÜV-Reminder-Sensor, der aktualisiert werden soll.
+      required: true
+      selector:
+        entity:
+          domain: sensor

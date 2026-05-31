@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add vehicle",
+        "description": "Add a vehicle and its next inspection due date.",
+        "data": {
+          "vehicle_name": "Vehicle name",
+          "plate": "License plate",
+          "month": "Inspection month",
+          "year": "Inspection year",
+          "interval": "Interval"
+        }
+      }
+    }
+  }
+}
