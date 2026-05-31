@@ -2,14 +2,41 @@
   "config": {
     "step": {
       "user": {
-        "title": "Fahrzeug hinzufügen",
-        "description": "Lege ein Fahrzeug und dessen nächste HU-Fälligkeit an.",
+        "title": "Add vehicle",
+        "description": "Add a vehicle and its next inspection due date.",
         "data": {
-          "vehicle_name": "Fahrzeugname",
-          "plate": "Kennzeichen",
-          "month": "HU-Monat",
-          "year": "HU-Jahr",
-          "interval": "Intervall"
+          "vehicle_name": "Vehicle name",
+          "plate": "License plate",
+          "month": "Inspection month",
+          "year": "Inspection year",
+          "interval": "Interval"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Edit vehicle",
+        "description": "Update vehicle data and inspection due date.",
+        "data": {
+          "vehicle_name": "Vehicle name",
+          "plate": "License plate",
+          "month": "Inspection month",
+          "year": "Inspection year",
+          "interval": "Interval"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "tuev_status": {
+        "name": "TÜV",
+        "state": {
+          "valid": "valid",
+          "due": "due",
+          "expired": "expired"
         }
       }
     }
