@@ -22,7 +22,7 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r008"', "manifest r008 version")
+assert_contains(manifest, '"version": "0.1.0-r009"', "manifest r009 version")
 
 for needle in [
     'PLATE_FORMAT_SINGLE_LINE = "single_line"',
@@ -40,7 +40,7 @@ for needle in [
     "_validate_plate_format_for_kind",
     'errors[CONF_PLATE_FORMAT] = "invalid_plate_format_for_kind"',
     "PLATE_KIND_CHANGE: {",
-    "PLATE_FORMAT_SINGLE_LINE,\n        PLATE_FORMAT_TWO_LINE,",
+    "PLATE_FORMAT_SINGLE_LINE,\n        PLATE_FORMAT_TWO_LINE,\n        PLATE_FORMAT_MOTORCYCLE,",
 ]:
     assert_contains(config_flow, needle, "config flow format validation")
 
@@ -54,8 +54,8 @@ for text, label in [(strings, "strings"), (de, "German translations"), (en, "Eng
     assert_contains(text, '"invalid_plate_format"', label)
     assert_contains(text, '"invalid_plate_format_for_kind"', label)
 
-assert_contains(readme, "Reminder r008", "README r008")
-assert_contains(handover, "Reminder r008", "handover r008")
-assert_contains(handover, "Card b354", "Card baseline")
+assert_contains(readme, "Reminder r009", "README r009")
+assert_contains(handover, "Reminder r009", "handover r009")
+assert_contains(handover, "Card b355", "Card compatibility")
 
-print("r008 plate format validation check OK")
+print("r008/r009 plate format validation compatibility check OK")

@@ -89,6 +89,7 @@ PLATE_FORMATS_BY_KIND = {
     PLATE_KIND_CHANGE: {
         PLATE_FORMAT_SINGLE_LINE,
         PLATE_FORMAT_TWO_LINE,
+        PLATE_FORMAT_MOTORCYCLE,
     },
 }
 
@@ -482,7 +483,7 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=_user_schema(self._data),
+            data_schema=_user_schema({**self._data, **(user_input or {})}),
             errors=errors,
         )
 
@@ -570,7 +571,7 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
-            data_schema=_user_schema(self._data),
+            data_schema=_user_schema({**self._data, **(user_input or {})}),
             errors=errors,
         )
 

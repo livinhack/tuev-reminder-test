@@ -1,35 +1,39 @@
-# Handover – Reminder r008 Plate Format Validation in Vehicle Step
+# Handover – Reminder r009 Change-Plate Motorcycle + Validation Form State Fix
 
-Current Reminder stand: **r008**.
+Current Reminder stand: **r009**.
 
-Card baseline reference: **Card b354**. Card and Reminder are separate projects with separate versioning.
+Card compatibility reference: **Card b355**. Card and Reminder are separate projects with separate versioning.
 
-## What changed in r008
+## Why r009 exists
 
-- Added `plate_format` to the first Config/Options flow step, directly below `plate_kind`.
-- The flow remains three steps:
-  1. vehicle name + plate type + plate format
-  2. plate details
-  3. HU due data
-- Added plate display format values:
+The HA test matrix showed two issues after r008:
+
+1. Wechselkennzeichen + Motorrad could not be tested because the r008 format check blocked it together with `small_two_line`.
+2. When the first-step type/format validation rejected a combination, Home Assistant re-rendered the form with the previous stored defaults instead of the submitted values. This made the fields look cleared/reset.
+
+## What changed in r009
+
+- Wechselkennzeichen now allow:
   - `single_line`
   - `two_line`
-  - `small_two_line`
   - `motorcycle`
-- Added central type/format validation.
-- Invalid combinations stay in step 1 and show an error on `plate_format`.
-- Current restriction: `change` plates allow only `single_line` and `two_line`.
-- r004-r007 legacy `plate_format` values `standard`/`change` are accepted as read fallback and map to `single_line`.
+- Wechselkennzeichen still reject:
+  - `small_two_line`
+- ConfigFlow `async_step_user` now re-renders `_user_schema({**self._data, **(user_input or {})})` on errors.
+- OptionsFlow `async_step_init` does the same.
+- Result: invalid type/format combinations keep the user's entered values when showing the error.
 
 ## Preserved
 
-- r007 suffix reset fix.
+- r008 `plate_format` in first step.
+- r007 NONE/suffix reset fix.
 - r007 single-step season validation.
-- r006 Card b354 bridge: `plate` is full display string; `plate_base` is suffix-free.
+- r006/Card bridge: `plate` is full display string; `plate_base` is suffix-free.
 - Green plate types hide and reset H/E fields.
 - Season ranges must cover at least 2 and at most 11 months.
+- Card b355 structured mapping remains the current Card-side partner.
 
-## Sensor attributes relevant for the future Card mapping
+## Sensor attributes relevant for Card b355
 
 ```text
 plate
@@ -53,26 +57,23 @@ change_plate_vehicle_text
 ## Not changed
 
 - no Card change
-- no renderer mapping
+- no renderer geometry change
 - no calendar-v3 change
 - no `local_calendar` sync
 - no Sidebar/Manager UI
 - no Area-Code autocomplete list
 
+## Test focus for r009
+
+In HA, specifically retest:
+
+```text
+Wechselkennzeichen + Motorrad
+Wechselkennzeichen + verkleinert zweizeilig -> must still show format error
+After that format error, vehicle name/type/format must remain filled
+Same check in the edit/options dialog
+```
+
 ## Next likely step
 
-After r008 is verified in HA, the next Reminder-side option is either:
-
-```text
-r009 = Area Code Autocomplete List
-```
-
-or we switch to the Card project:
-
-```text
-Card b355 = Reminder Attribute Mapping
-```
-
-## r007 compatibility note
-
-The r007 NONE fix is preserved: `plate_suffix: "none"` is not appended to the visible plate and is not interpreted as E.
+If r009 passes, continue the Card b355 + Reminder r009 E2E matrix. If no further mapping bugs appear, create a compatibility note/checkpoint for the tested combination.

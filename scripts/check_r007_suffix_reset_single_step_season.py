@@ -25,7 +25,7 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r008"', "manifest r008 version")
+assert_contains(manifest, '"version": "0.1.0-r009"', "manifest r009 version")
 
 # NONE must not be interpreted as E and must not be appended to displayed plates.
 assert_contains(helpers, "suffix_text == PLATE_SUFFIX_NONE.upper()", "NONE display guard")
