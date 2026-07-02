@@ -15,6 +15,8 @@ from .const import (
     CONF_PLATE_KIND,
     CONF_PLATE_FORMAT,
     CONF_PLATE_SUFFIX,
+    CONF_PLATE_SUFFIX_H,
+    CONF_PLATE_SUFFIX_E,
     CONF_PLATE_COLOR_MODE,
     CONF_SEASONAL,
     CONF_SEASON_START_MONTH,
@@ -32,7 +34,6 @@ from .const import (
     PLATE_FORMAT_CHANGE,
     PLATE_FORMATS,
     PLATE_SUFFIX_NONE,
-    PLATE_SUFFIXES,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
@@ -131,11 +132,19 @@ class TuevSensor(SensorEntity):
         return normalize_plate_text(self.data.get(CONF_PLATE, ""))
 
     @property
+    def plate_suffix_h(self):
+        legacy_suffix = str(self.data.get(CONF_PLATE_SUFFIX, "")).upper()
+        return bool(self.data.get(CONF_PLATE_SUFFIX_H, False)) or PLATE_SUFFIX_H in legacy_suffix
+
+    @property
+    def plate_suffix_e(self):
+        legacy_suffix = str(self.data.get(CONF_PLATE_SUFFIX, "")).upper()
+        return bool(self.data.get(CONF_PLATE_SUFFIX_E, False)) or PLATE_SUFFIX_E in legacy_suffix
+
+    @property
     def plate_suffix(self):
-        value = str(self.data.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE)).strip().upper()
-        if value not in PLATE_SUFFIXES:
-            return PLATE_SUFFIX_NONE
-        return value
+        suffix = f"{PLATE_SUFFIX_H if self.plate_suffix_h else ''}{PLATE_SUFFIX_E if self.plate_suffix_e else ''}"
+        return suffix or PLATE_SUFFIX_NONE
 
     @property
     def plate_display(self):
@@ -248,6 +257,8 @@ class TuevSensor(SensorEntity):
             "plate_kind": self.plate_kind,
             "plate_format": self.plate_format,
             "plate_suffix": self.plate_suffix,
+            "plate_suffix_h": self.plate_suffix_h,
+            "plate_suffix_e": self.plate_suffix_e,
             "plate_color_mode": self.plate_color_mode,
             "seasonal": self.seasonal,
             "season_start_month": self.season_start_month,

@@ -23,6 +23,8 @@ handover = read("HANDOVER.md")
 # The setup UI is now cascaded. This check therefore verifies compatibility of
 # the data model, not the old flat form layout.
 fields = [
+    "CONF_PLATE_SUFFIX_H",
+    "CONF_PLATE_SUFFIX_E",
     "CONF_PLATE_COLOR_MODE",
     "CONF_SEASONAL",
     "CONF_SEASON_START_MONTH",
@@ -33,6 +35,8 @@ fields = [
 ]
 
 attributes = [
+    "plate_suffix_h",
+    "plate_suffix_e",
     "plate_color_mode",
     "seasonal",
     "season_start_month",

@@ -37,6 +37,8 @@ required_constants = [
     'PLATE_KIND_GREEN_SEASONAL = "green_seasonal"',
     'CONF_PLATE_FORMAT = "plate_format"',
     'CONF_PLATE_SUFFIX = "plate_suffix"',
+    'CONF_PLATE_SUFFIX_H = "plate_suffix_h"',
+    'CONF_PLATE_SUFFIX_E = "plate_suffix_e"',
     'CONF_CHANGE_PLATE_VEHICLE_DIGIT = "change_plate_vehicle_digit"',
 ]
 
@@ -66,17 +68,18 @@ assert_contains(sensor, '"change_plate_vehicle_text"', "r003 compatibility alias
 for text, label in [(strings, "strings"), (translations_de, "German translations"), (translations_en, "English translations")]:
     for key in [
         '"plate_kind"',
-        '"plate_suffix"',
+        '"plate_suffix_h"',
+        '"plate_suffix_e"',
         '"change_plate_vehicle_digit"',
         '"invalid_vehicle_digit"',
         '"invalid_season_range"',
     ]:
         assert_contains(text, key, label)
 
-assert_contains(manifest, '"version": "0.1.0-r004"', "manifest version")
-assert_contains(readme, "Reminder r004", "README r004 documentation")
-assert_contains(handover, "Reminder r004", "handover r004 documentation")
+assert_contains(manifest, '"version": "0.1.0-r005"', "manifest version")
+assert_contains(readme, "Reminder r005", "README r005 documentation")
+assert_contains(handover, "Reminder r005", "handover r005 documentation")
 assert_contains(readme, "Leerzeichen", "README spacing decision")
 assert_contains(handover, "Card b354", "Card baseline reference")
 
-print("r004 cascaded single-field flow check OK")
+print("r004 cascaded single-field flow compatibility check OK under r005")

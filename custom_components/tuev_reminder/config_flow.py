@@ -14,6 +14,8 @@ from .const import (
     CONF_PLATE_KIND,
     CONF_PLATE_FORMAT,
     CONF_PLATE_SUFFIX,
+    CONF_PLATE_SUFFIX_H,
+    CONF_PLATE_SUFFIX_E,
     CONF_PLATE_COLOR_MODE,
     CONF_SEASONAL,
     CONF_SEASON_START_MONTH,
@@ -33,7 +35,6 @@ from .const import (
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
-    PLATE_SUFFIXES,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
 )
@@ -48,14 +49,13 @@ PLATE_KIND_OPTIONS = [
     {"value": PLATE_KIND_GREEN_SEASONAL, "label": "Grünes Kennzeichen + Saison"},
 ]
 
-PLATE_SUFFIX_OPTIONS = [
-    {"value": PLATE_SUFFIX_NONE, "label": "kein Zusatz"},
-    {"value": PLATE_SUFFIX_H, "label": "H"},
-    {"value": PLATE_SUFFIX_E, "label": "E"},
+MONTH_OPTIONS = [
+    {"value": str(month), "label": f"{month:02d}"}
+    for month in range(1, 13)
 ]
 
 
-def _month_selector():
+def _month_number_selector():
     return selector.NumberSelector(
         selector.NumberSelectorConfig(
             min=1,
@@ -64,6 +64,23 @@ def _month_selector():
             mode=selector.NumberSelectorMode.BOX,
         )
     )
+
+
+def _month_select_selector(options=None):
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=options or MONTH_OPTIONS,
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+
+def _season_end_month_options(start_month: int):
+    return [
+        {"value": str(month), "label": f"{month:02d}"}
+        for month in range(1, 13)
+        if _is_valid_season_range(start_month, month)
+    ]
 
 
 def _derive_plate_kind(values: dict) -> str:
@@ -107,6 +124,26 @@ def _season_duration(start_month: int, end_month: int) -> int:
 def _is_valid_season_range(start_month: int, end_month: int) -> bool:
     duration = _season_duration(start_month, end_month)
     return 2 <= duration <= 11
+
+
+def _coerce_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
+    return bool(value)
+
+
+def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
+    legacy_suffix = str(values.get(CONF_PLATE_SUFFIX, "")).upper()
+    suffix_h = _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)) or "H" in legacy_suffix
+    suffix_e = _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)) or "E" in legacy_suffix
+    return suffix_h, suffix_e
+
+
+def _build_suffix_summary(suffix_h: bool, suffix_e: bool) -> str:
+    suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}"
+    return suffix or PLATE_SUFFIX_NONE
 
 
 def _user_schema(defaults: dict):
@@ -156,31 +193,39 @@ def _plate_schema(defaults: dict, kind: str):
             )
         ] = str
 
+    suffix_h, suffix_e = _suffix_flags_from_values(defaults)
     schema[
-        vol.Required(
-            CONF_PLATE_SUFFIX,
-            default=defaults.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE),
+        vol.Optional(
+            CONF_PLATE_SUFFIX_H,
+            default=suffix_h,
         )
-    ] = selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=PLATE_SUFFIX_OPTIONS,
-            mode=selector.SelectSelectorMode.DROPDOWN,
+    ] = bool
+    schema[
+        vol.Optional(
+            CONF_PLATE_SUFFIX_E,
+            default=suffix_e,
         )
-    )
+    ] = bool
 
     if kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL}:
+        start_default = int(defaults.get(CONF_SEASON_START_MONTH, 4))
+        end_default = int(defaults.get(CONF_SEASON_END_MONTH, 10))
+        valid_end_options = _season_end_month_options(start_default)
+        valid_end_values = {option["value"] for option in valid_end_options}
+        if str(end_default) not in valid_end_values:
+            end_default = int(valid_end_options[0]["value"])
         schema[
             vol.Required(
                 CONF_SEASON_START_MONTH,
-                default=int(defaults.get(CONF_SEASON_START_MONTH, 4)),
+                default=str(start_default),
             )
-        ] = _month_selector()
+        ] = _month_select_selector()
         schema[
             vol.Required(
                 CONF_SEASON_END_MONTH,
-                default=int(defaults.get(CONF_SEASON_END_MONTH, 10)),
+                default=str(end_default),
             )
-        ] = _month_selector()
+        ] = _month_select_selector(valid_end_options)
 
     return vol.Schema(schema)
 
@@ -193,7 +238,7 @@ def _due_schema(defaults: dict):
             vol.Required(
                 CONF_MONTH,
                 default=int(defaults.get(CONF_MONTH, datetime.date.today().month)),
-            ): _month_selector(),
+            ): _month_number_selector(),
             vol.Required(
                 CONF_YEAR,
                 default=int(defaults.get(CONF_YEAR, current_year + 1)),
@@ -227,10 +272,11 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     flags = _plate_kind_flags(kind)
     normalized.update(flags)
 
-    suffix = str(user_input.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE)).strip().upper()
-    if suffix not in PLATE_SUFFIXES:
-        errors[CONF_PLATE_SUFFIX] = "invalid_plate_suffix"
-    normalized[CONF_PLATE_SUFFIX] = suffix
+    suffix_h = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_H, False))
+    suffix_e = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_E, False))
+    normalized[CONF_PLATE_SUFFIX_H] = suffix_h
+    normalized[CONF_PLATE_SUFFIX_E] = suffix_e
+    normalized[CONF_PLATE_SUFFIX] = _build_suffix_summary(suffix_h, suffix_e)
 
     if kind == PLATE_KIND_CHANGE:
         common_text = normalize_plate_text(user_input.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))

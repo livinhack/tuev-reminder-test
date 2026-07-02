@@ -11,14 +11,15 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Gib die Kennzeichendaten passend zum gewählten Typ ein. Leerzeichen bleiben für den Card-Renderer erhalten.",
+        "description": "Gib die Kennzeichendaten passend zum gewählten Typ ein. Leerzeichen bleiben für den Card-Renderer erhalten. H und E können unabhängig gesetzt werden.",
         "data": {
           "plate": "Kennzeichen",
-          "plate_suffix": "H/E-Zusatz",
           "season_start_month": "Saisonbeginn Monat",
           "season_end_month": "Saisonende Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
-          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer"
+          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
+          "plate_suffix_h": "H-Kennzeichen",
+          "plate_suffix_e": "E-Kennzeichen"
         }
       },
       "due": {
@@ -34,7 +35,6 @@
     "error": {
       "required": "Dieses Feld ist erforderlich.",
       "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
-      "invalid_plate_suffix": "Ungültiger H/E-Zusatz.",
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
       "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
     }
@@ -51,14 +51,15 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Passe die Kennzeichendaten passend zum gewählten Typ an. Leerzeichen bleiben für den Card-Renderer erhalten.",
+        "description": "Passe die Kennzeichendaten passend zum gewählten Typ an. Leerzeichen bleiben für den Card-Renderer erhalten. H und E können unabhängig gesetzt werden.",
         "data": {
           "plate": "Kennzeichen",
-          "plate_suffix": "H/E-Zusatz",
           "season_start_month": "Saisonbeginn Monat",
           "season_end_month": "Saisonende Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
-          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer"
+          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
+          "plate_suffix_h": "H-Kennzeichen",
+          "plate_suffix_e": "E-Kennzeichen"
         }
       },
       "due": {
@@ -74,7 +75,6 @@
     "error": {
       "required": "Dieses Feld ist erforderlich.",
       "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
-      "invalid_plate_suffix": "Ungültiger H/E-Zusatz.",
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
       "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
     }
