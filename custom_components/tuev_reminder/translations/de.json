@@ -9,7 +9,14 @@
           "plate": "Kennzeichen",
           "month": "HU-Monat",
           "year": "HU-Jahr",
-          "interval": "Intervall"
+          "interval": "Intervall",
+          "plate_color_mode": "Kennzeichenfarbe",
+          "seasonal": "Saisonkennzeichen",
+          "season_start_month": "Saisonbeginn Monat",
+          "season_end_month": "Saisonende Monat",
+          "change_plate_enabled": "Wechselkennzeichen",
+          "change_plate_common_text": "Gemeinsamer Wechselkennzeichen-Teil",
+          "change_plate_vehicle_text": "Fahrzeugbezogener Wechselkennzeichen-Teil"
         }
       }
     }
@@ -24,12 +31,18 @@
           "plate": "Kennzeichen",
           "month": "HU-Monat",
           "year": "HU-Jahr",
-          "interval": "Intervall"
+          "interval": "Intervall",
+          "plate_color_mode": "Kennzeichenfarbe",
+          "seasonal": "Saisonkennzeichen",
+          "season_start_month": "Saisonbeginn Monat",
+          "season_end_month": "Saisonende Monat",
+          "change_plate_enabled": "Wechselkennzeichen",
+          "change_plate_common_text": "Gemeinsamer Wechselkennzeichen-Teil",
+          "change_plate_vehicle_text": "Fahrzeugbezogener Wechselkennzeichen-Teil"
         }
       }
     }
   },
-  
   "entity": {
     "sensor": {
       "tuev_status": {

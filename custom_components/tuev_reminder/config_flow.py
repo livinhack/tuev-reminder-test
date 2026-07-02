@@ -11,7 +11,27 @@ from .const import (
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
+    CONF_PLATE_COLOR_MODE,
+    CONF_SEASONAL,
+    CONF_SEASON_START_MONTH,
+    CONF_SEASON_END_MONTH,
+    CONF_CHANGE_PLATE_ENABLED,
+    CONF_CHANGE_PLATE_COMMON_TEXT,
+    CONF_CHANGE_PLATE_VEHICLE_TEXT,
+    PLATE_COLOR_STANDARD,
+    PLATE_COLOR_GREEN,
 )
+
+
+def _month_selector():
+    return selector.NumberSelector(
+        selector.NumberSelectorConfig(
+            min=1,
+            max=12,
+            step=1,
+            mode=selector.NumberSelectorMode.BOX,
+        )
+    )
 
 
 def _build_schema(defaults: dict):
@@ -30,14 +50,7 @@ def _build_schema(defaults: dict):
             vol.Required(
                 CONF_MONTH,
                 default=int(defaults.get(CONF_MONTH, datetime.date.today().month)),
-            ): selector.NumberSelector(
-                selector.NumberSelectorConfig(
-                    min=1,
-                    max=12,
-                    step=1,
-                    mode=selector.NumberSelectorMode.BOX,
-                )
-            ),
+            ): _month_selector(),
             vol.Required(
                 CONF_YEAR,
                 default=int(defaults.get(CONF_YEAR, current_year + 1)),
@@ -61,6 +74,42 @@ def _build_schema(defaults: dict):
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             ),
+            vol.Required(
+                CONF_PLATE_COLOR_MODE,
+                default=defaults.get(CONF_PLATE_COLOR_MODE, PLATE_COLOR_STANDARD),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=[
+                        {"value": PLATE_COLOR_STANDARD, "label": "Standard"},
+                        {"value": PLATE_COLOR_GREEN, "label": "Grün"},
+                    ],
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Required(
+                CONF_SEASONAL,
+                default=bool(defaults.get(CONF_SEASONAL, False)),
+            ): selector.BooleanSelector(),
+            vol.Required(
+                CONF_SEASON_START_MONTH,
+                default=int(defaults.get(CONF_SEASON_START_MONTH, 4)),
+            ): _month_selector(),
+            vol.Required(
+                CONF_SEASON_END_MONTH,
+                default=int(defaults.get(CONF_SEASON_END_MONTH, 10)),
+            ): _month_selector(),
+            vol.Required(
+                CONF_CHANGE_PLATE_ENABLED,
+                default=bool(defaults.get(CONF_CHANGE_PLATE_ENABLED, False)),
+            ): selector.BooleanSelector(),
+            vol.Optional(
+                CONF_CHANGE_PLATE_COMMON_TEXT,
+                default=defaults.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""),
+            ): str,
+            vol.Optional(
+                CONF_CHANGE_PLATE_VEHICLE_TEXT,
+                default=defaults.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, ""),
+            ): str,
         }
     )
 

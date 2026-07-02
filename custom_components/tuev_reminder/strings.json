@@ -9,7 +9,14 @@
           "plate": "License plate",
           "month": "Inspection month",
           "year": "Inspection year",
-          "interval": "Interval"
+          "interval": "Interval",
+          "plate_color_mode": "License plate color",
+          "seasonal": "Seasonal license plate",
+          "season_start_month": "Season start month",
+          "season_end_month": "Season end month",
+          "change_plate_enabled": "Changeable license plate",
+          "change_plate_common_text": "Shared change-plate text",
+          "change_plate_vehicle_text": "Vehicle-specific change-plate text"
         }
       }
     }
@@ -24,7 +31,14 @@
           "plate": "License plate",
           "month": "Inspection month",
           "year": "Inspection year",
-          "interval": "Interval"
+          "interval": "Interval",
+          "plate_color_mode": "License plate color",
+          "seasonal": "Seasonal license plate",
+          "season_start_month": "Season start month",
+          "season_end_month": "Season end month",
+          "change_plate_enabled": "Changeable license plate",
+          "change_plate_common_text": "Shared change-plate text",
+          "change_plate_vehicle_text": "Vehicle-specific change-plate text"
         }
       }
     }

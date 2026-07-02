@@ -12,6 +12,15 @@ from .const import (
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
+    CONF_PLATE_COLOR_MODE,
+    CONF_SEASONAL,
+    CONF_SEASON_START_MONTH,
+    CONF_SEASON_END_MONTH,
+    CONF_CHANGE_PLATE_ENABLED,
+    CONF_CHANGE_PLATE_COMMON_TEXT,
+    CONF_CHANGE_PLATE_VEHICLE_TEXT,
+    PLATE_COLOR_STANDARD,
+    PLATE_COLOR_MODES,
 )
 
 from .helpers import (
@@ -82,6 +91,45 @@ class TuevSensor(SensorEntity):
         return int(self.data.get(CONF_INTERVAL, 2))
 
     @property
+    def plate_color_mode(self):
+        value = self.data.get(CONF_PLATE_COLOR_MODE, PLATE_COLOR_STANDARD)
+        if value not in PLATE_COLOR_MODES:
+            return PLATE_COLOR_STANDARD
+        return value
+
+    @property
+    def seasonal(self):
+        return bool(self.data.get(CONF_SEASONAL, False))
+
+    @property
+    def season_start_month(self):
+        if not self.seasonal:
+            return None
+        return int(self.data.get(CONF_SEASON_START_MONTH, 4))
+
+    @property
+    def season_end_month(self):
+        if not self.seasonal:
+            return None
+        return int(self.data.get(CONF_SEASON_END_MONTH, 10))
+
+    @property
+    def change_plate_enabled(self):
+        return bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
+
+    @property
+    def change_plate_common_text(self):
+        if not self.change_plate_enabled:
+            return ""
+        return str(self.data.get(CONF_CHANGE_PLATE_COMMON_TEXT, "")).strip()
+
+    @property
+    def change_plate_vehicle_text(self):
+        if not self.change_plate_enabled:
+            return ""
+        return str(self.data.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, "")).strip()
+
+    @property
     def name(self):
         return f"{self.vehicle_name} TÜV"
 
@@ -121,4 +169,11 @@ class TuevSensor(SensorEntity):
             "expired_date": expired_date.isoformat(),
             "status": self.status,
             "blurred": is_blurred(self.year, self.month),
+            "plate_color_mode": self.plate_color_mode,
+            "seasonal": self.seasonal,
+            "season_start_month": self.season_start_month,
+            "season_end_month": self.season_end_month,
+            "change_plate_enabled": self.change_plate_enabled,
+            "change_plate_common_text": self.change_plate_common_text,
+            "change_plate_vehicle_text": self.change_plate_vehicle_text,
         }
