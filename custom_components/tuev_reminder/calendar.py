@@ -13,7 +13,11 @@ from .const import (
     CONF_YEAR,
     CONF_INTERVAL,
     CONF_PLATE_SUFFIX,
+    CONF_PLATE_SUFFIX_H,
+    CONF_PLATE_SUFFIX_E,
     PLATE_SUFFIX_NONE,
+    PLATE_SUFFIX_H,
+    PLATE_SUFFIX_E,
 )
 
 from .helpers import (
@@ -99,9 +103,13 @@ class TuevReminderCalendar(CalendarEntity):
         }
 
         vehicle_name = data.get(CONF_VEHICLE_NAME, entry.title)
+        legacy_suffix = str(data.get(CONF_PLATE_SUFFIX, "")).upper()
+        suffix_h = bool(data.get(CONF_PLATE_SUFFIX_H, False)) or PLATE_SUFFIX_H in legacy_suffix
+        suffix_e = bool(data.get(CONF_PLATE_SUFFIX_E, False)) or PLATE_SUFFIX_E in legacy_suffix
+        suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}" or PLATE_SUFFIX_NONE
         plate = build_plate_with_suffix(
             data.get(CONF_PLATE, ""),
-            data.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE),
+            suffix,
         )
         month = int(data.get(CONF_MONTH, 1))
         year = int(data.get(CONF_YEAR, 2026))

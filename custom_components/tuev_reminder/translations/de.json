@@ -11,11 +11,10 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Gib die Kennzeichendaten passend zum gewählten Typ ein. Leerzeichen bleiben für den Card-Renderer erhalten. H und E können unabhängig gesetzt werden.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H und E können unabhängig gewählt werden.",
         "data": {
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
-          "season_end_month": "Saisonende Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
           "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
           "plate_suffix_h": "H-Kennzeichen",
@@ -29,6 +28,13 @@
           "month": "HU-Monat",
           "year": "HU-Jahr",
           "interval": "Intervall"
+        }
+      },
+      "season_end": {
+        "title": "Saisonende",
+        "description": "Nur gesetzlich zulässige Saisonenden werden angeboten: mindestens 2 und höchstens 11 Monate.",
+        "data": {
+          "season_end_month": "Saisonende"
         }
       }
     },
@@ -51,11 +57,10 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Passe die Kennzeichendaten passend zum gewählten Typ an. Leerzeichen bleiben für den Card-Renderer erhalten. H und E können unabhängig gesetzt werden.",
+        "description": "Kennzeichendaten aktualisieren. Leerzeichen bleiben für die Card erhalten. H und E können unabhängig gewählt werden.",
         "data": {
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
-          "season_end_month": "Saisonende Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
           "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
           "plate_suffix_h": "H-Kennzeichen",
@@ -69,6 +74,13 @@
           "month": "HU-Monat",
           "year": "HU-Jahr",
           "interval": "Intervall"
+        }
+      },
+      "season_end": {
+        "title": "Saisonende",
+        "description": "Nur zulässige Saisonenden werden angeboten: mindestens 2 und höchstens 11 Monate.",
+        "data": {
+          "season_end_month": "Saisonende"
         }
       }
     },

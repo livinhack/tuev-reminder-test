@@ -38,7 +38,7 @@ from .const import (
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
 )
-from .helpers import build_change_plate_text, normalize_plate_text
+from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
 
 
 PLATE_KIND_OPTIONS = [
@@ -73,6 +73,15 @@ def _month_select_selector(options=None):
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     )
+
+
+def _int_or_default(value: object, default: int) -> int:
+    try:
+        if value is None:
+            return default
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _season_end_month_options(start_month: int):
@@ -208,26 +217,33 @@ def _plate_schema(defaults: dict, kind: str):
     ] = bool
 
     if kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL}:
-        start_default = int(defaults.get(CONF_SEASON_START_MONTH, 4))
-        end_default = int(defaults.get(CONF_SEASON_END_MONTH, 10))
-        valid_end_options = _season_end_month_options(start_default)
-        valid_end_values = {option["value"] for option in valid_end_options}
-        if str(end_default) not in valid_end_values:
-            end_default = int(valid_end_options[0]["value"])
+        start_default = _int_or_default(defaults.get(CONF_SEASON_START_MONTH), 4)
         schema[
             vol.Required(
                 CONF_SEASON_START_MONTH,
                 default=str(start_default),
             )
         ] = _month_select_selector()
-        schema[
+
+    return vol.Schema(schema)
+
+
+def _season_end_schema(defaults: dict):
+    start_month = _int_or_default(defaults.get(CONF_SEASON_START_MONTH), 4)
+    end_default = _int_or_default(defaults.get(CONF_SEASON_END_MONTH), 10)
+    valid_end_options = _season_end_month_options(start_month)
+    valid_end_values = {option["value"] for option in valid_end_options}
+    if str(end_default) not in valid_end_values:
+        end_default = int(valid_end_options[0]["value"])
+
+    return vol.Schema(
+        {
             vol.Required(
                 CONF_SEASON_END_MONTH,
                 default=str(end_default),
-            )
-        ] = _month_select_selector(valid_end_options)
-
-    return vol.Schema(schema)
+            ): _month_select_selector(valid_end_options),
+        }
+    )
 
 
 def _due_schema(defaults: dict):
@@ -302,12 +318,10 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = ""
 
     if flags[CONF_SEASONAL]:
-        start_month = int(user_input.get(CONF_SEASON_START_MONTH, 4))
-        end_month = int(user_input.get(CONF_SEASON_END_MONTH, 10))
-        if not _is_valid_season_range(start_month, end_month):
-            errors[CONF_SEASON_END_MONTH] = "invalid_season_range"
-        normalized[CONF_SEASON_START_MONTH] = start_month
-        normalized[CONF_SEASON_END_MONTH] = end_month
+        normalized[CONF_SEASON_START_MONTH] = _int_or_default(
+            user_input.get(CONF_SEASON_START_MONTH),
+            4,
+        )
     else:
         normalized[CONF_SEASON_START_MONTH] = None
         normalized[CONF_SEASON_END_MONTH] = None
@@ -315,9 +329,24 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     return errors, normalized
 
 
+def _validate_and_normalize_season_end_data(defaults: dict, user_input: dict) -> tuple[dict, dict]:
+    errors = {}
+    start_month = _int_or_default(defaults.get(CONF_SEASON_START_MONTH), 4)
+    end_month = _int_or_default(user_input.get(CONF_SEASON_END_MONTH), 10)
+
+    if not _is_valid_season_range(start_month, end_month):
+        errors[CONF_SEASON_END_MONTH] = "invalid_season_range"
+
+    return errors, {CONF_SEASON_END_MONTH: end_month}
+
+
 def _entry_title(values: dict) -> str:
     vehicle_name = values.get(CONF_VEHICLE_NAME, "Fahrzeug")
-    plate = values.get(CONF_PLATE, "")
+    suffix_h, suffix_e = _suffix_flags_from_values(values)
+    plate = build_plate_with_suffix(
+        values.get(CONF_PLATE, ""),
+        _build_suffix_summary(suffix_h, suffix_e),
+    )
     return f"{vehicle_name} ({plate})" if plate else vehicle_name
 
 
@@ -356,11 +385,28 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
             if not errors:
                 self._data.update(normalized)
+                if self._data.get(CONF_SEASONAL):
+                    return await self.async_step_season_end()
                 return await self.async_step_due()
 
         return self.async_show_form(
             step_id="plate",
             data_schema=_plate_schema({**self._data, **(user_input or {})}, kind),
+            errors=errors,
+        )
+
+    async def async_step_season_end(self, user_input=None):
+        errors = {}
+
+        if user_input is not None:
+            errors, normalized = _validate_and_normalize_season_end_data(self._data, user_input)
+            if not errors:
+                self._data.update(normalized)
+                return await self.async_step_due()
+
+        return self.async_show_form(
+            step_id="season_end",
+            data_schema=_season_end_schema({**self._data, **(user_input or {})}),
             errors=errors,
         )
 
@@ -424,11 +470,28 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
             errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
             if not errors:
                 self._data.update(normalized)
+                if self._data.get(CONF_SEASONAL):
+                    return await self.async_step_season_end()
                 return await self.async_step_due()
 
         return self.async_show_form(
             step_id="plate",
             data_schema=_plate_schema({**self._data, **(user_input or {})}, kind),
+            errors=errors,
+        )
+
+    async def async_step_season_end(self, user_input=None):
+        errors = {}
+
+        if user_input is not None:
+            errors, normalized = _validate_and_normalize_season_end_data(self._data, user_input)
+            if not errors:
+                self._data.update(normalized)
+                return await self.async_step_due()
+
+        return self.async_show_form(
+            step_id="season_end",
+            data_schema=_season_end_schema({**self._data, **(user_input or {})}),
             errors=errors,
         )
 

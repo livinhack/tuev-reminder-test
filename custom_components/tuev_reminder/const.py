@@ -6,7 +6,7 @@ CONF_MONTH = "month"
 CONF_YEAR = "year"
 CONF_INTERVAL = "interval"
 
-# r005: one UI selector for the common user-facing plate type.
+# r006: one UI selector for the common user-facing plate type.
 CONF_PLATE_KIND = "plate_kind"
 PLATE_KIND_STANDARD = "standard"
 PLATE_KIND_SEASONAL = "seasonal"
@@ -30,7 +30,7 @@ PLATE_FORMATS = [
     PLATE_FORMAT_CHANGE,
 ]
 
-# Compatibility/renderer-facing suffix summary. r005 uses the two boolean
+# Compatibility/renderer-facing suffix summary. r006 uses the two boolean
 # input flags below so H and E can be selected independently.
 CONF_PLATE_SUFFIX = "plate_suffix"
 CONF_PLATE_SUFFIX_H = "plate_suffix_h"

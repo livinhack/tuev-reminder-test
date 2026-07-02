@@ -34,6 +34,8 @@ from .const import (
     PLATE_FORMAT_CHANGE,
     PLATE_FORMATS,
     PLATE_SUFFIX_NONE,
+    PLATE_SUFFIX_H,
+    PLATE_SUFFIX_E,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
@@ -243,7 +245,12 @@ class TuevSensor(SensorEntity):
 
         return {
             "vehicle_name": self.vehicle_name,
-            "plate": self.plate,
+            # Keep the legacy Card bridge intact: Card b354 reads the `plate`
+            # attribute directly and does not yet know the structured suffix
+            # booleans. Therefore `plate` remains the full display plate,
+            # while `plate_base` carries the suffix-free base text.
+            "plate": self.plate_display,
+            "plate_base": self.plate,
             "plate_display": self.plate_display,
             "month": self.month,
             "year": self.year,

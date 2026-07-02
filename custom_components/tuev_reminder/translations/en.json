@@ -11,11 +11,10 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Enter the license plate data for the selected type. Spaces are preserved for the card renderer. H and E can be selected independently.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. H and E can be selected independently.",
         "data": {
           "plate": "License plate",
           "season_start_month": "Season start month",
-          "season_end_month": "Season end month",
           "change_plate_common_text": "Shared change-plate part",
           "change_plate_vehicle_digit": "Vehicle-specific digit",
           "plate_suffix_h": "H suffix",
@@ -29,6 +28,13 @@
           "month": "Inspection month",
           "year": "Inspection year",
           "interval": "Interval"
+        }
+      },
+      "season_end": {
+        "title": "Season end",
+        "description": "Only legally valid season ends are offered: at least 2 and at most 11 months.",
+        "data": {
+          "season_end_month": "Season end month"
         }
       }
     },
@@ -51,11 +57,10 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Update the license plate data for the selected type. Spaces are preserved for the card renderer. H and E can be selected independently.",
+        "description": "Update the license plate data. Spaces are preserved for the card. H and E can be selected independently.",
         "data": {
           "plate": "License plate",
           "season_start_month": "Season start month",
-          "season_end_month": "Season end month",
           "change_plate_common_text": "Shared change-plate part",
           "change_plate_vehicle_digit": "Vehicle-specific digit",
           "plate_suffix_h": "H suffix",
@@ -69,6 +74,13 @@
           "month": "Inspection month",
           "year": "Inspection year",
           "interval": "Interval"
+        }
+      },
+      "season_end": {
+        "title": "Season end",
+        "description": "Only valid season ends are offered: at least 2 and at most 11 months.",
+        "data": {
+          "season_end_month": "Season end month"
         }
       }
     },

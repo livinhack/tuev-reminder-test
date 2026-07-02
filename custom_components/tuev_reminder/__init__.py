@@ -12,15 +12,42 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import (
     DOMAIN,
+    CONF_VEHICLE_NAME,
+    CONF_PLATE,
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
+    CONF_PLATE_SUFFIX,
+    CONF_PLATE_SUFFIX_H,
+    CONF_PLATE_SUFFIX_E,
+    PLATE_SUFFIX_NONE,
+    PLATE_SUFFIX_H,
+    PLATE_SUFFIX_E,
     SERVICE_CONFIRM_PASSED,
 )
+from .helpers import build_plate_with_suffix
 
 PLATFORMS = ["sensor", "calendar"]
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _coerce_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
+    return bool(value)
+
+
+def _entry_title_from_values(values: dict, fallback: str = "Fahrzeug") -> str:
+    vehicle_name = values.get(CONF_VEHICLE_NAME, fallback)
+    legacy_suffix = str(values.get(CONF_PLATE_SUFFIX, "")).upper()
+    suffix_h = _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)) or PLATE_SUFFIX_H in legacy_suffix
+    suffix_e = _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)) or PLATE_SUFFIX_E in legacy_suffix
+    suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}" or PLATE_SUFFIX_NONE
+    plate = build_plate_with_suffix(values.get(CONF_PLATE, ""), suffix)
+    return f"{vehicle_name} ({plate})" if plate else vehicle_name
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -110,6 +137,14 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    current_values = {
+        **entry.data,
+        **entry.options,
+    }
+    current_title = _entry_title_from_values(current_values, entry.title)
+    if current_title != entry.title:
+        hass.config_entries.async_update_entry(entry, title=current_title)
+
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

@@ -1,3 +1,3 @@
-Reminder r005
-Suffix Checkboxes + Season Month Guard
+Reminder r006
+Card Bridge Suffix + Cascaded Season End Fix
 Card baseline reference: Card b354

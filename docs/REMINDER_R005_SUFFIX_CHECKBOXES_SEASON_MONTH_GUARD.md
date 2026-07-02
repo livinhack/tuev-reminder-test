@@ -1,6 +1,6 @@
-# Reminder r005 – Suffix Checkboxes + Season Month Guard
+# Reminder r006 – Card Bridge Suffix + Cascaded Season End Fix
 
-r005 refines the r004 cascaded single-field plate setup flow.
+r006 refines the r004 cascaded single-field plate setup flow.
 
 ## Changes
 

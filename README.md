@@ -1,28 +1,36 @@
-# TÜV Reminder – Reminder r005
+# TÜV Reminder – Reminder r006
 
-Reminder r005 is the current Reminder-side working stand. The Card remains a separate project; the current Card baseline is **Card b354**.
+Reminder r006 is the current Reminder-side working stand. The Card remains a separate project; the current Card baseline is **Card b354**.
 
-## r005 focus
+## r006 focus
 
-**Suffix Checkboxes + Season Month Guard**
+**Card Bridge Suffix + Cascaded Season End Fix**
 
-r005 refines the r004 cascaded single-field plate setup flow:
+r006 is a corrective follow-up to r005 after the HA test:
 
-1. Vehicle name + plate kind
-2. Plate data for the selected kind
-3. HU month/year/interval
+- Sensor availability/Card bridge repaired.
+- H/E suffix now reaches the legacy Card via the existing `plate` attribute.
+- Device/config-entry titles include the H/E suffix again.
+- Seasonal end month is moved into its own cascaded step so invalid end months can be blocked based on the already selected start month.
 
-For normal, green and seasonal plates, the user still enters one plate field, for example:
+## Card bridge compatibility
+
+Card b354 still reads the existing `plate` attribute. Therefore r006 keeps that bridge compatible:
 
 ```text
-WIL AB 123
+plate: "TR EI 100E"
+plate_base: "TR EI 100"
+plate_display: "TR EI 100E"
+plate_suffix_h: false
+plate_suffix_e: true
+plate_suffix: "E"
 ```
 
-Spaces are preserved. The Reminder does not normalize this to `WILAB123`.
+`plate_base` is the suffix-free base text for future structured Card mapping. `plate` remains the full display value for the current Card.
 
 ## H/E suffixes
 
-H and E are now independent checkbox-style boolean fields:
+H and E remain independent checkbox-style boolean fields:
 
 ```text
 plate_suffix_h: true | false
@@ -35,17 +43,28 @@ The compatibility summary remains:
 plate_suffix: none | H | E | HE
 ```
 
-The old free-text suffix validation path was removed because there is no free suffix text to validate anymore.
+No free-text suffix validation exists; there is no user-entered suffix text to validate.
 
 ## Seasonal plates
 
-Season start/end are selected via dropdowns. End-month options are constrained so the selected/default start month can only produce a 2–11 month season. Validation still enforces the same rule as a safety net.
+The seasonal flow is now cascaded:
+
+```text
+plate step:
+  season_start_month
+
+season_end step:
+  season_end_month dropdown filtered from selected season_start_month
+```
+
+That means the UI can actually hide invalid 1-month and 12-month seasons instead of only catching them afterward. The 2–11 month validation remains as a safety net.
 
 ## Current sensor attributes
 
 ```text
 vehicle_name
 plate
+plate_base
 plate_display
 month
 year
@@ -71,9 +90,9 @@ change_plate_vehicle_digit
 change_plate_vehicle_text
 ```
 
-## Not included in r005
+## Not included in r006
 
-- No Card mapping.
+- No Card code changes.
 - No renderer changes.
 - No calendar-v3 changes.
 - No local-calendar sync.

@@ -84,11 +84,16 @@ def build_change_plate_text(common_text: object, vehicle_digit: object) -> str:
 
 
 def build_plate_with_suffix(plate: object, suffix: object) -> str:
-    """Return a display string with H/E suffix appended for human text contexts."""
+    """Return a display plate with H/E appended to the final plate block.
+
+    German H/E suffixes are part of the visible plate string, not a separate
+    renderer block. Keeping them directly attached preserves the legacy Card
+    bridge, e.g. ``TR EI 100`` + ``E`` -> ``TR EI 100E``.
+    """
     normalized = normalize_plate_text(plate)
     suffix_text = str(suffix or PLATE_SUFFIX_NONE).strip().upper()
 
     if not suffix_text or suffix_text == PLATE_SUFFIX_NONE:
         return normalized
 
-    return normalize_plate_text(f"{normalized} {suffix_text}")
+    return f"{normalized}{suffix_text}" if normalized else suffix_text
