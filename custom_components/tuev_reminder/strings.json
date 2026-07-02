@@ -3,10 +3,11 @@
     "step": {
       "user": {
         "title": "Add vehicle",
-        "description": "First choose the vehicle name and license plate type.",
+        "description": "First choose the vehicle name, license plate type and plate format. Invalid combinations are marked when continuing.",
         "data": {
           "vehicle_name": "Vehicle name",
-          "plate_kind": "License plate type"
+          "plate_kind": "License plate type",
+          "plate_format": "License plate format"
         }
       },
       "plate": {
@@ -43,17 +44,20 @@
       "required": "This field is required.",
       "invalid_plate_kind": "Invalid license plate type.",
       "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
-      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months."
+      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months.",
+      "invalid_plate_format": "Invalid license plate format.",
+      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Edit vehicle",
-        "description": "First edit the vehicle name and license plate type.",
+        "description": "First edit the vehicle name, license plate type and plate format. Invalid combinations are marked when continuing.",
         "data": {
           "vehicle_name": "Vehicle name",
-          "plate_kind": "License plate type"
+          "plate_kind": "License plate type",
+          "plate_format": "License plate format"
         }
       },
       "plate": {
@@ -90,7 +94,9 @@
       "required": "This field is required.",
       "invalid_plate_kind": "Invalid license plate type.",
       "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
-      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months."
+      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months.",
+      "invalid_plate_format": "Invalid license plate format.",
+      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type."
     }
   },
   "entity": {

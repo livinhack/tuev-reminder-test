@@ -21,14 +21,24 @@ PLATE_KINDS = [
     PLATE_KIND_GREEN_SEASONAL,
 ]
 
-# Renderer-facing normalized/derived attributes.
+# Renderer-facing plate display format. r008: this is no longer the
+# standard/change technical discriminator; change plates are identified by
+# plate_kind/change_plate_enabled.
 CONF_PLATE_FORMAT = "plate_format"
-PLATE_FORMAT_STANDARD = "standard"
-PLATE_FORMAT_CHANGE = "change"
+PLATE_FORMAT_SINGLE_LINE = "single_line"
+PLATE_FORMAT_TWO_LINE = "two_line"
+PLATE_FORMAT_SMALL_TWO_LINE = "small_two_line"
+PLATE_FORMAT_MOTORCYCLE = "motorcycle"
 PLATE_FORMATS = [
-    PLATE_FORMAT_STANDARD,
-    PLATE_FORMAT_CHANGE,
+    PLATE_FORMAT_SINGLE_LINE,
+    PLATE_FORMAT_TWO_LINE,
+    PLATE_FORMAT_SMALL_TWO_LINE,
+    PLATE_FORMAT_MOTORCYCLE,
 ]
+
+# r004-r007 legacy values. Kept so existing entries do not break when read.
+LEGACY_PLATE_FORMAT_STANDARD = "standard"
+LEGACY_PLATE_FORMAT_CHANGE = "change"
 
 # Compatibility/renderer-facing suffix summary. r007 uses the two boolean
 # input flags below so H and E can be selected independently.

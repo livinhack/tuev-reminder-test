@@ -30,9 +30,10 @@ from .const import (
     PLATE_KIND_CHANGE,
     PLATE_KIND_GREEN,
     PLATE_KIND_GREEN_SEASONAL,
-    PLATE_FORMAT_STANDARD,
-    PLATE_FORMAT_CHANGE,
+    PLATE_FORMAT_SINGLE_LINE,
     PLATE_FORMATS,
+    LEGACY_PLATE_FORMAT_STANDARD,
+    LEGACY_PLATE_FORMAT_CHANGE,
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
@@ -137,7 +138,9 @@ class TuevSensor(SensorEntity):
         value = self.data.get(CONF_PLATE_FORMAT)
         if value in PLATE_FORMATS:
             return value
-        return PLATE_FORMAT_CHANGE if self.change_plate_enabled else PLATE_FORMAT_STANDARD
+        if value in {LEGACY_PLATE_FORMAT_STANDARD, LEGACY_PLATE_FORMAT_CHANGE}:
+            return PLATE_FORMAT_SINGLE_LINE
+        return PLATE_FORMAT_SINGLE_LINE
 
     @property
     def plate(self):
@@ -214,9 +217,13 @@ class TuevSensor(SensorEntity):
 
     @property
     def change_plate_enabled(self):
+        # r008: plate_format describes the visual plate layout. Change plates
+        # are identified by the explicit kind/flag. The legacy r004-r007 value
+        # plate_format="change" is still accepted for older stored entries.
         return (
-            self.data.get(CONF_PLATE_FORMAT) == PLATE_FORMAT_CHANGE
+            self.data.get(CONF_PLATE_KIND) == PLATE_KIND_CHANGE
             or bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
+            or self.data.get(CONF_PLATE_FORMAT) == LEGACY_PLATE_FORMAT_CHANGE
         )
 
     @property

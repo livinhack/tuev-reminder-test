@@ -76,10 +76,10 @@ for text, label in [(strings, "strings"), (translations_de, "German translations
     ]:
         assert_contains(text, key, label)
 
-assert_contains(manifest, '"version": "0.1.0-r007"', "manifest version")
-assert_contains(readme, "Reminder r007", "README r007 documentation")
-assert_contains(handover, "Reminder r007", "handover r007 documentation")
+assert_contains(manifest, '"version": "0.1.0-r008"', "manifest version")
+assert_contains(readme, "Reminder r008", "README r008 documentation")
+assert_contains(handover, "Reminder r008", "handover r008 documentation")
 assert_contains(readme, "Leerzeichen", "README spacing decision")
 assert_contains(handover, "Card b354", "Card baseline reference")
 
-print("r004 cascaded single-field flow compatibility check OK under r007")
+print("r004 cascaded single-field flow compatibility check OK under r008")

@@ -1,75 +1,45 @@
-# Handover – Reminder r007
+# Handover – Reminder r008 Plate Format Validation in Vehicle Step
 
-Current Reminder stand: **r007 – Suffix State Reset + Single-Step Season Fix**.
+Current Reminder stand: **r008**.
 
-Card baseline remains: **Card b354**.
+Card baseline reference: **Card b354**. Card and Reminder are separate projects with separate versioning.
 
-## Why r007 exists
+## What changed in r008
 
-The r006 HA test showed these regressions:
-
-1. `plate_suffix: "none"` was handled incorrectly and could be appended as visible `NONE`.
-2. The substring check treated `none` as an E suffix because it contains the letter `e`.
-3. Unchecking H/E in the edit dialog could be overridden by the legacy suffix summary.
-4. Green plate types still offered H/E fields, which should not be possible in this flow.
-5. The extra season-end cascade was undesirable. Season validation should work without that additional step.
-6. Green/seasonal values are stored by the Reminder but not yet visible in Card b354 because Card mapping is still missing.
-
-## Fixed in r007
-
-- `build_plate_with_suffix()` treats `none` case-insensitively as no suffix.
-- Legacy suffix interpretation now uses exact values only: `H`, `E`, `HE`, `EH`.
-- Boolean suffix fields are canonical when present, so edit-dialog unchecks persist.
-- Green and green-seasonal plate types hide H/E in the plate step and reset both booleans to `false`.
-- Sensor-side suffix properties suppress H/E for green plate mode as a safety net.
-- Season start and end are back in the same plate step.
-- The 2–11 month season rule is validated on submit.
-- Card b354 bridge remains intact: `plate` is full display value, `plate_base` is suffix-free.
+- Added `plate_format` to the first Config/Options flow step, directly below `plate_kind`.
+- The flow remains three steps:
+  1. vehicle name + plate type + plate format
+  2. plate details
+  3. HU due data
+- Added plate display format values:
+  - `single_line`
+  - `two_line`
+  - `small_two_line`
+  - `motorcycle`
+- Added central type/format validation.
+- Invalid combinations stay in step 1 and show an error on `plate_format`.
+- Current restriction: `change` plates allow only `single_line` and `two_line`.
+- r004-r007 legacy `plate_format` values `standard`/`change` are accepted as read fallback and map to `single_line`.
 
 ## Preserved
 
-- Cascaded setup remains at the high level:
-  - vehicle/type
-  - plate data
-  - HU data
-- Single plate field for normal/green/seasonal plates.
-- Spaces in plate text are preserved.
-- Wechselkennzeichen keeps:
-  - `change_plate_common_text`
-  - `change_plate_vehicle_digit`
-  - compatibility alias `change_plate_vehicle_text`
-- No free-text suffix validation branch exists.
+- r007 suffix reset fix.
+- r007 single-step season validation.
+- r006 Card b354 bridge: `plate` is full display string; `plate_base` is suffix-free.
+- Green plate types hide and reset H/E fields.
+- Season ranges must cover at least 2 and at most 11 months.
 
-## Not changed
-
-- No Card code changes.
-- No renderer changes.
-- No calendar-v3 changes.
-- No local-calendar sync.
-- No Sidebar/Manager UI.
-- No area-code autocomplete yet.
-
-## Test focus in HA
-
-- New vehicle without H/E must not show `NONE`.
-- `plate_suffix: none` must not create E.
-- Existing E/H vehicle: uncheck suffix in edit dialog, save, reload; suffix disappears.
-- Green and green-seasonal vehicle: H/E fields are not shown and stored suffix flags are false.
-- Seasonal vehicle: invalid 1-month and 12-month ranges show validation error on the plate step.
-- Sensor is available, not unavailable.
-- Card b354 still sees the suffix through attribute `plate` for non-green H/E vehicles.
-
-## Next required separate Card work
-
-Reminder r007 exposes the attributes, but Card b354 does not yet render green/seasonal/structured Reminder attributes. Next Card artifact should be:
+## Sensor attributes relevant for the future Card mapping
 
 ```text
-Card b355 = Reminder Attribute Mapping
-```
-
-That Card step should map:
-
-```text
+plate
+plate_base
+plate_display
+plate_kind
+plate_format
+plate_suffix
+plate_suffix_h
+plate_suffix_e
 plate_color_mode
 seasonal
 season_start_month
@@ -77,6 +47,32 @@ season_end_month
 change_plate_enabled
 change_plate_common_text
 change_plate_vehicle_digit
-plate_suffix_h
-plate_suffix_e
+change_plate_vehicle_text
 ```
+
+## Not changed
+
+- no Card change
+- no renderer mapping
+- no calendar-v3 change
+- no `local_calendar` sync
+- no Sidebar/Manager UI
+- no Area-Code autocomplete list
+
+## Next likely step
+
+After r008 is verified in HA, the next Reminder-side option is either:
+
+```text
+r009 = Area Code Autocomplete List
+```
+
+or we switch to the Card project:
+
+```text
+Card b355 = Reminder Attribute Mapping
+```
+
+## r007 compatibility note
+
+The r007 NONE fix is preserved: `plate_suffix: "none"` is not appended to the visible plate and is not interpreted as E.

@@ -30,8 +30,13 @@ from .const import (
     PLATE_KIND_GREEN,
     PLATE_KIND_GREEN_SEASONAL,
     PLATE_KINDS,
-    PLATE_FORMAT_STANDARD,
-    PLATE_FORMAT_CHANGE,
+    PLATE_FORMAT_SINGLE_LINE,
+    PLATE_FORMAT_TWO_LINE,
+    PLATE_FORMAT_SMALL_TWO_LINE,
+    PLATE_FORMAT_MOTORCYCLE,
+    PLATE_FORMATS,
+    LEGACY_PLATE_FORMAT_STANDARD,
+    LEGACY_PLATE_FORMAT_CHANGE,
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
@@ -48,6 +53,44 @@ PLATE_KIND_OPTIONS = [
     {"value": PLATE_KIND_GREEN, "label": "Grünes Kennzeichen"},
     {"value": PLATE_KIND_GREEN_SEASONAL, "label": "Grünes Kennzeichen + Saison"},
 ]
+
+PLATE_FORMAT_OPTIONS = [
+    {"value": PLATE_FORMAT_SINGLE_LINE, "label": "Einzeilig"},
+    {"value": PLATE_FORMAT_TWO_LINE, "label": "Zweizeilig"},
+    {"value": PLATE_FORMAT_SMALL_TWO_LINE, "label": "Verkleinert zweizeilig"},
+    {"value": PLATE_FORMAT_MOTORCYCLE, "label": "Motorrad"},
+]
+
+PLATE_FORMATS_BY_KIND = {
+    PLATE_KIND_STANDARD: {
+        PLATE_FORMAT_SINGLE_LINE,
+        PLATE_FORMAT_TWO_LINE,
+        PLATE_FORMAT_SMALL_TWO_LINE,
+        PLATE_FORMAT_MOTORCYCLE,
+    },
+    PLATE_KIND_SEASONAL: {
+        PLATE_FORMAT_SINGLE_LINE,
+        PLATE_FORMAT_TWO_LINE,
+        PLATE_FORMAT_SMALL_TWO_LINE,
+        PLATE_FORMAT_MOTORCYCLE,
+    },
+    PLATE_KIND_GREEN: {
+        PLATE_FORMAT_SINGLE_LINE,
+        PLATE_FORMAT_TWO_LINE,
+        PLATE_FORMAT_SMALL_TWO_LINE,
+        PLATE_FORMAT_MOTORCYCLE,
+    },
+    PLATE_KIND_GREEN_SEASONAL: {
+        PLATE_FORMAT_SINGLE_LINE,
+        PLATE_FORMAT_TWO_LINE,
+        PLATE_FORMAT_SMALL_TWO_LINE,
+        PLATE_FORMAT_MOTORCYCLE,
+    },
+    PLATE_KIND_CHANGE: {
+        PLATE_FORMAT_SINGLE_LINE,
+        PLATE_FORMAT_TWO_LINE,
+    },
+}
 
 MONTH_OPTIONS = [
     {"value": str(month), "label": f"{month:02d}"}
@@ -115,15 +158,33 @@ def _derive_plate_kind(values: dict) -> str:
 def _plate_kind_flags(kind: str) -> dict:
     return {
         CONF_PLATE_KIND: kind,
-        CONF_PLATE_FORMAT: PLATE_FORMAT_CHANGE
-        if kind == PLATE_KIND_CHANGE
-        else PLATE_FORMAT_STANDARD,
         CONF_PLATE_COLOR_MODE: PLATE_COLOR_GREEN
         if kind in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL}
         else PLATE_COLOR_STANDARD,
         CONF_SEASONAL: kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL},
         CONF_CHANGE_PLATE_ENABLED: kind == PLATE_KIND_CHANGE,
     }
+
+
+def _allowed_plate_formats_for_kind(kind: str) -> set[str]:
+    return PLATE_FORMATS_BY_KIND.get(kind, set(PLATE_FORMATS))
+
+
+def _derive_plate_format(values: dict, kind: str | None = None) -> str:
+    value = values.get(CONF_PLATE_FORMAT)
+    if value in PLATE_FORMATS:
+        return value
+
+    # r004-r007 compatibility: previous values only described standard/change.
+    # They map to the safest visible format after r008.
+    if value in {LEGACY_PLATE_FORMAT_STANDARD, LEGACY_PLATE_FORMAT_CHANGE}:
+        return PLATE_FORMAT_SINGLE_LINE
+
+    return PLATE_FORMAT_SINGLE_LINE
+
+
+def _validate_plate_format_for_kind(kind: str, plate_format: str) -> bool:
+    return plate_format in _allowed_plate_formats_for_kind(kind)
 
 
 def _season_duration(start_month: int, end_month: int) -> int:
@@ -187,6 +248,15 @@ def _user_schema(defaults: dict):
             ): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=PLATE_KIND_OPTIONS,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Required(
+                CONF_PLATE_FORMAT,
+                default=_derive_plate_format(defaults, _derive_plate_kind(defaults)),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=PLATE_FORMAT_OPTIONS,
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             ),
@@ -314,6 +384,7 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     normalized = {}
     flags = _plate_kind_flags(kind)
     normalized.update(flags)
+    normalized[CONF_PLATE_FORMAT] = _derive_plate_format(user_input, kind)
 
     if _suffix_allowed_for_kind(kind):
         suffix_h = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_H, False))
@@ -398,8 +469,13 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             kind = user_input[CONF_PLATE_KIND]
+            plate_format = user_input[CONF_PLATE_FORMAT]
             if kind not in PLATE_KINDS:
                 errors[CONF_PLATE_KIND] = "invalid_plate_kind"
+            elif plate_format not in PLATE_FORMATS:
+                errors[CONF_PLATE_FORMAT] = "invalid_plate_format"
+            elif not _validate_plate_format_for_kind(kind, plate_format):
+                errors[CONF_PLATE_FORMAT] = "invalid_plate_format_for_kind"
             else:
                 self._data = dict(user_input)
                 return await self.async_step_plate()
@@ -415,7 +491,7 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         kind = self._data.get(CONF_PLATE_KIND, PLATE_KIND_STANDARD)
 
         if user_input is not None:
-            errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
+            errors, normalized = _validate_and_normalize_plate_data(kind, {**self._data, **user_input})
             if not errors:
                 self._data.update(normalized)
                 return await self.async_step_due()
@@ -481,8 +557,13 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
 
         if user_input is not None:
             kind = user_input[CONF_PLATE_KIND]
+            plate_format = user_input[CONF_PLATE_FORMAT]
             if kind not in PLATE_KINDS:
                 errors[CONF_PLATE_KIND] = "invalid_plate_kind"
+            elif plate_format not in PLATE_FORMATS:
+                errors[CONF_PLATE_FORMAT] = "invalid_plate_format"
+            elif not _validate_plate_format_for_kind(kind, plate_format):
+                errors[CONF_PLATE_FORMAT] = "invalid_plate_format_for_kind"
             else:
                 self._data.update(user_input)
                 return await self.async_step_plate()
@@ -498,7 +579,7 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
         kind = self._data.get(CONF_PLATE_KIND, _derive_plate_kind(self._data))
 
         if user_input is not None:
-            errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
+            errors, normalized = _validate_and_normalize_plate_data(kind, {**self._data, **user_input})
             if not errors:
                 self._data.update(normalized)
                 return await self.async_step_due()

@@ -3,10 +3,11 @@
     "step": {
       "user": {
         "title": "Fahrzeug hinzufügen",
-        "description": "Wähle zuerst Fahrzeugname und Kennzeichentyp.",
+        "description": "Wähle zuerst Fahrzeugname, Kennzeichentyp und Kennzeichenformat. Nicht passende Kombinationen werden beim Weitergehen markiert.",
         "data": {
           "vehicle_name": "Fahrzeugname",
-          "plate_kind": "Kennzeichentyp"
+          "plate_kind": "Kennzeichentyp",
+          "plate_format": "Kennzeichenformat"
         }
       },
       "plate": {
@@ -43,17 +44,20 @@
       "required": "Dieses Feld ist erforderlich.",
       "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
-      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
+      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen.",
+      "invalid_plate_format": "Ungültiges Kennzeichenformat.",
+      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Fahrzeug bearbeiten",
-        "description": "Bearbeite zuerst Fahrzeugname und Kennzeichentyp.",
+        "description": "Bearbeite zuerst Fahrzeugname, Kennzeichentyp und Kennzeichenformat. Nicht passende Kombinationen werden beim Weitergehen markiert.",
         "data": {
           "vehicle_name": "Fahrzeugname",
-          "plate_kind": "Kennzeichentyp"
+          "plate_kind": "Kennzeichentyp",
+          "plate_format": "Kennzeichenformat"
         }
       },
       "plate": {
@@ -90,7 +94,9 @@
       "required": "Dieses Feld ist erforderlich.",
       "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
-      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
+      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen.",
+      "invalid_plate_format": "Ungültiges Kennzeichenformat.",
+      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp."
     }
   },
   "entity": {
