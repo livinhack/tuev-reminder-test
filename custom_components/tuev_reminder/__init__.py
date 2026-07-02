@@ -40,11 +40,26 @@ def _coerce_bool(value: object) -> bool:
     return bool(value)
 
 
+def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
+    legacy_suffix = str(value or "").strip().upper()
+    return (
+        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
+        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
+    )
+
+
+def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
+    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
+        return (
+            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
+            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
+        )
+    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
+
+
 def _entry_title_from_values(values: dict, fallback: str = "Fahrzeug") -> str:
     vehicle_name = values.get(CONF_VEHICLE_NAME, fallback)
-    legacy_suffix = str(values.get(CONF_PLATE_SUFFIX, "")).upper()
-    suffix_h = _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)) or PLATE_SUFFIX_H in legacy_suffix
-    suffix_e = _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)) or PLATE_SUFFIX_E in legacy_suffix
+    suffix_h, suffix_e = _suffix_flags_from_values(values)
     suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}" or PLATE_SUFFIX_NONE
     plate = build_plate_with_suffix(values.get(CONF_PLATE, ""), suffix)
     return f"{vehicle_name} ({plate})" if plate else vehicle_name

@@ -93,7 +93,7 @@ def build_plate_with_suffix(plate: object, suffix: object) -> str:
     normalized = normalize_plate_text(plate)
     suffix_text = str(suffix or PLATE_SUFFIX_NONE).strip().upper()
 
-    if not suffix_text or suffix_text == PLATE_SUFFIX_NONE:
+    if not suffix_text or suffix_text == PLATE_SUFFIX_NONE.upper():
         return normalized
 
     return f"{normalized}{suffix_text}" if normalized else suffix_text

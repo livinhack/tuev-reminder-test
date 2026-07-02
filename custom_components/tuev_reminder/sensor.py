@@ -54,6 +54,23 @@ from .helpers import (
 )
 
 
+
+
+def _coerce_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
+    return bool(value)
+
+
+def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
+    legacy_suffix = str(value or "").strip().upper()
+    return (
+        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
+        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
+    )
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -135,13 +152,21 @@ class TuevSensor(SensorEntity):
 
     @property
     def plate_suffix_h(self):
-        legacy_suffix = str(self.data.get(CONF_PLATE_SUFFIX, "")).upper()
-        return bool(self.data.get(CONF_PLATE_SUFFIX_H, False)) or PLATE_SUFFIX_H in legacy_suffix
+        if self.plate_color_mode == PLATE_COLOR_GREEN:
+            return False
+        if CONF_PLATE_SUFFIX_H in self.data or CONF_PLATE_SUFFIX_E in self.data:
+            return _coerce_bool(self.data.get(CONF_PLATE_SUFFIX_H, False))
+        suffix_h, _suffix_e = _legacy_suffix_flags(self.data.get(CONF_PLATE_SUFFIX))
+        return suffix_h
 
     @property
     def plate_suffix_e(self):
-        legacy_suffix = str(self.data.get(CONF_PLATE_SUFFIX, "")).upper()
-        return bool(self.data.get(CONF_PLATE_SUFFIX_E, False)) or PLATE_SUFFIX_E in legacy_suffix
+        if self.plate_color_mode == PLATE_COLOR_GREEN:
+            return False
+        if CONF_PLATE_SUFFIX_H in self.data or CONF_PLATE_SUFFIX_E in self.data:
+            return _coerce_bool(self.data.get(CONF_PLATE_SUFFIX_E, False))
+        _suffix_h, suffix_e = _legacy_suffix_flags(self.data.get(CONF_PLATE_SUFFIX))
+        return suffix_e
 
     @property
     def plate_suffix(self):

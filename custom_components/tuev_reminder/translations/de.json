@@ -11,14 +11,15 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H und E können unabhängig gewählt werden.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
         "data": {
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
           "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
           "plate_suffix_h": "H-Kennzeichen",
-          "plate_suffix_e": "E-Kennzeichen"
+          "plate_suffix_e": "E-Kennzeichen",
+          "season_end_month": "Saisonende"
         }
       },
       "due": {
@@ -57,14 +58,15 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten aktualisieren. Leerzeichen bleiben für die Card erhalten. H und E können unabhängig gewählt werden.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
         "data": {
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
           "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer",
           "plate_suffix_h": "H-Kennzeichen",
-          "plate_suffix_e": "E-Kennzeichen"
+          "plate_suffix_e": "E-Kennzeichen",
+          "season_end_month": "Saisonende"
         }
       },
       "due": {

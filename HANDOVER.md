@@ -1,41 +1,44 @@
-# Handover – Reminder r006
+# Handover – Reminder r007
 
-Current Reminder stand: **r006 – Card Bridge Suffix + Cascaded Season End Fix**.
+Current Reminder stand: **r007 – Suffix State Reset + Single-Step Season Fix**.
 
 Card baseline remains: **Card b354**.
 
-## Why r006 exists
+## Why r007 exists
 
-The r005 HA test showed two real regressions:
+The r006 HA test showed these regressions:
 
-1. The legacy Card handover broke because Card b354 still reads the `plate` attribute, while r005 only exposed the H/E suffix through new structured fields and `plate_display`.
-2. Seasonal end-month blocking could not work correctly inside one form step because the end dropdown was built before the user-selected start month was submitted.
+1. `plate_suffix: "none"` was handled incorrectly and could be appended as visible `NONE`.
+2. The substring check treated `none` as an E suffix because it contains the letter `e`.
+3. Unchecking H/E in the edit dialog could be overridden by the legacy suffix summary.
+4. Green plate types still offered H/E fields, which should not be possible in this flow.
+5. The extra season-end cascade was undesirable. Season validation should work without that additional step.
+6. Green/seasonal values are stored by the Reminder but not yet visible in Card b354 because Card mapping is still missing.
 
-There was also a runtime issue in the sensor suffix properties: the H/E constants were used but not imported, which could make entities unavailable.
+## Fixed in r007
 
-## Fixed in r006
+- `build_plate_with_suffix()` treats `none` case-insensitively as no suffix.
+- Legacy suffix interpretation now uses exact values only: `H`, `E`, `HE`, `EH`.
+- Boolean suffix fields are canonical when present, so edit-dialog unchecks persist.
+- Green and green-seasonal plate types hide H/E in the plate step and reset both booleans to `false`.
+- Sensor-side suffix properties suppress H/E for green plate mode as a safety net.
+- Season start and end are back in the same plate step.
+- The 2–11 month season rule is validated on submit.
+- Card b354 bridge remains intact: `plate` is full display value, `plate_base` is suffix-free.
 
-- Imported missing `PLATE_SUFFIX_H` / `PLATE_SUFFIX_E` in `sensor.py`.
-- `plate` sensor attribute is again the full display plate for Card b354, including suffix.
-- New `plate_base` attribute carries the suffix-free base text.
-- `plate_display` remains full display text.
-- H/E suffix is appended directly to the final plate block, e.g. `TR EI 100` + `E` -> `TR EI 100E`.
-- Config-entry/device title now includes the H/E suffix.
-- Existing entries are title-refreshed during setup when needed.
-- Seasonal end month moved to a separate `season_end` flow step with filtered valid options.
-- The 2–11 month season validation remains as a safety net.
-- No free-text suffix validation branch exists.
+## Preserved
 
-## Preserved from r005/r004
-
-- Cascaded setup flow.
+- Cascaded setup remains at the high level:
+  - vehicle/type
+  - plate data
+  - HU data
 - Single plate field for normal/green/seasonal plates.
 - Spaces in plate text are preserved.
-- H and E are independent checkbox booleans.
 - Wechselkennzeichen keeps:
   - `change_plate_common_text`
   - `change_plate_vehicle_digit`
   - compatibility alias `change_plate_vehicle_text`
+- No free-text suffix validation branch exists.
 
 ## Not changed
 
@@ -48,15 +51,23 @@ There was also a runtime issue in the sensor suffix properties: the H/E constant
 
 ## Test focus in HA
 
-- Existing/new E or H vehicle shows suffix in the integration/device title.
+- New vehicle without H/E must not show `NONE`.
+- `plate_suffix: none` must not create E.
+- Existing E/H vehicle: uncheck suffix in edit dialog, save, reload; suffix disappears.
+- Green and green-seasonal vehicle: H/E fields are not shown and stored suffix flags are false.
+- Seasonal vehicle: invalid 1-month and 12-month ranges show validation error on the plate step.
 - Sensor is available, not unavailable.
-- Card b354 sees the suffix through attribute `plate`.
-- Attribute `plate_base` exists for future structured mapping.
-- Seasonal flow: choose start first, then end dropdown only offers valid 2–11 month ranges.
+- Card b354 still sees the suffix through attribute `plate` for non-green H/E vehicles.
 
-## Attribute compatibility list
+## Next required separate Card work
 
-r006 preserves and documents these Reminder/Card-facing attributes:
+Reminder r007 exposes the attributes, but Card b354 does not yet render green/seasonal/structured Reminder attributes. Next Card artifact should be:
+
+```text
+Card b355 = Reminder Attribute Mapping
+```
+
+That Card step should map:
 
 ```text
 plate_color_mode
@@ -65,7 +76,7 @@ season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
-change_plate_vehicle_text
+change_plate_vehicle_digit
 plate_suffix_h
 plate_suffix_e
 ```

@@ -1,6 +1,6 @@
-# Reminder r006 – Card Bridge Suffix + Cascaded Season End Fix
+# Reminder r007 – Suffix State Reset + Single-Step Season Fix
 
-r006 refines the r004 cascaded single-field plate setup flow.
+r007 refines the r004 cascaded single-field plate setup flow.
 
 ## Changes
 

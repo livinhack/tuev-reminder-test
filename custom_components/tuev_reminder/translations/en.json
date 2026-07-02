@@ -11,14 +11,15 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Enter the license plate data. Spaces are preserved for the card. H and E can be selected independently.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
         "data": {
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",
           "change_plate_vehicle_digit": "Vehicle-specific digit",
           "plate_suffix_h": "H suffix",
-          "plate_suffix_e": "E suffix"
+          "plate_suffix_e": "E suffix",
+          "season_end_month": "Season end month"
         }
       },
       "due": {
@@ -57,14 +58,15 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Update the license plate data. Spaces are preserved for the card. H and E can be selected independently.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
         "data": {
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",
           "change_plate_vehicle_digit": "Vehicle-specific digit",
           "plate_suffix_h": "H suffix",
-          "plate_suffix_e": "E suffix"
+          "plate_suffix_e": "E suffix",
+          "season_end_month": "Season end month"
         }
       },
       "due": {

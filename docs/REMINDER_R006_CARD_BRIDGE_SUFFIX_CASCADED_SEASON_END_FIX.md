@@ -1,6 +1,6 @@
-# Reminder r006 – Card Bridge Suffix + Cascaded Season End Fix
+# Reminder r007 – Suffix State Reset + Single-Step Season Fix
 
-r006 fixes r005 HA-test regressions without changing the Card.
+r007 fixes r005 HA-test regressions without changing the Card.
 
 ## Fixes
 

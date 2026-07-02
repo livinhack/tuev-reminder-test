@@ -143,11 +143,30 @@ def _coerce_bool(value: object) -> bool:
     return bool(value)
 
 
+def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
+    legacy_suffix = str(value or "").strip().upper()
+    return (
+        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
+        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
+    )
+
+
 def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
-    legacy_suffix = str(values.get(CONF_PLATE_SUFFIX, "")).upper()
-    suffix_h = _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)) or "H" in legacy_suffix
-    suffix_e = _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)) or "E" in legacy_suffix
-    return suffix_h, suffix_e
+    # r007: stored boolean fields are canonical when present. Do not OR them
+    # with the legacy summary afterwards, otherwise an old value such as
+    # plate_suffix="E" can never be cleared in the edit dialog. Also avoid the
+    # previous substring bug where "none" accidentally contained "E".
+    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
+        return (
+            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
+            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
+        )
+    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
+
+
+def _suffix_allowed_for_kind(kind: str) -> bool:
+    # User decision: green plates do not expose H/E in this flow.
+    return kind not in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL}
 
 
 def _build_suffix_summary(suffix_h: bool, suffix_e: bool) -> str:
@@ -202,26 +221,34 @@ def _plate_schema(defaults: dict, kind: str):
             )
         ] = str
 
-    suffix_h, suffix_e = _suffix_flags_from_values(defaults)
-    schema[
-        vol.Optional(
-            CONF_PLATE_SUFFIX_H,
-            default=suffix_h,
-        )
-    ] = bool
-    schema[
-        vol.Optional(
-            CONF_PLATE_SUFFIX_E,
-            default=suffix_e,
-        )
-    ] = bool
+    if _suffix_allowed_for_kind(kind):
+        suffix_h, suffix_e = _suffix_flags_from_values(defaults)
+        schema[
+            vol.Optional(
+                CONF_PLATE_SUFFIX_H,
+                default=suffix_h,
+            )
+        ] = bool
+        schema[
+            vol.Optional(
+                CONF_PLATE_SUFFIX_E,
+                default=suffix_e,
+            )
+        ] = bool
 
     if kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL}:
         start_default = _int_or_default(defaults.get(CONF_SEASON_START_MONTH), 4)
+        end_default = _int_or_default(defaults.get(CONF_SEASON_END_MONTH), 10)
         schema[
             vol.Required(
                 CONF_SEASON_START_MONTH,
                 default=str(start_default),
+            )
+        ] = _month_select_selector()
+        schema[
+            vol.Required(
+                CONF_SEASON_END_MONTH,
+                default=str(end_default),
             )
         ] = _month_select_selector()
 
@@ -288,8 +315,12 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     flags = _plate_kind_flags(kind)
     normalized.update(flags)
 
-    suffix_h = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_H, False))
-    suffix_e = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_E, False))
+    if _suffix_allowed_for_kind(kind):
+        suffix_h = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_H, False))
+        suffix_e = _coerce_bool(user_input.get(CONF_PLATE_SUFFIX_E, False))
+    else:
+        suffix_h = False
+        suffix_e = False
     normalized[CONF_PLATE_SUFFIX_H] = suffix_h
     normalized[CONF_PLATE_SUFFIX_E] = suffix_e
     normalized[CONF_PLATE_SUFFIX] = _build_suffix_summary(suffix_h, suffix_e)
@@ -318,10 +349,12 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = ""
 
     if flags[CONF_SEASONAL]:
-        normalized[CONF_SEASON_START_MONTH] = _int_or_default(
-            user_input.get(CONF_SEASON_START_MONTH),
-            4,
-        )
+        start_month = _int_or_default(user_input.get(CONF_SEASON_START_MONTH), 4)
+        end_month = _int_or_default(user_input.get(CONF_SEASON_END_MONTH), 10)
+        normalized[CONF_SEASON_START_MONTH] = start_month
+        normalized[CONF_SEASON_END_MONTH] = end_month
+        if not _is_valid_season_range(start_month, end_month):
+            errors[CONF_SEASON_END_MONTH] = "invalid_season_range"
     else:
         normalized[CONF_SEASON_START_MONTH] = None
         normalized[CONF_SEASON_END_MONTH] = None
@@ -385,8 +418,6 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
             if not errors:
                 self._data.update(normalized)
-                if self._data.get(CONF_SEASONAL):
-                    return await self.async_step_season_end()
                 return await self.async_step_due()
 
         return self.async_show_form(
@@ -470,8 +501,6 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
             errors, normalized = _validate_and_normalize_plate_data(kind, user_input)
             if not errors:
                 self._data.update(normalized)
-                if self._data.get(CONF_SEASONAL):
-                    return await self.async_step_season_end()
                 return await self.async_step_due()
 
         return self.async_show_form(

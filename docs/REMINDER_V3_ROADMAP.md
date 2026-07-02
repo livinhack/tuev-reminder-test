@@ -87,7 +87,7 @@ reminder_offset_days: int
 
 The calendar should be able to show both reminder events and actual HU due events with stable UIDs.
 
-### r006 – Services and data lifecycle
+### r007 – Services and data lifecycle
 
 Keep `confirm_passed` compatible, but make the service behavior explicit and ready for v3 data.
 
@@ -101,7 +101,7 @@ set_vehicle_options
 
 Do not add service complexity before the schema is stable.
 
-### r006/r007 – Card mapping and compatibility
+### r007/r007 – Card mapping and compatibility
 
 Once Reminder attributes are visible in HA, the separate Card project can map them.
 
@@ -161,7 +161,7 @@ The Manager UI is not part of the first v3 implementation because it requires a 
 r002 = Roadmap + architecture + calendar-interface plan
 r003 = Vehicle Plate Options Schema
 r004 = Calendar Interface implementation
-r006 = service/data lifecycle cleanup if needed
+r007 = service/data lifecycle cleanup if needed
 Card b355 = read/mapping of Reminder attributes
 Stack compat note = Card b355 + Reminder r003/r004
 ```
