@@ -15,12 +15,13 @@ def assert_contains(text: str, needle: str, label: str) -> None:
 const = read("custom_components/tuev_reminder/const.py")
 config_flow = read("custom_components/tuev_reminder/config_flow.py")
 sensor = read("custom_components/tuev_reminder/sensor.py")
-strings = read("custom_components/tuev_reminder/strings.json")
-translations_de = read("custom_components/tuev_reminder/translations/de.json")
-translations_en = read("custom_components/tuev_reminder/translations/en.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
+# r004 keeps the r003 runtime attributes and compatibility aliases, but the
+# r003 flat form fields are no longer all visible in strings/translations.
+# The setup UI is now cascaded. This check therefore verifies compatibility of
+# the data model, not the old flat form layout.
 fields = [
     "CONF_PLATE_COLOR_MODE",
     "CONF_SEASONAL",
@@ -43,14 +44,10 @@ attributes = [
 
 for field in fields:
     assert_contains(const, field, "constant")
-    assert_contains(config_flow, field, "config/options field")
     assert_contains(sensor, field, "sensor data source")
 
 for attribute in attributes:
     assert_contains(sensor, f'"{attribute}"', "sensor attribute")
-    assert_contains(strings, f'"{attribute}"', "strings label")
-    assert_contains(translations_de, f'"{attribute}"', "German translation label")
-    assert_contains(translations_en, f'"{attribute}"', "English translation label")
     assert_contains(readme, attribute, "README attribute documentation")
     assert_contains(handover, attribute, "handover attribute documentation")
 
@@ -58,5 +55,6 @@ assert_contains(const, 'PLATE_COLOR_STANDARD = "standard"', "standard plate colo
 assert_contains(const, 'PLATE_COLOR_GREEN = "green"', "green plate color value")
 assert_contains(sensor, "if not self.seasonal:", "seasonal false/null behavior")
 assert_contains(sensor, "if not self.change_plate_enabled:", "change plate disabled behavior")
+assert_contains(config_flow, "_plate_kind_flags", "r004 derived fields replacing flat r003 UI")
 
-print("r003 schema check OK")
+print("r003 compatibility schema check OK under r004")

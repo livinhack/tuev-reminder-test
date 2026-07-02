@@ -1,114 +1,157 @@
-# Handover – TÜV Reminder r003 Vehicle Plate Options Schema
+# Handover – Reminder r004 Cascaded Single-Field Plate Setup Flow
 
-Current Reminder stand: **r003**.
+Current Reminder artifact: **Reminder r004**.
+Current Card compatibility baseline: **Card b354**.
 
-r003 is the first Reminder v3 runtime schema step. It keeps the current one-vehicle-per-device/config-entry model and adds vehicle-specific plate-option fields to the Reminder data model and sensor attributes.
-
-## Versioning rule
-
-- Card and Reminder are separate projects.
-- The Card remains on its own b-series.
-- The Reminder uses its own r-series.
-- Current tested Card baseline: `Card b354`.
-- Current Reminder stand: `Reminder r003`.
-
-## Changed in r003
-
-### Constants
-
-Added:
+Card and Reminder remain separate projects with separate versioning:
 
 ```text
-CONF_PLATE_COLOR_MODE
-CONF_SEASONAL
-CONF_SEASON_START_MONTH
-CONF_SEASON_END_MONTH
-CONF_CHANGE_PLATE_ENABLED
-CONF_CHANGE_PLATE_COMMON_TEXT
-CONF_CHANGE_PLATE_VEHICLE_TEXT
-PLATE_COLOR_STANDARD
-PLATE_COLOR_GREEN
-PLATE_COLOR_MODES
+TÜV Reminder Card = b-series
+TÜV Reminder      = r-series
 ```
 
-### Config/options flow
+## What changed in r004
 
-The add/edit vehicle form now contains:
+r004 replaces the flat r003 setup form with a cascaded Home Assistant flow:
+
+1. Fahrzeugname + Kennzeichentyp
+2. Kennzeichendaten passend zum Typ
+3. HU-Monat + HU-Jahr + Intervall
+
+The selected type is stored as:
 
 ```text
-plate_color_mode: standard | green
-seasonal: bool
-season_start_month: 1..12
-season_end_month: 1..12
-change_plate_enabled: bool
-change_plate_common_text: str
-change_plate_vehicle_text: str
+plate_kind
 ```
 
-### Sensor attributes
-
-The vehicle sensor now additionally exposes:
+Supported values:
 
 ```text
+standard
+seasonal
+change
+green
+green_seasonal
+```
+
+Derived renderer/Card-facing values:
+
+```text
+plate_format
+plate_color_mode
+seasonal
+change_plate_enabled
+```
+
+## Key decision: one plate field for normal plates
+
+For standard, seasonal, green and green+seasonal plates, r004 keeps a single field:
+
+```text
+plate: "WIL AB 123"
+```
+
+Leerzeichen bleiben erhalten. The Card/renderer needs the block structure, and it is not safe to store `WILAB123` because the first block can have one, two or three letters.
+
+H/E is stored separately:
+
+```text
+plate_suffix: none | H | E
+```
+
+`plate_display` is exposed for human display contexts:
+
+```text
+WIL AB 123 H
+```
+
+## Wechselkennzeichen
+
+For change plates the flow shows:
+
+```text
+change_plate_common_text
+change_plate_vehicle_digit
+plate_suffix
+```
+
+The vehicle-specific part must be exactly one digit.
+
+Compatibility alias preserved:
+
+```text
+change_plate_vehicle_text
+```
+
+Canonical r004 field:
+
+```text
+change_plate_vehicle_digit
+```
+
+## Saisonregel
+
+Seasonal plate ranges are validated as:
+
+```text
+minimum 2 months
+maximum 11 months
+```
+
+Year-crossing ranges are supported.
+
+## Sensor attributes after r004
+
+Existing baseline attributes remain:
+
+```text
+vehicle_name
+plate
+month
+year
+interval
+rotation
+due_date
+reminder_date
+expired_date
+status
+blurred
+```
+
+r004 plate attributes:
+
+```text
+plate_display
+plate_kind
+plate_format
+plate_suffix
 plate_color_mode
 seasonal
 season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
+change_plate_vehicle_digit
 change_plate_vehicle_text
 ```
 
-Existing baseline attributes are preserved.
+## Not changed
 
-## Compatibility behavior
+- No Card change.
+- No Card b355 mapping yet.
+- No renderer change.
+- No calendar-v3 implementation.
+- No local_calendar sync.
+- No sidebar/manager UI.
+- No area-code autocomplete list yet.
 
-Existing entries without the new options still work through defaults:
+## Suggested next steps
 
-```text
-plate_color_mode = standard
-seasonal = false
-season_start_month = null
-season_end_month = null
-change_plate_enabled = false
-change_plate_common_text = ""
-change_plate_vehicle_text = ""
-```
-
-## Not changed in r003
-
-- No Card changes.
-- No renderer changes.
-- No Calendar Interface implementation yet.
-- No Sidebar Manager UI implementation.
-- No `local_calendar` write/sync behavior.
-- No new services.
-- No migration that rewrites existing entries.
-
-## HA test focus
-
-1. Existing vehicle still loads and exposes default r003 attributes.
-2. New standard vehicle can be added.
-3. Green plate can be selected and appears as `plate_color_mode: green`.
-4. Seasonal plate exposes start/end months only when enabled.
-5. Changeable plate exposes common/vehicle text only when enabled.
-6. `confirm_passed` still updates month/year and preserves the new options.
-
-## Check
-
-```text
-python -m py_compile custom_components/tuev_reminder/*.py
-```
-
-Additional static r003 schema check:
-
-```text
-python scripts/check_r003_schema.py
-```
-
-## Next planned Reminder steps
-
-```text
-r004 = Calendar Interface implementation
-Card b355 = Reminder Attribute Mapping, only after Reminder attributes are stable
-```
+1. Test r004 in Home Assistant:
+   - Add standard vehicle.
+   - Add seasonal vehicle with valid range.
+   - Try invalid seasonal range `04-04` and `01-12`.
+   - Add change plate with `WIL AB 12` + `3`.
+   - Verify sensor attributes.
+2. Then build **Reminder r005 = Area Code Autocomplete List** or **Reminder r005 = Calendar Interface**, depending on priority.
+3. Card mapping remains separate: **Card b355** later.

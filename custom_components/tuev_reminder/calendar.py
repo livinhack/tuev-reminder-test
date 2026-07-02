@@ -12,9 +12,12 @@ from .const import (
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
+    CONF_PLATE_SUFFIX,
+    PLATE_SUFFIX_NONE,
 )
 
 from .helpers import (
+    build_plate_with_suffix,
     get_due_date,
     get_reminder_date,
 )
@@ -96,7 +99,10 @@ class TuevReminderCalendar(CalendarEntity):
         }
 
         vehicle_name = data.get(CONF_VEHICLE_NAME, entry.title)
-        plate = data.get(CONF_PLATE, "")
+        plate = build_plate_with_suffix(
+            data.get(CONF_PLATE, ""),
+            data.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE),
+        )
         month = int(data.get(CONF_MONTH, 1))
         year = int(data.get(CONF_YEAR, 2026))
         interval = int(data.get(CONF_INTERVAL, 2))

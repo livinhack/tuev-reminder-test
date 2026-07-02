@@ -3,44 +3,80 @@
     "step": {
       "user": {
         "title": "Fahrzeug hinzufügen",
-        "description": "Lege ein Fahrzeug und dessen nächste HU-Fälligkeit an.",
+        "description": "Wähle zuerst Fahrzeugname und Kennzeichentyp.",
         "data": {
           "vehicle_name": "Fahrzeugname",
+          "plate_kind": "Kennzeichentyp"
+        }
+      },
+      "plate": {
+        "title": "Kennzeichen",
+        "description": "Gib die Kennzeichendaten passend zum gewählten Typ ein. Leerzeichen bleiben für den Card-Renderer erhalten.",
+        "data": {
           "plate": "Kennzeichen",
-          "month": "HU-Monat",
-          "year": "HU-Jahr",
-          "interval": "Intervall",
-          "plate_color_mode": "Kennzeichenfarbe",
-          "seasonal": "Saisonkennzeichen",
+          "plate_suffix": "H/E-Zusatz",
           "season_start_month": "Saisonbeginn Monat",
           "season_end_month": "Saisonende Monat",
-          "change_plate_enabled": "Wechselkennzeichen",
-          "change_plate_common_text": "Gemeinsamer Wechselkennzeichen-Teil",
-          "change_plate_vehicle_text": "Fahrzeugbezogener Wechselkennzeichen-Teil"
+          "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
+          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer"
+        }
+      },
+      "due": {
+        "title": "HU-Fälligkeit",
+        "description": "Gib HU-Monat, HU-Jahr und Intervall ein.",
+        "data": {
+          "month": "HU-Monat",
+          "year": "HU-Jahr",
+          "interval": "Intervall"
         }
       }
+    },
+    "error": {
+      "required": "Dieses Feld ist erforderlich.",
+      "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
+      "invalid_plate_suffix": "Ungültiger H/E-Zusatz.",
+      "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
+      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Fahrzeug bearbeiten",
-        "description": "Passe Fahrzeugdaten und HU-Fälligkeit an.",
+        "description": "Bearbeite zuerst Fahrzeugname und Kennzeichentyp.",
         "data": {
           "vehicle_name": "Fahrzeugname",
+          "plate_kind": "Kennzeichentyp"
+        }
+      },
+      "plate": {
+        "title": "Kennzeichen",
+        "description": "Passe die Kennzeichendaten passend zum gewählten Typ an. Leerzeichen bleiben für den Card-Renderer erhalten.",
+        "data": {
           "plate": "Kennzeichen",
-          "month": "HU-Monat",
-          "year": "HU-Jahr",
-          "interval": "Intervall",
-          "plate_color_mode": "Kennzeichenfarbe",
-          "seasonal": "Saisonkennzeichen",
+          "plate_suffix": "H/E-Zusatz",
           "season_start_month": "Saisonbeginn Monat",
           "season_end_month": "Saisonende Monat",
-          "change_plate_enabled": "Wechselkennzeichen",
-          "change_plate_common_text": "Gemeinsamer Wechselkennzeichen-Teil",
-          "change_plate_vehicle_text": "Fahrzeugbezogener Wechselkennzeichen-Teil"
+          "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
+          "change_plate_vehicle_digit": "Fahrzeugbezogene Ziffer"
+        }
+      },
+      "due": {
+        "title": "HU-Fälligkeit",
+        "description": "Passe HU-Monat, HU-Jahr und Intervall an.",
+        "data": {
+          "month": "HU-Monat",
+          "year": "HU-Jahr",
+          "interval": "Intervall"
         }
       }
+    },
+    "error": {
+      "required": "Dieses Feld ist erforderlich.",
+      "invalid_plate_kind": "Ungültiger Kennzeichentyp.",
+      "invalid_plate_suffix": "Ungültiger H/E-Zusatz.",
+      "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
+      "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen."
     }
   },
   "entity": {

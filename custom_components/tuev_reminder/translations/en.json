@@ -3,44 +3,80 @@
     "step": {
       "user": {
         "title": "Add vehicle",
-        "description": "Add a vehicle and its next inspection due date.",
+        "description": "First choose the vehicle name and license plate type.",
         "data": {
           "vehicle_name": "Vehicle name",
+          "plate_kind": "License plate type"
+        }
+      },
+      "plate": {
+        "title": "License plate",
+        "description": "Enter the license plate data for the selected type. Spaces are preserved for the card renderer.",
+        "data": {
           "plate": "License plate",
-          "month": "Inspection month",
-          "year": "Inspection year",
-          "interval": "Interval",
-          "plate_color_mode": "License plate color",
-          "seasonal": "Seasonal license plate",
+          "plate_suffix": "H/E suffix",
           "season_start_month": "Season start month",
           "season_end_month": "Season end month",
-          "change_plate_enabled": "Changeable license plate",
-          "change_plate_common_text": "Shared change-plate text",
-          "change_plate_vehicle_text": "Vehicle-specific change-plate text"
+          "change_plate_common_text": "Shared change-plate part",
+          "change_plate_vehicle_digit": "Vehicle-specific digit"
+        }
+      },
+      "due": {
+        "title": "Inspection due date",
+        "description": "Enter the next inspection due date and interval.",
+        "data": {
+          "month": "Inspection month",
+          "year": "Inspection year",
+          "interval": "Interval"
         }
       }
+    },
+    "error": {
+      "required": "This field is required.",
+      "invalid_plate_kind": "Invalid license plate type.",
+      "invalid_plate_suffix": "Invalid H/E suffix.",
+      "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
+      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Edit vehicle",
-        "description": "Update vehicle data and inspection due date.",
+        "description": "First edit the vehicle name and license plate type.",
         "data": {
           "vehicle_name": "Vehicle name",
+          "plate_kind": "License plate type"
+        }
+      },
+      "plate": {
+        "title": "License plate",
+        "description": "Update the license plate data for the selected type. Spaces are preserved for the card renderer.",
+        "data": {
           "plate": "License plate",
-          "month": "Inspection month",
-          "year": "Inspection year",
-          "interval": "Interval",
-          "plate_color_mode": "License plate color",
-          "seasonal": "Seasonal license plate",
+          "plate_suffix": "H/E suffix",
           "season_start_month": "Season start month",
           "season_end_month": "Season end month",
-          "change_plate_enabled": "Changeable license plate",
-          "change_plate_common_text": "Shared change-plate text",
-          "change_plate_vehicle_text": "Vehicle-specific change-plate text"
+          "change_plate_common_text": "Shared change-plate part",
+          "change_plate_vehicle_digit": "Vehicle-specific digit"
+        }
+      },
+      "due": {
+        "title": "Inspection due date",
+        "description": "Update the next inspection due date and interval.",
+        "data": {
+          "month": "Inspection month",
+          "year": "Inspection year",
+          "interval": "Interval"
         }
       }
+    },
+    "error": {
+      "required": "This field is required.",
+      "invalid_plate_kind": "Invalid license plate type.",
+      "invalid_plate_suffix": "Invalid H/E suffix.",
+      "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
+      "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months."
     }
   },
   "entity": {

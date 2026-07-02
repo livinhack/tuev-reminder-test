@@ -12,24 +12,42 @@ from .const import (
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
+    CONF_PLATE_KIND,
+    CONF_PLATE_FORMAT,
+    CONF_PLATE_SUFFIX,
     CONF_PLATE_COLOR_MODE,
     CONF_SEASONAL,
     CONF_SEASON_START_MONTH,
     CONF_SEASON_END_MONTH,
     CONF_CHANGE_PLATE_ENABLED,
     CONF_CHANGE_PLATE_COMMON_TEXT,
+    CONF_CHANGE_PLATE_VEHICLE_DIGIT,
     CONF_CHANGE_PLATE_VEHICLE_TEXT,
+    PLATE_KIND_STANDARD,
+    PLATE_KIND_SEASONAL,
+    PLATE_KIND_CHANGE,
+    PLATE_KIND_GREEN,
+    PLATE_KIND_GREEN_SEASONAL,
+    PLATE_FORMAT_STANDARD,
+    PLATE_FORMAT_CHANGE,
+    PLATE_FORMATS,
+    PLATE_SUFFIX_NONE,
+    PLATE_SUFFIXES,
     PLATE_COLOR_STANDARD,
+    PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
 )
 
 from .helpers import (
+    build_change_plate_text,
+    build_plate_with_suffix,
     get_due_date,
     get_expired_date,
     get_reminder_date,
     get_rotation_for_month,
     get_status,
     is_blurred,
+    normalize_plate_text,
 )
 
 
@@ -75,8 +93,53 @@ class TuevSensor(SensorEntity):
         return self.data.get(CONF_VEHICLE_NAME, self.entry.title)
 
     @property
+    def plate_kind(self):
+        configured = self.data.get(CONF_PLATE_KIND)
+        if configured:
+            return configured
+
+        if self.change_plate_enabled:
+            return PLATE_KIND_CHANGE
+
+        green = self.plate_color_mode == PLATE_COLOR_GREEN
+        seasonal = self.seasonal
+
+        if green and seasonal:
+            return PLATE_KIND_GREEN_SEASONAL
+        if green:
+            return PLATE_KIND_GREEN
+        if seasonal:
+            return PLATE_KIND_SEASONAL
+        return PLATE_KIND_STANDARD
+
+    @property
+    def plate_format(self):
+        value = self.data.get(CONF_PLATE_FORMAT)
+        if value in PLATE_FORMATS:
+            return value
+        return PLATE_FORMAT_CHANGE if self.change_plate_enabled else PLATE_FORMAT_STANDARD
+
+    @property
     def plate(self):
-        return self.data.get(CONF_PLATE, "")
+        if self.change_plate_enabled:
+            built_plate = build_change_plate_text(
+                self.change_plate_common_text,
+                self.change_plate_vehicle_digit,
+            )
+            if built_plate:
+                return built_plate
+        return normalize_plate_text(self.data.get(CONF_PLATE, ""))
+
+    @property
+    def plate_suffix(self):
+        value = str(self.data.get(CONF_PLATE_SUFFIX, PLATE_SUFFIX_NONE)).strip().upper()
+        if value not in PLATE_SUFFIXES:
+            return PLATE_SUFFIX_NONE
+        return value
+
+    @property
+    def plate_display(self):
+        return build_plate_with_suffix(self.plate, self.plate_suffix)
 
     @property
     def month(self):
@@ -115,19 +178,31 @@ class TuevSensor(SensorEntity):
 
     @property
     def change_plate_enabled(self):
-        return bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
+        return (
+            self.data.get(CONF_PLATE_FORMAT) == PLATE_FORMAT_CHANGE
+            or bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
+        )
 
     @property
     def change_plate_common_text(self):
         if not self.change_plate_enabled:
             return ""
-        return str(self.data.get(CONF_CHANGE_PLATE_COMMON_TEXT, "")).strip()
+        return normalize_plate_text(self.data.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))
+
+    @property
+    def change_plate_vehicle_digit(self):
+        if not self.change_plate_enabled:
+            return ""
+        return str(
+            self.data.get(
+                CONF_CHANGE_PLATE_VEHICLE_DIGIT,
+                self.data.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, ""),
+            )
+        ).strip()
 
     @property
     def change_plate_vehicle_text(self):
-        if not self.change_plate_enabled:
-            return ""
-        return str(self.data.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, "")).strip()
+        return self.change_plate_vehicle_digit
 
     @property
     def name(self):
@@ -140,7 +215,7 @@ class TuevSensor(SensorEntity):
             name=self.vehicle_name,
             manufacturer="TÜV Reminder",
             model="Fahrzeug",
-            serial_number=self.plate,
+            serial_number=self.plate_display,
         )
 
     @property
@@ -160,6 +235,7 @@ class TuevSensor(SensorEntity):
         return {
             "vehicle_name": self.vehicle_name,
             "plate": self.plate,
+            "plate_display": self.plate_display,
             "month": self.month,
             "year": self.year,
             "interval": self.interval,
@@ -169,11 +245,15 @@ class TuevSensor(SensorEntity):
             "expired_date": expired_date.isoformat(),
             "status": self.status,
             "blurred": is_blurred(self.year, self.month),
+            "plate_kind": self.plate_kind,
+            "plate_format": self.plate_format,
+            "plate_suffix": self.plate_suffix,
             "plate_color_mode": self.plate_color_mode,
             "seasonal": self.seasonal,
             "season_start_month": self.season_start_month,
             "season_end_month": self.season_end_month,
             "change_plate_enabled": self.change_plate_enabled,
             "change_plate_common_text": self.change_plate_common_text,
+            "change_plate_vehicle_digit": self.change_plate_vehicle_digit,
             "change_plate_vehicle_text": self.change_plate_vehicle_text,
         }

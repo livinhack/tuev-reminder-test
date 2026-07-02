@@ -11,48 +11,74 @@ TÜV Reminder Card = b-series
 TÜV Reminder      = r-series
 ```
 
-Current Reminder artifact: **r003 Vehicle Plate Options Schema**.
+Current Reminder artifact: **r004 Cascaded Single-Field Plate Setup Flow**.
 Current Card compatibility baseline: **Card b354**.
 
 ## Features
 
-- Add one vehicle per integration entry/device
-- Store vehicle name, license plate, inspection month, inspection year, and interval
-- Store first vehicle-specific plate options for the future Card renderer mapping
-- Provides a sensor per vehicle
+- Add one vehicle per integration entry/device.
+- Store vehicle name, license plate data, inspection month, inspection year and interval.
+- Provides a sensor per vehicle.
 - Calculates inspection status:
   - `valid`
   - `due`
   - `expired`
-- Provides a shared virtual calendar entity with all upcoming inspection reminders
-- Reminder date is one week before the end of the due month
-- Supports a `confirm_passed` service to update the next inspection date based on the current month
+- Provides a shared virtual calendar entity with all upcoming inspection reminders.
+- Reminder date is one week before the end of the due month.
+- Supports a `confirm_passed` service to update the next inspection date based on the current month.
 
-## Vehicle configuration
+## r004 setup flow
 
-When adding or editing a vehicle, enter:
+r004 uses a cascaded setup/edit flow:
 
-- Vehicle name
-- License plate
-- Next inspection month
-- Next inspection year
-- Inspection interval: 1 or 2 years
-- License plate color: `standard` or `green`
-- Seasonal license plate: enabled/disabled
-- Season start/end month
-- Changeable license plate: enabled/disabled
-- Shared change-plate text
-- Vehicle-specific change-plate text
+1. Vehicle name and license plate type.
+2. License plate fields matching the selected type.
+3. HU month, HU year and interval.
+
+Supported license plate types:
+
+```text
+standard
+seasonal
+change
+green
+green_seasonal
+```
+
+For standard, seasonal, green and green+seasonal plates, use one plate field:
+
+```text
+WIL AB 123
+```
+
+Leerzeichen bleiben erhalten. They are part of the Card/renderer block structure. The integration does not store `WILAB123`.
+
+H/E is stored separately:
+
+```text
+plate_suffix: none | H | E
+```
+
+For change plates, r004 uses:
+
+```text
+change_plate_common_text
+change_plate_vehicle_digit
+plate_suffix
+```
+
+The vehicle-specific change-plate part must be exactly one digit.
+
+Seasonal plate ranges must cover at least 2 months and at most 11 months.
 
 ## Sensor attributes
 
-Each vehicle sensor exposes the existing HU attributes plus the new r003 plate-option attributes.
-
-Existing baseline attributes:
+Each vehicle sensor exposes:
 
 ```text
 vehicle_name
 plate
+plate_display
 month
 year
 interval
@@ -62,19 +88,20 @@ reminder_date
 expired_date
 status
 blurred
-```
-
-New r003 attributes:
-
-```text
+plate_kind
+plate_format
+plate_suffix
 plate_color_mode
 seasonal
 season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
+change_plate_vehicle_digit
 change_plate_vehicle_text
 ```
+
+`change_plate_vehicle_text` is kept as compatibility alias. The canonical r004 field is `change_plate_vehicle_digit`.
 
 ## Service
 
@@ -101,7 +128,7 @@ Confirmed in May 2026 with a 2-year interval
 
 ## Dashboard Card
 
-This integration is designed to be used together with the separate TÜV Card Lovelace card. r003 only exposes the new data; Card-side mapping is a separate later Card version.
+This integration is designed to be used together with the separate TÜV Card Lovelace card. r004 only improves Reminder-side data entry and attributes. Card-side mapping is a separate later Card version.
 
 ## Installation
 
@@ -127,18 +154,17 @@ Settings → Devices & services → Add integration → TÜV Reminder
 
 This project is currently in early testing. Verify inspection dates manually.
 
-## Development checkpoint: Reminder r003
-
-r003 implements the first v3 runtime schema step:
+## Development checkpoint: Reminder r004
 
 ```text
-Reminder r003 = Vehicle Plate Options Schema
+Reminder r004 = Cascaded Single-Field Plate Setup Flow
 ```
 
 No Card change is included.
 
-Next planned step:
+Planned later work:
 
 ```text
-Reminder r004 = Calendar Interface implementation
+Reminder r005 = Area Code Autocomplete List or Calendar Interface
+Card b355     = Reminder Attribute Mapping
 ```

@@ -1,7 +1,9 @@
 import calendar
+import re
 from datetime import date, timedelta
 
 from .const import (
+    PLATE_SUFFIX_NONE,
     STATUS_VALID,
     STATUS_DUE,
     STATUS_EXPIRED,
@@ -54,3 +56,39 @@ def is_blurred(year: int, month: int, today: date | None = None) -> bool:
         STATUS_DUE,
         STATUS_EXPIRED,
     }
+
+
+def normalize_plate_text(value: object) -> str:
+    """Normalize user-entered plate text while preserving block structure.
+
+    Spaces are significant for the renderer/Card, so they are preserved as block
+    separators. Hyphens are accepted as user convenience and converted to a
+    single space. Multiple whitespace runs collapse to a single space.
+    """
+    text = str(value or "").upper().strip()
+    text = text.replace("-", " ")
+    text = re.sub(r"\s+", " ", text)
+    return text
+
+
+def build_change_plate_text(common_text: object, vehicle_digit: object) -> str:
+    """Build the visible full plate from common change-plate text and digit."""
+    common = normalize_plate_text(common_text)
+    digit = str(vehicle_digit or "").strip()
+
+    if not common:
+        return digit
+
+    separator = "" if common[-1].isdigit() else " "
+    return normalize_plate_text(f"{common}{separator}{digit}")
+
+
+def build_plate_with_suffix(plate: object, suffix: object) -> str:
+    """Return a display string with H/E suffix appended for human text contexts."""
+    normalized = normalize_plate_text(plate)
+    suffix_text = str(suffix or PLATE_SUFFIX_NONE).strip().upper()
+
+    if not suffix_text or suffix_text == PLATE_SUFFIX_NONE:
+        return normalized
+
+    return normalize_plate_text(f"{normalized} {suffix_text}")
