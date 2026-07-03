@@ -12,7 +12,8 @@ class TuevReminderPanel extends HTMLElement {
     this._vehicles = [];
     this._filter = "";
     this._statusFilter = "all";
-    this._sort = "due";
+    this._sortKey = "hu";
+    this._sortDirection = "asc";
     this._openMenuIndex = null;
     this._view = "list";
     this._selectedVehicle = null;
@@ -155,6 +156,45 @@ class TuevReminderPanel extends HTMLElement {
     }, {});
   }
 
+  _sortValue(vehicle, key) {
+    if (key === "name") return String(vehicle.vehicle_name || vehicle.title || "").toLowerCase();
+    if (key === "hu") return String(vehicle.due_date || `${String(vehicle.year || "9999").padStart(4, "0")}-${String(vehicle.month || "99").padStart(2, "0")}-01`);
+    if (key === "reminder") return String(vehicle.reminder_date || "9999-99-99");
+    if (key === "status") {
+      const order = { expired: 0, due: 1, valid: 2 };
+      return order[vehicle.status] ?? 9;
+    }
+    if (key === "plate") return String(vehicle.plate_display || vehicle.plate || "").toLowerCase();
+    return String(vehicle.due_date || "9999-99-99");
+  }
+
+  _compareVehicles(a, b) {
+    const key = this._sortKey || "hu";
+    const direction = this._sortDirection === "desc" ? -1 : 1;
+    const left = this._sortValue(a, key);
+    const right = this._sortValue(b, key);
+    let result;
+    if (typeof left === "number" && typeof right === "number") {
+      result = left - right;
+    } else {
+      result = String(left).localeCompare(String(right), "de", { sensitivity: "base", numeric: true });
+    }
+    if (result === 0 && key !== "name") {
+      result = String(a.vehicle_name || a.title || "").localeCompare(String(b.vehicle_name || b.title || ""), "de", { sensitivity: "base", numeric: true });
+    }
+    return result * direction;
+  }
+
+  _sortIndicator(key) {
+    if (this._sortKey !== key) return "";
+    return this._sortDirection === "desc" ? " ↓" : " ↑";
+  }
+
+  _sortHeader(label, key, extraClass = "") {
+    const active = this._sortKey === key ? " active" : "";
+    return `<th class="${this._escape(extraClass)}"><button class="sort-header${active}" type="button" data-sort-key="${this._escape(key)}" aria-label="Nach ${this._escape(label)} sortieren">${this._escape(label)}<span>${this._escape(this._sortIndicator(key))}</span></button></th>`;
+  }
+
   _visibleVehicles() {
     const filter = this._filter.trim().toLowerCase();
     const vehicles = this._vehicles.filter((vehicle) => {
@@ -177,16 +217,7 @@ class TuevReminderPanel extends HTMLElement {
         .some((value) => String(value).toLowerCase().includes(filter));
     });
 
-    return vehicles.sort((a, b) => {
-      if (this._sort === "name") {
-        return String(a.vehicle_name || a.title || "").localeCompare(String(b.vehicle_name || b.title || ""), "de", { sensitivity: "base" });
-      }
-      if (this._sort === "status") {
-        const order = { expired: 0, due: 1, valid: 2 };
-        return (order[a.status] ?? 9) - (order[b.status] ?? 9) || String(a.due_date || "").localeCompare(String(b.due_date || ""));
-      }
-      return String(a.due_date || "9999-99-99").localeCompare(String(b.due_date || "9999-99-99"));
-    });
+    return vehicles.sort((a, b) => this._compareVehicles(a, b));
   }
 
   _platePreviewFromText(text, options = {}) {
@@ -534,17 +565,17 @@ class TuevReminderPanel extends HTMLElement {
         <table class="manager-table">
           <thead>
             <tr>
-              <th class="col-name">Name</th>
-              <th>HU</th>
-              <th>Erinnerung</th>
-              <th>Status</th>
-              <th class="col-preview">Kennzeichen</th>
+              ${this._sortHeader("Name", "name", "col-name")}
+              ${this._sortHeader("HU", "hu")}
+              ${this._sortHeader("Erinnerung", "reminder")}
+              ${this._sortHeader("Status", "status")}
+              ${this._sortHeader("Kennzeichen", "plate", "col-preview")}
               <th class="col-menu" aria-label="Menü"></th>
             </tr>
           </thead>
           <tbody>
             ${vehicles.map((vehicle, index) => `
-              <tr data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}" tabindex="0" title="Detail-/Formularansicht öffnen">
+              <tr data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
                 <td class="name-cell">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
                 </td>
@@ -738,7 +769,7 @@ class TuevReminderPanel extends HTMLElement {
         .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
         .toolbar {
           display: ${listMode ? "grid" : "none"};
-          grid-template-columns: minmax(240px, 1fr) auto auto auto;
+          grid-template-columns: minmax(240px, 1fr) auto auto;
           gap: 8px;
           padding: 10px 16px;
           border-bottom: 1px solid var(--divider-color);
@@ -838,7 +869,23 @@ class TuevReminderPanel extends HTMLElement {
         .manager-table { width: 100%; min-width: 940px; border-collapse: collapse; }
         th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
         th { height: 32px; color: var(--secondary-text-color); font-size: 12px; font-weight: 600; }
-        tbody tr { cursor: pointer; }
+        .sort-header {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          width: 100%;
+          border: 0;
+          padding: 0;
+          background: transparent;
+          color: inherit;
+          font: inherit;
+          font-weight: inherit;
+          text-align: inherit;
+          cursor: pointer;
+        }
+        .sort-header:hover, .sort-header.active { color: var(--primary-text-color); }
+        .col-preview .sort-header { justify-content: flex-end; }
+        tbody tr { cursor: default; }
         tbody tr:hover { background: var(--secondary-background-color); }
         .col-name { width: 38%; }
         .col-preview { width: 240px; text-align: right; }
@@ -1047,11 +1094,6 @@ class TuevReminderPanel extends HTMLElement {
             <option value="due" ${this._statusFilter === "due" ? "selected" : ""}>Fällig</option>
             <option value="valid" ${this._statusFilter === "valid" ? "selected" : ""}>Gültig</option>
           </select>
-          <select id="sort" aria-label="Sortierung">
-            <option value="due" ${this._sort === "due" ? "selected" : ""}>HU-Datum</option>
-            <option value="status" ${this._sort === "status" ? "selected" : ""}>Status</option>
-            <option value="name" ${this._sort === "name" ? "selected" : ""}>Name</option>
-          </select>
           <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>Aktualisieren</button>
         </section>
 
@@ -1059,7 +1101,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-API aktiv · Formular speichert Entitäten · Drei-Punkte-Menü vorbereitet · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-API aktiv · Formular speichert Entitäten · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
@@ -1100,27 +1142,17 @@ class TuevReminderPanel extends HTMLElement {
       });
     }
 
-    const sortSelect = this.shadowRoot.querySelector("#sort");
-    if (sortSelect) {
-      sortSelect.addEventListener("change", (event) => {
-        this._sort = event.target.value;
-        this._render();
-      });
-    }
-
-    this.shadowRoot.querySelectorAll("tr[data-row-index]").forEach((row) => {
-      row.addEventListener("click", () => {
-        const index = Number(row.dataset.rowIndex);
-        const vehicle = this._visibleVehicles()[index];
-        if (vehicle) this._openDetailForm(vehicle);
-      });
-      row.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          const index = Number(row.dataset.rowIndex);
-          const vehicle = this._visibleVehicles()[index];
-          if (vehicle) this._openDetailForm(vehicle);
+    this.shadowRoot.querySelectorAll("button[data-sort-key]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.sortKey;
+        if (this._sortKey === key) {
+          this._sortDirection = this._sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          this._sortKey = key;
+          this._sortDirection = "asc";
         }
+        this._openMenuIndex = null;
+        this._render();
       });
     });
 

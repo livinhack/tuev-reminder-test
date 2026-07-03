@@ -298,3 +298,16 @@ r037 keeps the r036 modal form and focus behavior, but changes the create entry 
 ## r036 Sidebar Modal Form + Focus Fix
 
 r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
+
+## r046 – Sidebar Row Actions + Sortable Headers
+
+r046 keeps the Sidebar create/update flow and improves table interaction:
+
+- rows themselves are no longer clickable;
+- only the three-dot menu opens per-vehicle actions;
+- table headers sort the list ascending/descending;
+- create and update remain handled by the Reminder Manager WebSocket API;
+- the Card remains a separate Dashboard/Lovelace project.
+
+
+Reminder r046

@@ -233,3 +233,12 @@
 
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
+
+## Reminder r046 – Sidebar Row Actions + Sortable Headers
+
+- Removed full-row click handling in the Sidebar vehicle table.
+- Kept only the three-dot row menu as the action entry point for edit/delete actions.
+- Replaced the toolbar sort selector with clickable table headers.
+- Added ascending/descending sort toggling for Name, HU, Erinnerung, Status, and Kennzeichen.
+- Preserved create/update API behavior from r041/r045.
+- Preserved Reminder/Card repository separation.

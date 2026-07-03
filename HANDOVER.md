@@ -474,3 +474,24 @@ change_plate_common_text
 change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
+
+# r046 Handover Addendum – Sidebar Row Actions + Sortable Headers
+
+## Implemented in r046
+
+- Full vehicle rows are no longer clickable.
+- Only the three-dot button at the end of a row opens row actions.
+- Row cursor no longer implies clickability.
+- Sorting moved from toolbar dropdown to sortable table headers.
+- Columns with header sorting: Name, HU, Erinnerung, Status, Kennzeichen.
+- Header clicks toggle ascending/descending order.
+
+## Preserved
+
+- r041 create form save remains active.
+- r044/r045 update backend and frontend save remain active.
+- r042 three-dot menu remains the action entry point.
+- No Card repository files are imported into Reminder.
+
+
+Reminder r046

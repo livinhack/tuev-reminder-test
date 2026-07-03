@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r045 Sidebar modal form and input focus fix."""
+"""Validate r046 Sidebar modal form and input focus fix."""
 from __future__ import annotations
 
 import json
@@ -12,15 +12,15 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r045 modal form focus fix check failed: {message}")
+    raise SystemExit(f"r046 modal form focus fix check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r045":
-        fail("manifest version must be 0.1.0-r045")
-    if VERSION.read_text(encoding="utf-8").strip() != "r045":
-        fail("REMINDER_VERSION.txt must be r045")
+    if manifest.get("version") != "0.1.0-r046":
+        fail("manifest version must be 0.1.0-r046")
+    if VERSION.read_text(encoding="utf-8").strip() != "r046":
+        fail("REMINDER_VERSION.txt must be r046")
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
@@ -47,7 +47,7 @@ def main() -> None:
         if needle in panel:
             fail(f"Sidebar panel must not include {needle!r}")
 
-    print("r045 modal form focus fix check OK")
+    print("r046 modal form focus fix check OK")
 
 
 if __name__ == "__main__":

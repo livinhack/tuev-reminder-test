@@ -17,9 +17,9 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r045":
-    fail("manifest version must be 0.1.0-r045")
-if read("REMINDER_VERSION.txt").strip() != "r045":
+if manifest.get("version") != "0.1.0-r046":
+    fail("manifest version must be 0.1.0-r046")
+if read("REMINDER_VERSION.txt").strip() != "r046":
     fail("REMINDER_VERSION.txt must be r031")
 
 required_dependencies = {"http", "frontend", "panel_custom"}
