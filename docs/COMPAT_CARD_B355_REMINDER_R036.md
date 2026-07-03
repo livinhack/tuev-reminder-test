@@ -1,6 +1,6 @@
-# Compatibility – Card b355+ / b356 RC with Reminder r036
+# Compatibility – Card b355+ / b356 RC with Reminder r037
 
-Reminder r036 does not change the sensor attributes, services, calendar behavior or Card bridge fields.
+Reminder r037 does not change the sensor attributes, services, calendar behavior or Card bridge fields.
 
 Compared with r035 it only changes the Reminder-owned Sidebar frontend:
 

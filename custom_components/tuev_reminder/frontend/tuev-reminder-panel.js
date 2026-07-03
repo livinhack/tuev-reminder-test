@@ -567,7 +567,7 @@ class TuevReminderPanel extends HTMLElement {
         .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
         .toolbar {
           display: ${listMode ? "grid" : "none"};
-          grid-template-columns: minmax(240px, 1fr) auto auto auto auto;
+          grid-template-columns: minmax(240px, 1fr) auto auto auto;
           gap: 8px;
           padding: 10px 16px;
           border-bottom: 1px solid var(--divider-color);
@@ -607,6 +607,31 @@ class TuevReminderPanel extends HTMLElement {
           white-space: nowrap;
         }
         button.action[disabled] { opacity: 0.52; cursor: not-allowed; }
+        button.icon-action {
+          width: 40px;
+          min-width: 40px;
+          padding: 0;
+          border-radius: 50%;
+          font-size: 26px;
+          line-height: 1;
+        }
+        .list-add-row {
+          display: ${listMode ? "flex" : "none"};
+          align-items: center;
+          justify-content: flex-end;
+          padding: 10px 16px;
+          border-bottom: 1px solid var(--divider-color);
+          background: var(--primary-background-color);
+        }
+        .list-add-row.bottom {
+          border-top: 1px solid var(--divider-color);
+          border-bottom: 0;
+        }
+        .list-add-row .add-label {
+          margin-right: 10px;
+          color: var(--secondary-text-color);
+          font-size: 13px;
+        }
         button.ghost {
           border: 1px solid var(--divider-color);
           padding: 0 12px;
@@ -826,7 +851,6 @@ class TuevReminderPanel extends HTMLElement {
             <option value="name" ${this._sort === "name" ? "selected" : ""}>Name</option>
           </select>
           <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>Aktualisieren</button>
-          <button class="action" id="new-vehicle">Neues Fahrzeug</button>
         </section>
 
         <section class="summary-strip" aria-label="Manager Status">
@@ -836,8 +860,18 @@ class TuevReminderPanel extends HTMLElement {
           <span>Reminder-eigene Seite · Formular-Skeleton · noch read-only · keine Card-Funktionen</span>
         </section>
 
+        <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
+          <span class="add-label">Neues Fahrzeug</span>
+          <button class="action icon-action" data-create-trigger="top" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
+        </section>
+
         <section class="content">
           ${this._renderVehicles()}
+        </section>
+
+        <section class="list-add-row bottom" aria-label="Fahrzeug unten hinzufügen">
+          <span class="add-label">Neues Fahrzeug</span>
+          <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
         ${formOpen ? this._renderCreateForm() : ""}
       </main>
@@ -846,8 +880,9 @@ class TuevReminderPanel extends HTMLElement {
     const refreshButton = this.shadowRoot.querySelector("#refresh");
     if (refreshButton) refreshButton.addEventListener("click", () => this._refresh());
 
-    const newVehicleButton = this.shadowRoot.querySelector("#new-vehicle");
-    if (newVehicleButton) newVehicleButton.addEventListener("click", () => this._openCreateForm());
+    this.shadowRoot.querySelectorAll("[data-create-trigger]").forEach((button) => {
+      button.addEventListener("click", () => this._openCreateForm());
+    });
 
     const filterInput = this.shadowRoot.querySelector("#filter");
     if (filterInput) {

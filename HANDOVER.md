@@ -1,16 +1,16 @@
-# Handover – Reminder r036 Sidebar Modal Form + Focus Fix
+# Handover – Reminder r037 Sidebar List Add Plus Buttons
 
-Current Reminder version: **r036**.
+Current Reminder version: **r037**.
 
-## What changed in r036
+## What changed in r037
 
-- Updated `REMINDER_VERSION.txt` to `r036`.
-- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r036`.
-- Preserved the r035 read-only create/detail form skeleton.
-- Changed the form from a full second page into a centered modal overlay above the existing vehicle list.
-- Fixed the focus loss after one typed character: normal text/number inputs now update form state, preview and validation in place instead of calling full `_render()` on every `input` event.
-- Kept full re-rendering for layout-changing controls such as `plate_kind`, where fields must appear/disappear.
-- Added backdrop click close and a compact modal action area.
+- Updated `REMINDER_VERSION.txt` to `r037`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r037`.
+- Preserved the r036 centered modal form and the input focus fix.
+- Removed the large `Neues Fahrzeug` toolbar button.
+- Added compact `+` add controls above and below the vehicle list.
+- Both `+` controls open the same read-only create form modal.
+- Kept the Switch-Manager-style dense list as the primary page surface.
 
 ## Still deliberately not included
 
@@ -20,22 +20,22 @@ Current Reminder version: **r036**.
 - No `confirm_passed` or `set_due_date` duplication.
 - No `vehicles/create`, `vehicles/update` or `vehicles/delete` WebSocket command yet.
 
-## HA smoke test focus for r036
+## HA smoke test focus for r037
 
 1. Install/update the Reminder integration.
 2. Restart Home Assistant or reload custom components as required.
 3. Open Sidebar → TÜV Reminder.
-4. Verify the list still loads behind the form overlay.
-5. Click `Neues Fahrzeug`.
-6. Verify the form opens centered above the page rather than replacing the list.
-7. Type several characters into `Fahrzeugname`, `Kennzeichen`, `HU-Jahr` and `Reminder-Vorlauf Tage`; the caret should stay in the active field.
-8. Verify preview and validation update while typing.
+4. Verify the old toolbar text button `Neues Fahrzeug` is gone.
+5. Verify a compact `+` appears above the vehicle list.
+6. Scroll to the bottom and verify a second compact `+` appears below the list.
+7. Click both `+` controls and verify they open the centered create modal.
+8. Type several characters into form fields; the caret should stay in the active field.
 9. Close via `Schließen` and by clicking the backdrop.
 10. Verify Save/Create is still disabled and no Card behavior changed.
 
 ## Next recommended step
 
-r037 should add backend validation/write API foundation for creating a Reminder ConfigEntry, while keeping actual UI save behavior conservative and testable.
+Next should be the Reminder-owned write API foundation for creating ConfigEntries, still without Card action duplication or Card renderer coupling.
 
 ---
 

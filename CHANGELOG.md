@@ -1,5 +1,13 @@
 # Changelog
 
+## r037 - Sidebar List Add Plus Buttons
+
+- Replaces the large `Neues Fahrzeug` toolbar button with compact `+` add controls above and below the vehicle list.
+- Both `+` controls open the existing r036 centered modal create form.
+- Keeps the r036 input-focus fix unchanged.
+- Keeps the Sidebar list visible and closer to the Switch Manager interaction pattern.
+- Keeps Card repository and Dashboard Card behavior separate.
+
 ## r036 - Sidebar Modal Form + Focus Fix
 
 - Keeps the r035 create/detail form skeleton read-only, but changes it from a second page view into a centered modal overlay above the vehicle list.

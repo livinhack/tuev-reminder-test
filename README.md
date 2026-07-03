@@ -1,11 +1,11 @@
-# TÜV Reminder r036
+# TÜV Reminder r037
 
-**Reminder r036** keeps the r035 Sidebar create/detail form skeleton read-only, but changes it into a centered modal overlay and fixes the input focus loss after one character. Normal text/number fields now update form state, preview and validation in place instead of rebuilding the whole panel on every keystroke. It still does not create ConfigEntries yet and does not import or duplicate Card functionality. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031-r035 Sidebar work remain preserved.
+**Reminder r037** keeps the r036 centered modal form and input-focus fix, but replaces the large `Neues Fahrzeug` toolbar button with compact `+` add controls above and below the vehicle list. This moves the Sidebar UI further toward the Switch-Manager-style list workflow while keeping the form read-only until a dedicated Reminder write API exists. It still does not create ConfigEntries yet and does not import or duplicate Card functionality. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031-r036 Sidebar work remain preserved.
 
 Compatible stack:
 
 ```text
-Card b355+ / b356 RC + Reminder r036
+Card b355+ / b356 RC + Reminder r037
 ```
 
 ## What the integration does
@@ -120,7 +120,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r036
+0.1.0-r037
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
@@ -213,6 +213,10 @@ It still intentionally contains no Card code, no plate renderer, no Dashboard co
 r033 keeps the Sidebar panel inside the Reminder integration and improves the read-only vehicle list toward the Switch Manager reference: compact top bar, toolbar search, dense table rows, row-end Kennzeichen preview and disabled row menu placeholder. The preview is a lightweight Reminder UI fallback only; the Card repository remains separate.
 
 
+## r037 Sidebar List Add Plus Buttons
+
+r037 keeps the r036 modal form and focus behavior, but changes the create entry point: the large `Neues Fahrzeug` button in the toolbar is removed. Instead the list gets compact `+` add controls above and below the table. Both open the same read-only modal create form. This is UI-only; no Reminder write API, Card renderer import, Card action duplication or Dashboard/Lovelace management is added.
+
 ## r036 Sidebar Modal Form + Focus Fix
 
-r036 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
+r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.

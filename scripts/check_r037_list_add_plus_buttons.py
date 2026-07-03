@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r037 Sidebar modal form and input focus fix."""
+"""Validate r037 Sidebar list add plus buttons."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r037 modal form focus fix check failed: {message}")
+    raise SystemExit(f"r037 list add plus buttons check failed: {message}")
 
 
 def main() -> None:
@@ -24,20 +24,22 @@ def main() -> None:
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
+        "data-create-trigger=\"top\"",
+        "data-create-trigger=\"bottom\"",
+        "list-add-row top",
+        "list-add-row bottom",
+        "button.icon-action",
+        "this.shadowRoot.querySelectorAll(\"[data-create-trigger]\")",
+        "button.addEventListener(\"click\", () => this._openCreateForm());",
         "modal-backdrop",
-        "role=\"dialog\"",
-        "aria-modal=\"true\"",
         "_syncFormSummary()",
-        "{ render: false }",
-        "if (event.target === modalBackdrop) this._closeForm();",
-        "${formOpen ? this._renderCreateForm() : \"\"}",
-        "${this._renderVehicles()}",
     ]
     for needle in required:
         if needle not in panel:
             fail(f"missing {needle!r}")
 
     forbidden = [
+        "id=\"new-vehicle\"",
         "tuev-card",
         "confirm_passed",
         "set_due_date",
@@ -49,7 +51,7 @@ def main() -> None:
         if needle in panel:
             fail(f"Sidebar panel must not include {needle!r}")
 
-    print("r037 modal form focus fix check OK")
+    print("r037 list add plus buttons check OK")
 
 
 if __name__ == "__main__":

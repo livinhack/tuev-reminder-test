@@ -1,6 +1,6 @@
-# Reminder r036 – Sidebar Modal Form + Focus Fix
+# Reminder r037 – Sidebar Modal Form + Focus Fix
 
-r036 keeps the r035 Reminder-owned create/detail form skeleton read-only, but improves its behavior and layout.
+r037 keeps the r035 Reminder-owned create/detail form skeleton read-only, but improves its behavior and layout.
 
 ## Changes
 
