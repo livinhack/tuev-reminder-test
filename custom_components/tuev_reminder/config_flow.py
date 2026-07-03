@@ -48,6 +48,7 @@ from .const import (
     DEFAULT_REMINDER_OFFSET_DAYS,
 )
 from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
+from .manager import entry_title_from_vehicle_values, validate_and_normalize_vehicle_payload
 
 
 PLATE_KIND_OPTIONS = [
@@ -485,6 +486,21 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     def async_get_options_flow(config_entry):
         return TuevReminderOptionsFlow(config_entry)
+
+    async def async_step_import(self, user_input=None):
+        """Create a TÜV Reminder entry from the manager write API.
+
+        The Sidebar Manager uses this import path so the resulting object is a
+        normal Home Assistant ConfigEntry, not a separate custom storage row.
+        """
+        errors, values = validate_and_normalize_vehicle_payload(user_input or {})
+        if errors:
+            return self.async_abort(reason="invalid_manager_payload")
+
+        return self.async_create_entry(
+            title=entry_title_from_vehicle_values(values),
+            data=values,
+        )
 
     async def async_step_user(self, user_input=None):
         errors = {}

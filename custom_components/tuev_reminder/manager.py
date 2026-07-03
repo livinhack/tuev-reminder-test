@@ -65,7 +65,7 @@ from .helpers import (
     normalize_plate_text,
 )
 
-MANAGER_API_VERSION = 1
+MANAGER_API_VERSION = 2
 
 PLATE_KIND_OPTIONS = [
     {"value": PLATE_KIND_STANDARD, "label": "Standard"},
@@ -261,6 +261,129 @@ def plate_parts_from_values(values: dict, kind: str | None = None) -> dict:
     }
 
 
+
+def _season_duration(start_month: int, end_month: int) -> int:
+    return (end_month - start_month) % 12 + 1
+
+
+def _is_valid_season_range(start_month: int, end_month: int) -> bool:
+    duration = _season_duration(start_month, end_month)
+    return 2 <= duration <= 11
+
+
+def _entry_title_from_values(values: dict) -> str:
+    vehicle_name = str(values.get(CONF_VEHICLE_NAME, "Fahrzeug") or "Fahrzeug").strip()
+    plate = plate_parts_from_values(values).get("plate_display", "")
+    return f"{vehicle_name} ({plate})" if plate else vehicle_name
+
+
+def validate_and_normalize_vehicle_payload(payload: dict) -> tuple[dict, dict]:
+    """Validate and normalize manager write payloads for ConfigEntry creation.
+
+    The manager UI must not write arbitrary frontend data into Home Assistant's
+    config entry storage. This function is the backend contract shared by the
+    WebSocket create command and future update/import paths.
+    """
+    errors: dict[str, str] = {}
+    values: dict = {}
+
+    vehicle_name = str(payload.get(CONF_VEHICLE_NAME, "") or "").strip()
+    if not vehicle_name:
+        errors[CONF_VEHICLE_NAME] = "required"
+    values[CONF_VEHICLE_NAME] = vehicle_name
+
+    kind = payload.get(CONF_PLATE_KIND, PLATE_KIND_STANDARD)
+    if kind not in PLATE_KINDS:
+        errors[CONF_PLATE_KIND] = "invalid_plate_kind"
+        kind = PLATE_KIND_STANDARD
+    values[CONF_PLATE_KIND] = kind
+
+    plate_format = payload.get(CONF_PLATE_FORMAT, PLATE_FORMAT_SINGLE_LINE)
+    if plate_format in {LEGACY_PLATE_FORMAT_STANDARD, LEGACY_PLATE_FORMAT_CHANGE}:
+        plate_format = PLATE_FORMAT_SINGLE_LINE
+    if plate_format not in PLATE_FORMATS:
+        errors[CONF_PLATE_FORMAT] = "invalid_plate_format"
+        plate_format = PLATE_FORMAT_SINGLE_LINE
+    elif plate_format not in PLATE_FORMATS_BY_KIND.get(kind, PLATE_FORMATS):
+        errors[CONF_PLATE_FORMAT] = "invalid_plate_format_for_kind"
+    values[CONF_PLATE_FORMAT] = plate_format
+
+    values[CONF_PLATE_COLOR_MODE] = PLATE_COLOR_GREEN if kind in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL} else PLATE_COLOR_STANDARD
+    values[CONF_SEASONAL] = kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL}
+    values[CONF_CHANGE_PLATE_ENABLED] = kind == PLATE_KIND_CHANGE
+
+    if kind == PLATE_KIND_CHANGE:
+        common_text = normalize_plate_text(payload.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))
+        vehicle_digit = str(payload.get(CONF_CHANGE_PLATE_VEHICLE_DIGIT, payload.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, "")) or "").strip()
+        if not common_text:
+            errors[CONF_CHANGE_PLATE_COMMON_TEXT] = "required"
+        if len(vehicle_digit) != 1 or not vehicle_digit.isdigit():
+            errors[CONF_CHANGE_PLATE_VEHICLE_DIGIT] = "invalid_vehicle_digit"
+        values[CONF_CHANGE_PLATE_COMMON_TEXT] = common_text
+        values[CONF_CHANGE_PLATE_VEHICLE_DIGIT] = vehicle_digit
+        values[CONF_CHANGE_PLATE_VEHICLE_TEXT] = vehicle_digit
+        values[CONF_PLATE] = build_change_plate_text(common_text, vehicle_digit)
+        suffix_h = False
+        suffix_e = False
+    else:
+        plate = normalize_plate_text(payload.get(CONF_PLATE, ""))
+        if not plate:
+            errors[CONF_PLATE] = "required"
+        values[CONF_PLATE] = plate
+        values[CONF_CHANGE_PLATE_COMMON_TEXT] = ""
+        values[CONF_CHANGE_PLATE_VEHICLE_DIGIT] = ""
+        values[CONF_CHANGE_PLATE_VEHICLE_TEXT] = ""
+        if kind in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL}:
+            suffix_h = False
+            suffix_e = False
+        else:
+            suffix_h, suffix_e = suffix_flags_from_values(payload)
+
+    values[CONF_PLATE_SUFFIX_H] = suffix_h
+    values[CONF_PLATE_SUFFIX_E] = suffix_e
+    values[CONF_PLATE_SUFFIX] = suffix_summary_from_flags(suffix_h, suffix_e)
+
+    if values[CONF_SEASONAL]:
+        start_month = _int_or_default(payload.get(CONF_SEASON_START_MONTH), 4)
+        end_month = _int_or_default(payload.get(CONF_SEASON_END_MONTH), 10)
+        if not 1 <= start_month <= 12:
+            errors[CONF_SEASON_START_MONTH] = "invalid_month"
+        if not 1 <= end_month <= 12:
+            errors[CONF_SEASON_END_MONTH] = "invalid_month"
+        elif not _is_valid_season_range(start_month, end_month):
+            errors[CONF_SEASON_END_MONTH] = "invalid_season_range"
+        values[CONF_SEASON_START_MONTH] = start_month
+        values[CONF_SEASON_END_MONTH] = end_month
+    else:
+        values[CONF_SEASON_START_MONTH] = None
+        values[CONF_SEASON_END_MONTH] = None
+
+    month = _int_or_default(payload.get(CONF_MONTH), 0)
+    year = _int_or_default(payload.get(CONF_YEAR), 0)
+    interval = _int_or_default(payload.get(CONF_INTERVAL), 2)
+    reminder_offset_days = reminder_offset_days_from_values(payload)
+
+    if not 1 <= month <= 12:
+        errors[CONF_MONTH] = "invalid_month"
+    if not 1900 <= year <= 2100:
+        errors[CONF_YEAR] = "invalid_year"
+    if interval not in {1, 2}:
+        errors[CONF_INTERVAL] = "invalid_interval"
+        interval = 2
+
+    values[CONF_MONTH] = month
+    values[CONF_YEAR] = year
+    values[CONF_INTERVAL] = interval
+    values[CONF_REMINDER_OFFSET_DAYS] = reminder_offset_days
+    values["calendar_event_mode"] = CALENDAR_EVENT_MODE_REMINDER_AND_DUE
+
+    return errors, values
+
+
+def entry_title_from_vehicle_values(values: dict) -> str:
+    """Return the canonical ConfigEntry title for manager-created vehicles."""
+    return _entry_title_from_values(values)
+
 def vehicle_record_from_entry(entry: ConfigEntry, entity_id: str | None = None) -> dict:
     """Build the stable manager-facing vehicle record for one config entry."""
     values = merged_entry_values(entry)
@@ -343,7 +466,9 @@ def manager_metadata() -> dict:
     return {
         "api_version": MANAGER_API_VERSION,
         "storage_model": "config_entries",
-        "write_api": False,
+        "write_api": True,
+        "write_api_version": 1,
+        "write_commands": ["tuev_reminder/manager/vehicles/create"],
         "manager_panel_ready": True,
         "plate_kinds": PLATE_KIND_OPTIONS,
         "plate_formats": PLATE_FORMAT_OPTIONS,

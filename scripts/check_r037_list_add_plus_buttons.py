@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r037 Sidebar list add plus buttons."""
+"""Validate r038 Sidebar list add plus buttons."""
 from __future__ import annotations
 
 import json
@@ -12,15 +12,15 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r037 list add plus buttons check failed: {message}")
+    raise SystemExit(f"r038 list add plus buttons check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r037":
-        fail("manifest version must be 0.1.0-r037")
-    if VERSION.read_text(encoding="utf-8").strip() != "r037":
-        fail("REMINDER_VERSION.txt must be r037")
+    if manifest.get("version") != "0.1.0-r038":
+        fail("manifest version must be 0.1.0-r038")
+    if VERSION.read_text(encoding="utf-8").strip() != "r038":
+        fail("REMINDER_VERSION.txt must be r038")
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
@@ -51,7 +51,7 @@ def main() -> None:
         if needle in panel:
             fail(f"Sidebar panel must not include {needle!r}")
 
-    print("r037 list add plus buttons check OK")
+    print("r038 list add plus buttons check OK")
 
 
 if __name__ == "__main__":

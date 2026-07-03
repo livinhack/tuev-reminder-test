@@ -1,5 +1,17 @@
 # Changelog
 
+## r038 - Backend Create API Foundation + Plain Plus Controls
+
+- Added Manager WebSocket command `tuev_reminder/manager/vehicles/create`.
+- Added backend validation/normalization for manager-created vehicle data.
+- Added ConfigFlow import path so Sidebar-created vehicles become normal Home Assistant ConfigEntries.
+- Updated Manager metadata to expose the create write command.
+- Kept the Sidebar save button disabled until the UI wiring step.
+- Changed the list add controls from `Neues Fahrzeug +` to a plain `+` above and below the list without badge-style background.
+- Preserved the Reminder/Card repository separation.
+
+---
+
 ## r037 - Sidebar List Add Plus Buttons
 
 - Replaces the large `Neues Fahrzeug` toolbar button with compact `+` add controls above and below the vehicle list.

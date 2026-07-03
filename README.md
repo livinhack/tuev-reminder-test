@@ -1,3 +1,24 @@
+# TÜV Reminder r038
+
+**Reminder r038** adds the first backend write foundation for the Reminder-owned Sidebar manager: `tuev_reminder/manager/vehicles/create`. The Sidebar form still keeps UI saving disabled; r039 should wire the modal save button to the new backend command. The visible add controls were also simplified to plain `+` buttons above and below the list, without the previous `Neues Fahrzeug` label/badge treatment.
+
+The Card remains a separate Dashboard/Lovelace project. Reminder owns data, entities, services, calendar and the Sidebar manager. The Card only consumes the Reminder entities/attributes.
+
+## r038 Backend Create API Foundation
+
+- Manager WebSocket command: `tuev_reminder/manager/vehicles/create`
+- Backend validation and normalization for manager-created vehicles
+- ConfigFlow import path for creating normal Home Assistant ConfigEntries
+- Manager metadata advertises the create command
+- Plain `+` add controls above and below the list
+- UI save remains disabled until the next step
+
+## Recommended next step
+
+r039 should connect the modal form to the create API and refresh the vehicle list after successful creation.
+
+---
+
 # TÜV Reminder r037
 
 **Reminder r037** keeps the r036 centered modal form and input-focus fix, but replaces the large `Neues Fahrzeug` toolbar button with compact `+` add controls above and below the vehicle list. This moves the Sidebar UI further toward the Switch-Manager-style list workflow while keeping the form read-only until a dedicated Reminder write API exists. It still does not create ConfigEntries yet and does not import or duplicate Card functionality. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031-r036 Sidebar work remain preserved.
@@ -120,7 +141,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r037
+0.1.0-r038
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.

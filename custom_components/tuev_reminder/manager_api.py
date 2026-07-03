@@ -1,16 +1,24 @@
-"""WebSocket API foundation for a future TÜV Reminder Manager UI."""
+"""WebSocket API foundation for the TÜV Reminder Manager UI."""
 from __future__ import annotations
 
 import voluptuous as vol
 
+from homeassistant import config_entries
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant
 
-from .manager import manager_metadata, vehicle_record_by_entry_id, vehicle_records
+from .const import DOMAIN
+from .manager import (
+    manager_metadata,
+    validate_and_normalize_vehicle_payload,
+    vehicle_record_by_entry_id,
+    vehicle_records,
+)
 
 WS_TYPE_METADATA = "tuev_reminder/manager/metadata"
 WS_TYPE_VEHICLES_LIST = "tuev_reminder/manager/vehicles/list"
 WS_TYPE_VEHICLE_GET = "tuev_reminder/manager/vehicles/get"
+WS_TYPE_VEHICLE_CREATE = "tuev_reminder/manager/vehicles/create"
 
 
 @websocket_api.websocket_command(
@@ -51,8 +59,63 @@ async def websocket_manager_vehicle_get(hass: HomeAssistant, connection, msg) ->
     connection.send_result(msg["id"], {"vehicle": record})
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): WS_TYPE_VEHICLE_CREATE,
+        vol.Required("vehicle"): dict,
+    }
+)
+@websocket_api.async_response
+async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg) -> None:
+    """Create a TÜV Reminder vehicle ConfigEntry from manager form data."""
+    errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    if errors:
+        connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
+        return
+
+    existing_entry_ids = {entry.entry_id for entry in hass.config_entries.async_entries(DOMAIN)}
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_IMPORT},
+        data=normalized,
+    )
+
+    if result.get("type") != "create_entry":
+        connection.send_error(
+            msg["id"],
+            "create_failed",
+            f"TÜV Reminder ConfigEntry creation did not complete: {result.get('reason') or result.get('type')}",
+        )
+        return
+
+    created_entry = result.get("result")
+    if created_entry is None:
+        created_entry = next(
+            (
+                entry
+                for entry in hass.config_entries.async_entries(DOMAIN)
+                if entry.entry_id not in existing_entry_ids
+            ),
+            None,
+        )
+
+    record = None
+    if created_entry is not None:
+        record = vehicle_record_by_entry_id(hass, created_entry.entry_id)
+
+    connection.send_result(
+        msg["id"],
+        {
+            "created": True,
+            "vehicle": record,
+            "vehicles": vehicle_records(hass),
+        },
+    )
+
+
 def async_register_manager_api(hass: HomeAssistant) -> None:
-    """Register the read-only manager WebSocket API commands once."""
+    """Register the manager WebSocket API commands once."""
     websocket_api.async_register_command(hass, websocket_manager_metadata)
     websocket_api.async_register_command(hass, websocket_manager_vehicles_list)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_get)
+    websocket_api.async_register_command(hass, websocket_manager_vehicle_create)

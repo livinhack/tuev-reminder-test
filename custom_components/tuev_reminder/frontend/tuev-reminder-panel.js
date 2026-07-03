@@ -340,7 +340,7 @@ class TuevReminderPanel extends HTMLElement {
       validation.classList.toggle("ok", errors.length === 0);
       validation.innerHTML = errors.length
         ? `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>`
-        : `<strong>Formular lokal plausibel</strong><p>Die echte Speicherung bleibt deaktiviert, bis die Reminder-Write-API implementiert ist.</p>`;
+        : `<strong>Formular lokal plausibel</strong><p>Die Backend-Create-API ist vorbereitet; die UI-Verdrahtung des Speichern-Buttons folgt separat.</p>`;
     }
   }
 
@@ -354,7 +354,7 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     if (!this._vehicles.length) {
-      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „Neues Fahrzeug“, um die geplante Erstellstrecke zu prüfen.</p>`;
+      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „+“, um die geplante Erstellstrecke zu prüfen.</p>`;
     }
 
     const vehicles = this._visibleVehicles();
@@ -440,10 +440,10 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-head">
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
-            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Formular-Skeleton für die spätere ConfigEntry-Erstellung über eine Reminder-Write-API."}</p>
+            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Formular-Skeleton; die Backend-Create-API ist vorbereitet, die UI-Speicherung folgt im nächsten Schritt."}</p>
           </div>
           <div class="form-actions">
-            <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "Erstellen folgt später"}</button>
+            <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "UI-Speichern folgt später"}</button>
             <button class="ghost" id="back-to-list">Schließen</button>
           </div>
         </div>
@@ -503,9 +503,9 @@ class TuevReminderPanel extends HTMLElement {
             </dl>
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               <strong>${errors.length ? "Noch nicht speicherbar" : "Formular lokal plausibel"}</strong>
-              ${errors.length ? `<ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>` : `<p>Die echte Speicherung bleibt deaktiviert, bis die Reminder-Write-API implementiert ist.</p>`}
+              ${errors.length ? `<ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>` : `<p>Die Backend-Create-API ist vorbereitet; die UI-Verdrahtung des Speichern-Buttons folgt separat.</p>`}
             </div>
-            <p class="note">Dieser Stand erzeugt noch keine Entity. Er bereitet die Switch-Manager-artige Erstellseite optisch und fachlich vor.</p>
+            <p class="note">Dieser Stand hält den Speichern-Button noch deaktiviert. Die neue Backend-Create-API ist für die folgende UI-Verdrahtung vorbereitet.</p>
           </aside>
         </div>
         </div>
@@ -608,12 +608,18 @@ class TuevReminderPanel extends HTMLElement {
         }
         button.action[disabled] { opacity: 0.52; cursor: not-allowed; }
         button.icon-action {
-          width: 40px;
-          min-width: 40px;
+          width: auto;
+          min-width: 0;
+          height: auto;
           padding: 0;
-          border-radius: 50%;
-          font-size: 26px;
+          border: 0;
+          border-radius: 0;
+          background: transparent;
+          color: var(--primary-text-color);
+          font-size: 30px;
+          font-weight: 300;
           line-height: 1;
+          box-shadow: none;
         }
         .list-add-row {
           display: ${listMode ? "flex" : "none"};
@@ -626,11 +632,6 @@ class TuevReminderPanel extends HTMLElement {
         .list-add-row.bottom {
           border-top: 1px solid var(--divider-color);
           border-bottom: 0;
-        }
-        .list-add-row .add-label {
-          margin-right: 10px;
-          color: var(--secondary-text-color);
-          font-size: 13px;
         }
         button.ghost {
           border: 1px solid var(--divider-color);
@@ -857,11 +858,10 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Formular-Skeleton · noch read-only · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Backend-Create-API vorbereitet · UI-Speichern noch deaktiviert · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
-          <span class="add-label">Neues Fahrzeug</span>
           <button class="action icon-action" data-create-trigger="top" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
 
@@ -870,7 +870,6 @@ class TuevReminderPanel extends HTMLElement {
         </section>
 
         <section class="list-add-row bottom" aria-label="Fahrzeug unten hinzufügen">
-          <span class="add-label">Neues Fahrzeug</span>
           <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
         ${formOpen ? this._renderCreateForm() : ""}

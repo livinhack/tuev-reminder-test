@@ -1,11 +1,37 @@
+# Handover – Reminder r038 Backend Create API Foundation
+
+Current Reminder version: **r038**.
+
+## What changed in r038
+
+- Updated `REMINDER_VERSION.txt` to `r038`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r038`.
+- Added backend write command `tuev_reminder/manager/vehicles/create`.
+- Added `validate_and_normalize_vehicle_payload(...)` and canonical title creation helpers in `manager.py`.
+- Added `async_step_import(...)` to the ConfigFlow so manager-created vehicles are normal ConfigEntries.
+- Manager metadata now reports `write_api: true` and the supported create command.
+- Sidebar plus controls are now plain `+` controls above and below the list; no `Neues Fahrzeug` text badge beside them.
+- The modal form still does not submit from the UI; save button wiring is the next step.
+
+## HA smoke test focus for r038
+
+1. Install r038 over r037.
+2. Confirm the Sidebar page still opens under `/tuev-reminder`.
+3. Confirm add controls are plain `+` above and below the list.
+4. Confirm the modal still opens and text fields keep focus.
+5. Confirm existing entities and Card display are unchanged.
+6. UI creation is not expected yet; backend command is prepared for r039 UI wiring.
+
+---
+
 # Handover – Reminder r037 Sidebar List Add Plus Buttons
 
-Current Reminder version: **r037**.
+Current Reminder version: **r038**.
 
 ## What changed in r037
 
 - Updated `REMINDER_VERSION.txt` to `r037`.
-- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r037`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r038`.
 - Preserved the r036 centered modal form and the input focus fix.
 - Removed the large `Neues Fahrzeug` toolbar button.
 - Added compact `+` add controls above and below the vehicle list.
