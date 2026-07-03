@@ -26,7 +26,6 @@ from .const import (
     CONF_CHANGE_PLATE_COMMON_TEXT,
     CONF_CHANGE_PLATE_VEHICLE_DIGIT,
     CONF_CHANGE_PLATE_VEHICLE_TEXT,
-    CONF_CALENDAR_EVENT_MODE,
     CONF_REMINDER_OFFSET_DAYS,
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
@@ -44,10 +43,6 @@ from .const import (
     PLATE_FORMAT_TWO_LINE,
     PLATE_FORMAT_SMALL_TWO_LINE,
     PLATE_FORMAT_MOTORCYCLE,
-    CALENDAR_EVENT_MODE_REMINDER_ONLY,
-    CALENDAR_EVENT_MODE_DUE_ONLY,
-    CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
-    CALENDAR_EVENT_MODES,
     DEFAULT_REMINDER_OFFSET_DAYS,
 )
 
@@ -84,12 +79,6 @@ PLATE_FORMAT_LABELS = {
     PLATE_FORMAT_TWO_LINE: "Zweizeilig",
     PLATE_FORMAT_SMALL_TWO_LINE: "Verkleinert zweizeilig",
     PLATE_FORMAT_MOTORCYCLE: "Motorrad",
-}
-
-CALENDAR_EVENT_MODE_LABELS = {
-    CALENDAR_EVENT_MODE_REMINDER_ONLY: "Nur Erinnerung",
-    CALENDAR_EVENT_MODE_DUE_ONLY: "Nur HU-Fälligkeit",
-    CALENDAR_EVENT_MODE_REMINDER_AND_DUE: "Erinnerung und HU-Fälligkeit",
 }
 
 
@@ -138,10 +127,6 @@ def _int_or_default(value: object, default: int) -> int:
         return default
 
 
-def _calendar_event_mode(values: dict) -> str:
-    value = values.get(CONF_CALENDAR_EVENT_MODE, CALENDAR_EVENT_MODE_REMINDER_ONLY)
-    return value if value in CALENDAR_EVENT_MODES else CALENDAR_EVENT_MODE_REMINDER_ONLY
-
 
 def _reminder_offset_days(values: dict) -> int:
     value = _int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
@@ -183,7 +168,6 @@ def _description_lines(
     offset_days: int,
 ):
     status_label = STATUS_LABELS.get(status, status)
-    mode = _calendar_event_mode(values)
     lines = [
         f"Termin: {event_label}",
         f"Fahrzeug: {vehicle_name}",
@@ -192,7 +176,6 @@ def _description_lines(
         f"Fällig am: {_format_date(due_date)}",
         f"Erinnerung am: {_format_date(reminder_date)}",
         f"Erinnerung: {offset_days} Tag(e) vorher",
-        f"Kalendermodus: {CALENDAR_EVENT_MODE_LABELS.get(mode, mode)}",
         f"Status: {status_label}",
         f"Intervall: {interval} Jahr(e)",
     ]
@@ -308,7 +291,6 @@ class TuevReminderCalendar(CalendarEntity):
         month = int(data.get(CONF_MONTH, 1))
         year = int(data.get(CONF_YEAR, 2026))
         interval = int(data.get(CONF_INTERVAL, 2))
-        mode = _calendar_event_mode(data)
         offset_days = _reminder_offset_days(data)
 
         due_date = get_due_date(year, month)
@@ -316,52 +298,50 @@ class TuevReminderCalendar(CalendarEntity):
         status = get_status(year, month, reminder_offset_days=offset_days)
         events = []
 
-        if mode in {CALENDAR_EVENT_MODE_REMINDER_ONLY, CALENDAR_EVENT_MODE_REMINDER_AND_DUE}:
-            event_label = "HU-Erinnerung"
-            events.append(
-                CalendarEvent(
-                    start=reminder_date,
-                    end=reminder_date + timedelta(days=1),
-                    summary=f"TÜV/HU Erinnerung: {vehicle_name}",
-                    description=_description_lines(
-                        data,
-                        event_label,
-                        vehicle_name,
-                        plate,
-                        month,
-                        year,
-                        interval,
-                        due_date,
-                        reminder_date,
-                        status,
-                        offset_days,
-                    ),
-                    uid=f"{entry.entry_id}-tuev-reminder",
-                )
+        event_label = "HU-Erinnerung"
+        events.append(
+            CalendarEvent(
+                start=reminder_date,
+                end=reminder_date + timedelta(days=1),
+                summary=f"TÜV/HU Erinnerung: {vehicle_name}",
+                description=_description_lines(
+                    data,
+                    event_label,
+                    vehicle_name,
+                    plate,
+                    month,
+                    year,
+                    interval,
+                    due_date,
+                    reminder_date,
+                    status,
+                    offset_days,
+                ),
+                uid=f"{entry.entry_id}-tuev-reminder",
             )
+        )
 
-        if mode in {CALENDAR_EVENT_MODE_DUE_ONLY, CALENDAR_EVENT_MODE_REMINDER_AND_DUE}:
-            event_label = "HU-Fälligkeit"
-            events.append(
-                CalendarEvent(
-                    start=due_date,
-                    end=due_date + timedelta(days=1),
-                    summary=f"TÜV/HU fällig: {vehicle_name}",
-                    description=_description_lines(
-                        data,
-                        event_label,
-                        vehicle_name,
-                        plate,
-                        month,
-                        year,
-                        interval,
-                        due_date,
-                        reminder_date,
-                        status,
-                        offset_days,
-                    ),
-                    uid=f"{entry.entry_id}-tuev-due",
-                )
+        event_label = "HU-Fälligkeit"
+        events.append(
+            CalendarEvent(
+                start=due_date,
+                end=due_date + timedelta(days=1),
+                summary=f"TÜV/HU fällig: {vehicle_name}",
+                description=_description_lines(
+                    data,
+                    event_label,
+                    vehicle_name,
+                    plate,
+                    month,
+                    year,
+                    interval,
+                    due_date,
+                    reminder_date,
+                    status,
+                    offset_days,
+                ),
+                uid=f"{entry.entry_id}-tuev-due",
             )
+        )
 
         return events

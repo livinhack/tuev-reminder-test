@@ -1,15 +1,15 @@
-# r018 – V3 Stabilization Test Matrix
+# r019 – V3 Stabilization Test Matrix
 
-r018 is a documentation/checkpoint build after r017. It does not change runtime code.
+r019 is a documentation/checkpoint build after r017. It does not change runtime code.
 
 ## Install stack
 
 ```text
 Card b355
-Reminder r018
+Reminder r019
 ```
 
-r018 has the same runtime behavior as r017 plus this test matrix.
+r019 has the same runtime behavior as r017 plus this test matrix.
 
 ## Vehicle / Card tests
 
@@ -53,9 +53,8 @@ If a validation error is shown, existing entered fields should remain populated.
 Use at least one vehicle for each calendar mode:
 
 ```text
-reminder_only     -> only reminder event
- due_only          -> only due event
-reminder_and_due  -> both events
+calendar always emits both reminder and due events
+reminder_offset_days shifts only the reminder event
 ```
 
 Check offset behavior:

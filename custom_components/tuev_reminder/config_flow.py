@@ -44,10 +44,7 @@ from .const import (
     PLATE_COLOR_GREEN,
     CONF_CALENDAR_EVENT_MODE,
     CONF_REMINDER_OFFSET_DAYS,
-    CALENDAR_EVENT_MODE_REMINDER_ONLY,
-    CALENDAR_EVENT_MODE_DUE_ONLY,
     CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
-    CALENDAR_EVENT_MODES,
     DEFAULT_REMINDER_OFFSET_DAYS,
 )
 from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
@@ -105,12 +102,6 @@ MONTH_OPTIONS = [
     for month in range(1, 13)
 ]
 
-CALENDAR_EVENT_MODE_OPTIONS = [
-    {"value": CALENDAR_EVENT_MODE_REMINDER_ONLY, "label": "Nur Erinnerung"},
-    {"value": CALENDAR_EVENT_MODE_DUE_ONLY, "label": "Nur HU-Fälligkeit"},
-    {"value": CALENDAR_EVENT_MODE_REMINDER_AND_DUE, "label": "Erinnerung und HU-Fälligkeit"},
-]
-
 
 def _month_number_selector():
     return selector.NumberSelector(
@@ -140,10 +131,6 @@ def _int_or_default(value: object, default: int) -> int:
     except (TypeError, ValueError):
         return default
 
-
-def _derive_calendar_event_mode(values: dict) -> str:
-    value = values.get(CONF_CALENDAR_EVENT_MODE, CALENDAR_EVENT_MODE_REMINDER_ONLY)
-    return value if value in CALENDAR_EVENT_MODES else CALENDAR_EVENT_MODE_REMINDER_ONLY
 
 
 def _derive_reminder_offset_days(values: dict) -> int:
@@ -400,15 +387,6 @@ def _due_schema(defaults: dict):
                 )
             ),
             vol.Required(
-                CONF_CALENDAR_EVENT_MODE,
-                default=_derive_calendar_event_mode(defaults),
-            ): selector.SelectSelector(
-                selector.SelectSelectorConfig(
-                    options=CALENDAR_EVENT_MODE_OPTIONS,
-                    mode=selector.SelectSelectorMode.DROPDOWN,
-                )
-            ),
-            vol.Required(
                 CONF_REMINDER_OFFSET_DAYS,
                 default=_derive_reminder_offset_days(defaults),
             ): selector.NumberSelector(
@@ -566,7 +544,7 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._data.update(user_input)
-            self._data[CONF_CALENDAR_EVENT_MODE] = _derive_calendar_event_mode(self._data)
+            self._data[CONF_CALENDAR_EVENT_MODE] = CALENDAR_EVENT_MODE_REMINDER_AND_DUE
             self._data[CONF_REMINDER_OFFSET_DAYS] = _derive_reminder_offset_days(self._data)
             return self.async_create_entry(
                 title=_entry_title(self._data),
@@ -660,7 +638,7 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
 
         if user_input is not None:
             self._data.update(user_input)
-            self._data[CONF_CALENDAR_EVENT_MODE] = _derive_calendar_event_mode(self._data)
+            self._data[CONF_CALENDAR_EVENT_MODE] = CALENDAR_EVENT_MODE_REMINDER_AND_DUE
             self._data[CONF_REMINDER_OFFSET_DAYS] = _derive_reminder_offset_days(self._data)
 
             self.hass.config_entries.async_update_entry(

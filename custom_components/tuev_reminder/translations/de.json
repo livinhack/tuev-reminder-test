@@ -30,7 +30,6 @@
           "month": "HU-Monat",
           "year": "HU-Jahr",
           "interval": "Intervall",
-          "calendar_event_mode": "Kalendereinträge",
           "reminder_offset_days": "Erinnerung Tage vorher"
         }
       },
@@ -83,7 +82,6 @@
           "month": "HU-Monat",
           "year": "HU-Jahr",
           "interval": "Intervall",
-          "calendar_event_mode": "Kalendereinträge",
           "reminder_offset_days": "Erinnerung Tage vorher"
         }
       },

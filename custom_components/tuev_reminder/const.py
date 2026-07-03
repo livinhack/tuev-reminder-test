@@ -66,18 +66,14 @@ PLATE_COLOR_MODES = [
     PLATE_COLOR_GREEN,
 ]
 
-# r014 calendar interface. These are per vehicle entry options used by the
-# shared virtual CalendarEntity.
-CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"
+# r019 calendar interface. The user-configurable mode selector was removed:
+# the virtual calendar always emits both reminder and due events because Card
+# and automations rely on both due/reminder values being present.
 CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"
-CALENDAR_EVENT_MODE_REMINDER_ONLY = "reminder_only"
-CALENDAR_EVENT_MODE_DUE_ONLY = "due_only"
+# Legacy compatibility only. Older entries may still contain this key; runtime
+# ignores it and behaves like reminder_and_due.
+CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"
 CALENDAR_EVENT_MODE_REMINDER_AND_DUE = "reminder_and_due"
-CALENDAR_EVENT_MODES = [
-    CALENDAR_EVENT_MODE_REMINDER_ONLY,
-    CALENDAR_EVENT_MODE_DUE_ONLY,
-    CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
-]
 DEFAULT_REMINDER_OFFSET_DAYS = 7
 
 STATUS_VALID = "valid"

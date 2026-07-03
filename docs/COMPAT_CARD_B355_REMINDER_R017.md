@@ -1,4 +1,4 @@
-# Compatibility – Card b355 + Reminder r017/r018
+# Compatibility – Card b355 + Reminder r017/r019
 
 Status: compatibility checkpoint.
 
@@ -7,12 +7,12 @@ Status: compatibility checkpoint.
 ```text
 Card:     b355 Reminder r008 Attribute Mapping
 Reminder: r017 Detached Calendar Entity
-Reminder: r018 V3 Stabilization Test Matrix (same runtime as r017)
+Reminder: r019 V3 Stabilization Test Matrix (same runtime as r017)
 ```
 
 ## Runtime relation
 
-r018 keeps the r017 runtime behavior. It adds documentation/checks only.
+r019 keeps the r017 runtime behavior. It adds documentation/checks only.
 
 Important integration boundaries remain:
 

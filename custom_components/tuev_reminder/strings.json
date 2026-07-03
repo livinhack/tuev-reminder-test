@@ -30,7 +30,6 @@
           "month": "Inspection month",
           "year": "Inspection year",
           "interval": "Interval",
-          "calendar_event_mode": "Calendar events",
           "reminder_offset_days": "Reminder days before due date"
         }
       },
@@ -83,7 +82,6 @@
           "month": "Inspection month",
           "year": "Inspection year",
           "interval": "Interval",
-          "calendar_event_mode": "Calendar events",
           "reminder_offset_days": "Reminder days before due date"
         }
       },

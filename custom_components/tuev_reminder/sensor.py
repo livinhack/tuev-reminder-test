@@ -40,10 +40,8 @@ from .const import (
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
-    CONF_CALENDAR_EVENT_MODE,
     CONF_REMINDER_OFFSET_DAYS,
-    CALENDAR_EVENT_MODE_REMINDER_ONLY,
-    CALENDAR_EVENT_MODES,
+    CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
     DEFAULT_REMINDER_OFFSET_DAYS,
 )
 
@@ -199,10 +197,9 @@ class TuevSensor(SensorEntity):
 
     @property
     def calendar_event_mode(self):
-        value = self.data.get(CONF_CALENDAR_EVENT_MODE, CALENDAR_EVENT_MODE_REMINDER_ONLY)
-        if value not in CALENDAR_EVENT_MODES:
-            return CALENDAR_EVENT_MODE_REMINDER_ONLY
-        return value
+        # Legacy compatibility attribute only. The user-facing mode selector was
+        # removed in r019; the integration always keeps reminder and due events.
+        return CALENDAR_EVENT_MODE_REMINDER_AND_DUE
 
     @property
     def reminder_offset_days(self):
