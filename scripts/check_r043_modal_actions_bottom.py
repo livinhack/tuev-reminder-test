@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r043 Sidebar modal bottom action placement."""
+"""Validate r044 Sidebar modal bottom action placement."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,7 +10,7 @@ def read(path: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r043 modal actions bottom check failed: {message}")
+    raise SystemExit(f"r044 modal actions bottom check failed: {message}")
 
 
 def main() -> None:
@@ -19,10 +19,10 @@ def main() -> None:
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
     handover = read("HANDOVER.md")
 
-    if '"version": "0.1.0-r043"' not in manifest:
-        fail("manifest version must be 0.1.0-r043")
-    if version != "r043":
-        fail("REMINDER_VERSION.txt must be r043")
+    if '"version": "0.1.0-r044"' not in manifest:
+        fail("manifest version must be 0.1.0-r044")
+    if version != "r044":
+        fail("REMINDER_VERSION.txt must be r044")
 
     head_start = panel.index('<div class="form-head">')
     head_end = panel.index('<div class="form-grid">', head_start)
@@ -46,7 +46,7 @@ def main() -> None:
     if "No Card repository files" not in handover:
         fail("handover must preserve Reminder/Card separation")
 
-    print("r043 modal actions bottom check OK")
+    print("r044 modal actions bottom check OK")
 
 
 if __name__ == "__main__":

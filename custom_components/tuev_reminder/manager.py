@@ -65,7 +65,7 @@ from .helpers import (
     normalize_plate_text,
 )
 
-MANAGER_API_VERSION = 2
+MANAGER_API_VERSION = 3
 
 PLATE_KIND_OPTIONS = [
     {"value": PLATE_KIND_STANDARD, "label": "Standard"},
@@ -467,8 +467,11 @@ def manager_metadata() -> dict:
         "api_version": MANAGER_API_VERSION,
         "storage_model": "config_entries",
         "write_api": True,
-        "write_api_version": 1,
-        "write_commands": ["tuev_reminder/manager/vehicles/create"],
+        "write_api_version": 2,
+        "write_commands": [
+            "tuev_reminder/manager/vehicles/create",
+            "tuev_reminder/manager/vehicles/update",
+        ],
         "manager_panel_ready": True,
         "plate_kinds": PLATE_KIND_OPTIONS,
         "plate_formats": PLATE_FORMAT_OPTIONS,

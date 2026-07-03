@@ -1,3 +1,46 @@
+# Handover – Reminder r044 Backend Update API Foundation
+
+Current Reminder version: **r044** / manifest `0.1.0-r044`.
+
+## What changed in r044
+
+- Added backend WebSocket command: `tuev_reminder/manager/vehicles/update`.
+- The update command accepts `entry_id` plus a normalized `vehicle` payload.
+- It validates through the same backend contract as `vehicles/create`.
+- It updates the existing ConfigEntry via `async_update_entry(..., options=normalized, title=...)`.
+- It reloads the ConfigEntry after saving.
+- It returns the updated single vehicle record and the refreshed full vehicle list.
+- Manager metadata now exposes:
+  - `api_version: 3`
+  - `write_api_version: 2`
+  - `vehicles/create`
+  - `vehicles/update`
+
+## Not changed
+
+- The Sidebar edit button is still not wired to save changes.
+- Delete remains UI-prepared only.
+- No Card repository files are bundled or imported.
+- No Card actions such as `confirm_passed` or `set_due_date` are duplicated.
+
+## Checks
+
+Run:
+
+```bash
+python scripts/run_all_checks.py
+```
+
+Expected result:
+
+```text
+All TÜV Reminder checks passed without leaving generated cache artifacts.
+```
+
+## Next step
+
+Recommended next build: **r045 Sidebar Edit Save Wiring**. Connect the existing edit modal save button to `tuev_reminder/manager/vehicles/update`. Delete should come only after a dedicated backend delete command and confirmation dialog.
+
 # Handover – Reminder r043 Sidebar Modal Actions Bottom
 
 Current Reminder version: **r043** / manifest `0.1.0-r043`.

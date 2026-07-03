@@ -1,3 +1,13 @@
+Reminder r044
+
+# TÜV Reminder
+
+Current development build: **r044** – Backend update API foundation for Sidebar vehicle editing.
+
+r044 adds the Reminder-owned WebSocket command `tuev_reminder/manager/vehicles/update`. Existing vehicles can now be updated through the backend contract, but the Sidebar edit save button is intentionally not wired yet. That belongs in r045.
+
+The Lovelace/Dashboard Card remains a separate repository/project.
+
 # TÜV Reminder
 
 Current development build: **r043** – Sidebar modal action buttons moved to the bottom of the right preview column.

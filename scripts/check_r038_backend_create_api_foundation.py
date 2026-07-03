@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r043 Backend Create API foundation and plain add controls."""
+"""Validate r044 Backend Create API foundation and plain add controls."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r043 backend create API check failed: {message}")
+    raise SystemExit(f"r044 backend create API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r043":
-        fail("manifest version must be 0.1.0-r043")
-    if read("REMINDER_VERSION.txt").strip() != "r043":
-        fail("REMINDER_VERSION.txt must be r043")
+    if manifest.get("version") != "0.1.0-r044":
+        fail("manifest version must be 0.1.0-r044")
+    if read("REMINDER_VERSION.txt").strip() != "r044":
+        fail("REMINDER_VERSION.txt must be r044")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -30,11 +30,11 @@ def main() -> None:
     panel_py = read("custom_components/tuev_reminder/panel.py")
 
     for marker in [
-        "MANAGER_API_VERSION = 2",
+        "MANAGER_API_VERSION = 3",
         "def validate_and_normalize_vehicle_payload(",
         "def entry_title_from_vehicle_values(",
         '"write_api": True',
-        '"write_api_version": 1',
+        '"write_api_version": 2',
         '"tuev_reminder/manager/vehicles/create"',
     ]:
         if marker not in manager:
@@ -95,7 +95,7 @@ def main() -> None:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r043 backend create API check OK")
+    print("r044 backend create API check OK")
 
 
 if __name__ == "__main__":

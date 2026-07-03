@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r043 Switch-Manager-style Sidebar visual polish."""
+"""Validate r044 Switch-Manager-style Sidebar visual polish."""
 from __future__ import annotations
 
 import json
@@ -13,14 +13,14 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r043 sidebar visual polish check failed: {message}")
+    raise SystemExit(f"r044 sidebar visual polish check failed: {message}")
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r043":
-    fail("manifest version must be 0.1.0-r043")
-if read("REMINDER_VERSION.txt").strip() != "r043":
-    fail("REMINDER_VERSION.txt must be r043")
+if manifest.get("version") != "0.1.0-r044":
+    fail("manifest version must be 0.1.0-r044")
+if read("REMINDER_VERSION.txt").strip() != "r044":
+    fail("REMINDER_VERSION.txt must be r044")
 
 panel_py = read("custom_components/tuev_reminder/panel.py")
 panel_js = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
@@ -65,4 +65,4 @@ for relative in [
     if not (ROOT / relative).exists():
         fail(f"missing documentation file: {relative}")
 
-print("r043 sidebar visual polish check OK")
+print("r044 sidebar visual polish check OK")

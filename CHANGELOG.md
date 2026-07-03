@@ -1,5 +1,17 @@
 # Changelog
 
+## r044 - Backend Update API Foundation
+
+- Added Reminder Manager WebSocket command `tuev_reminder/manager/vehicles/update`.
+- Reuses the same backend vehicle validation/normalization contract as create.
+- Updates existing ConfigEntry options and refreshes the ConfigEntry title.
+- Reloads the updated ConfigEntry after a successful update.
+- Manager metadata now advertises `write_api_version: 2` and create/update commands.
+- Sidebar edit save remains intentionally unwired; r045 should connect the modal edit save path.
+- Card/Reminder separation remains unchanged.
+
+# Changelog
+
 ## r043 - Sidebar Modal Actions Bottom
 
 - Moves the modal action buttons out of the top-right header area.

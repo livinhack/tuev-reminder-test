@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .manager import (
+    entry_title_from_vehicle_values,
     manager_metadata,
     validate_and_normalize_vehicle_payload,
     vehicle_record_by_entry_id,
@@ -19,6 +20,7 @@ WS_TYPE_METADATA = "tuev_reminder/manager/metadata"
 WS_TYPE_VEHICLES_LIST = "tuev_reminder/manager/vehicles/list"
 WS_TYPE_VEHICLE_GET = "tuev_reminder/manager/vehicles/get"
 WS_TYPE_VEHICLE_CREATE = "tuev_reminder/manager/vehicles/create"
+WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"
 
 
 @websocket_api.websocket_command(
@@ -113,9 +115,47 @@ async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg)
     )
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): WS_TYPE_VEHICLE_UPDATE,
+        vol.Required("entry_id"): str,
+        vol.Required("vehicle"): dict,
+    }
+)
+@websocket_api.async_response
+async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg) -> None:
+    """Update an existing TÜV Reminder vehicle ConfigEntry from manager form data."""
+    entry = hass.config_entries.async_get_entry(msg["entry_id"])
+    if entry is None or entry.domain != DOMAIN:
+        connection.send_error(msg["id"], "not_found", "TÜV Reminder vehicle not found")
+        return
+
+    errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    if errors:
+        connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
+        return
+
+    hass.config_entries.async_update_entry(
+        entry,
+        title=entry_title_from_vehicle_values(normalized),
+        options=normalized,
+    )
+    await hass.config_entries.async_reload(entry.entry_id)
+
+    connection.send_result(
+        msg["id"],
+        {
+            "updated": True,
+            "vehicle": vehicle_record_by_entry_id(hass, entry.entry_id),
+            "vehicles": vehicle_records(hass),
+        },
+    )
+
+
 def async_register_manager_api(hass: HomeAssistant) -> None:
     """Register the manager WebSocket API commands once."""
     websocket_api.async_register_command(hass, websocket_manager_metadata)
     websocket_api.async_register_command(hass, websocket_manager_vehicles_list)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_get)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_create)
+    websocket_api.async_register_command(hass, websocket_manager_vehicle_update)
