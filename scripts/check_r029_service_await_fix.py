@@ -17,10 +17,10 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r029":
-    fail("manifest version must be 0.1.0-r029")
+if manifest.get("version") != "0.1.0-r030":
+    fail("manifest version must be 0.1.0-r030")
 
-if read("REMINDER_VERSION.txt").strip() != "r029":
+if read("REMINDER_VERSION.txt").strip() != "r030":
     fail("REMINDER_VERSION.txt must be r029")
 
 init_py = read("custom_components/tuev_reminder/__init__.py")

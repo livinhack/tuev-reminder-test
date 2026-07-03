@@ -22,7 +22,7 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r029"', "manifest r014 version")
+assert_contains(manifest, '"version": "0.1.0-r030"', "manifest r014 version")
 
 for needle in [
     'PLATE_FORMAT_SINGLE_LINE = "single_line"',
@@ -46,7 +46,7 @@ for needle in [
 
 assert_contains(config_flow, "vol.Required(\n                CONF_PLATE_FORMAT", "plate_format in first flow step")
 assert_contains(sensor, '"plate_format": self.plate_format', "sensor plate_format attribute")
-assert_contains(sensor, 'self.data.get(CONF_PLATE_KIND) == PLATE_KIND_CHANGE', "change plates no longer depend on visual plate_format")
+assert_contains(sensor, 'self.plate_kind == PLATE_KIND_CHANGE', "change plates no longer depend on visual plate_format")
 assert_contains(sensor, 'self.data.get(CONF_PLATE_FORMAT) == LEGACY_PLATE_FORMAT_CHANGE', "legacy change format fallback")
 
 for text, label in [(strings, "strings"), (de, "German translations"), (en, "English translations")]:

@@ -1,5 +1,12 @@
 # Changelog
 
+## r030 - Sensor Boolean/Kind Consistency
+
+- Align sensor-side plate kind, green plate, seasonal and change-plate derivation with the Manager read model.
+- Use validated `PLATE_KINDS` and `_coerce_bool(...)` for legacy/imported values.
+- Preserve Card bridge attributes, r028 Manager API and r029 service-await behaviour.
+
+
 ## r029 - Service Await Fix
 
 - Fixed the async ConfigEntry resolver call in `tuev_reminder.confirm_passed`.

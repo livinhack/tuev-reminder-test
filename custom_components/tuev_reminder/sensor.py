@@ -25,6 +25,7 @@ from .const import (
     CONF_CHANGE_PLATE_COMMON_TEXT,
     CONF_CHANGE_PLATE_VEHICLE_DIGIT,
     CONF_CHANGE_PLATE_VEHICLE_TEXT,
+    PLATE_KINDS,
     PLATE_KIND_STANDARD,
     PLATE_KIND_SEASONAL,
     PLATE_KIND_CHANGE,
@@ -119,14 +120,14 @@ class TuevSensor(SensorEntity):
     @property
     def plate_kind(self):
         configured = self.data.get(CONF_PLATE_KIND)
-        if configured:
+        if configured in PLATE_KINDS:
             return configured
 
-        if self.change_plate_enabled:
+        if _coerce_bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False)):
             return PLATE_KIND_CHANGE
 
-        green = self.plate_color_mode == PLATE_COLOR_GREEN
-        seasonal = self.seasonal
+        green = self.data.get(CONF_PLATE_COLOR_MODE) == PLATE_COLOR_GREEN
+        seasonal = _coerce_bool(self.data.get(CONF_SEASONAL, False))
 
         if green and seasonal:
             return PLATE_KIND_GREEN_SEASONAL
@@ -211,6 +212,8 @@ class TuevSensor(SensorEntity):
 
     @property
     def plate_color_mode(self):
+        if self.plate_kind in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL}:
+            return PLATE_COLOR_GREEN
         value = self.data.get(CONF_PLATE_COLOR_MODE, PLATE_COLOR_STANDARD)
         if value not in PLATE_COLOR_MODES:
             return PLATE_COLOR_STANDARD
@@ -218,7 +221,9 @@ class TuevSensor(SensorEntity):
 
     @property
     def seasonal(self):
-        return bool(self.data.get(CONF_SEASONAL, False))
+        if self.plate_kind in {PLATE_KIND_SEASONAL, PLATE_KIND_GREEN_SEASONAL}:
+            return True
+        return _coerce_bool(self.data.get(CONF_SEASONAL, False))
 
     @property
     def season_start_month(self):
@@ -238,8 +243,8 @@ class TuevSensor(SensorEntity):
         # are identified by the explicit kind/flag. The legacy r004-r007 value
         # plate_format="change" is still accepted for older stored entries.
         return (
-            self.data.get(CONF_PLATE_KIND) == PLATE_KIND_CHANGE
-            or bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
+            self.plate_kind == PLATE_KIND_CHANGE
+            or _coerce_bool(self.data.get(CONF_CHANGE_PLATE_ENABLED, False))
             or self.data.get(CONF_PLATE_FORMAT) == LEGACY_PLATE_FORMAT_CHANGE
         )
 

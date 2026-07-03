@@ -1,16 +1,30 @@
-# Handover – Reminder r029 Service Await Fix
+# Handover – Reminder r030 Sensor Boolean/Kind Consistency
 
-Current Reminder version: **r029**.
+Current Reminder version: **r030**.
 
 Current compatible stack:
 
 ```text
-Card b355+ / Card b356 RC + Reminder r029
+Card b355+ / Card b356 RC + Reminder r030
 ```
 
-r029 is a focused runtime bugfix on top of r028. It fixes the service handlers while preserving the r028 read-only Manager API foundation.
+r030 is a focused runtime consistency fix on top of r029. It aligns sensor boolean/kind derivation with the r028 Manager read model while preserving the r029 service-await fix.
 
-## What changed in r029
+## What changed in r030
+
+- Updated `REMINDER_VERSION.txt` to `r030`.
+- Updated `manifest.json` to `0.1.0-r030`.
+- Updated `custom_components/tuev_reminder/sensor.py` so sensor-side derivation matches the Manager read model more closely:
+  - configured `plate_kind` is accepted only when it exists in `PLATE_KINDS`,
+  - `change_plate_enabled` uses `_coerce_bool(...)`,
+  - seasonal plate kinds force `seasonal=True`,
+  - green plate kinds force `plate_color_mode=green`.
+- Added `docs/REMINDER_R030_SENSOR_BOOL_KIND_CONSISTENCY.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R030.md`.
+- Added `scripts/check_r030_sensor_bool_kind_consistency.py`.
+- Preserved the r029 service-await fix and r028 Manager API foundation.
+
+## Previous r029 change
 
 - Updated `REMINDER_VERSION.txt` to `r029`.
 - Updated `manifest.json` to `0.1.0-r029`.
@@ -62,7 +76,7 @@ The runner performs Python syntax checks, JSON validation and all `check_r*.py` 
 
 ## Next recommended step
 
-Install/test Reminder r029 in Home Assistant with Card b356 RC. Specifically test:
+Install/test Reminder r030 in Home Assistant with Card b356 RC. Specifically test:
 
 1. `tuev_reminder.confirm_passed` on an existing TÜV Reminder sensor.
 2. `tuev_reminder.set_due_date` on an existing TÜV Reminder sensor.
@@ -89,4 +103,4 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-Reminder r028 Manager API Foundation remains preserved.
+Reminder r028 Manager API Foundation and r029 Service Await Fix remain preserved.

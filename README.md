@@ -1,11 +1,11 @@
-# TÜV Reminder r029
+# TÜV Reminder r030
 
-**Reminder r029** fixes the async service-entry resolver bug in the stabilized v3 line. Reminder r028 Manager API foundation remains preserved.
+**Reminder r030** aligns sensor boolean and plate-kind derivation with the Manager read model. The r028 Manager API foundation and r029 service-await fix remain preserved.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r029
+Card b355 + Reminder r030
 ```
 
 ## What the integration does
@@ -120,7 +120,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r029
+0.1.0-r030
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
@@ -174,6 +174,17 @@ No Sidebar frontend, no write API and no Area-Code autocomplete UI are included 
 
 
 ---
+
+## r030 Sensor Boolean/Kind Consistency
+
+r030 aligns the sensor runtime with the Manager read model for legacy or manually edited entries:
+
+- invalid stored `plate_kind` values no longer pass through as-is,
+- string values such as `"false"` are coerced consistently,
+- green plate kinds force sensor-side green color mode,
+- seasonal plate kinds force sensor-side seasonal attributes.
+
+No Card bridge attributes are removed. Normal current entries should look unchanged.
 
 ## r029 Service Await Fix
 
