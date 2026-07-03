@@ -1,9 +1,10 @@
-# Handover – Reminder r039 Backend Create API Foundation
+# Handover – Reminder r040 Sidebar Table Compact Polish
 
-Current Reminder version: **r039**.
+Current Reminder version: **r040**.
 
-## r039 Sidebar table polish
+## r040 Sidebar table polish
 
+- Name and HU secondary lines removed from the main Sidebar table.
 - Status column moved behind Erinnerung.
 - Reminder column renamed to Erinnerung.
 - Reminder date displayed as TT.MM.JJJJ.
@@ -12,10 +13,10 @@ Current Reminder version: **r039**.
 - r038 Backend Create API foundation remains intact.
 
 
-## What changed in r039
+## What changed in r040
 
-- Updated `REMINDER_VERSION.txt` to `r039`.
-- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r039`.
+- Updated `REMINDER_VERSION.txt` to `r040`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r040`.
 - Added backend write command `tuev_reminder/manager/vehicles/create`.
 - Added `validate_and_normalize_vehicle_payload(...)` and canonical title creation helpers in `manager.py`.
 - Added `async_step_import(...)` to the ConfigFlow so manager-created vehicles are normal ConfigEntries.
@@ -23,25 +24,25 @@ Current Reminder version: **r039**.
 - Sidebar plus controls are now plain `+` controls above and below the list; no `Neues Fahrzeug` text badge beside them.
 - The modal form still does not submit from the UI; save button wiring is the next step.
 
-## HA smoke test focus for r039
+## HA smoke test focus for r040
 
-1. Install r039 over r037.
+1. Install r040 over r037.
 2. Confirm the Sidebar page still opens under `/tuev-reminder`.
 3. Confirm add controls are plain `+` above and below the list.
 4. Confirm the modal still opens and text fields keep focus.
 5. Confirm existing entities and Card display are unchanged.
-6. UI creation is not expected yet; backend command is prepared for r039 UI wiring.
+6. UI creation is not expected yet; backend command is prepared for r041 UI wiring.
 
 ---
 
 # Handover – Reminder r037 Sidebar List Add Plus Buttons
 
-Current Reminder version: **r039**.
+Current Reminder version: **r040**.
 
 ## What changed in r037
 
 - Updated `REMINDER_VERSION.txt` to `r037`.
-- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r039`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r040`.
 - Preserved the r036 centered modal form and the input focus fix.
 - Removed the large `Neues Fahrzeug` toolbar button.
 - Added compact `+` add controls above and below the vehicle list.

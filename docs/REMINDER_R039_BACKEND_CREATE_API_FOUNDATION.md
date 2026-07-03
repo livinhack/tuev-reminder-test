@@ -1,6 +1,6 @@
-# Reminder r039 – Sidebar Table Column Polish
+# Reminder r040 – Sidebar Table Compact Polish
 
-r039 applies the latest Sidebar list layout feedback on top of r038.
+r040 applies the latest Sidebar list layout feedback on top of r038.
 
 ## Changes
 

@@ -1,6 +1,14 @@
 # Changelog
 
-## r039 - Sidebar Table Column Polish
+## r040 - Sidebar Table Compact Polish
+
+- Removed the secondary entity-id line below the vehicle name in the Sidebar table.
+- Removed the secondary due-date line below the HU month/year in the Sidebar table.
+- Kept the compact column order: Name, HU, Erinnerung, Status, Kennzeichen, menu.
+- Preserved r038 Backend Create API foundation and r039 table label cleanup.
+- Preserved strict Reminder/Card separation.
+
+## r040 - Sidebar Table Compact Polish
 
 - Moved the Status column behind Erinnerung.
 - Renamed Reminder to Erinnerung.
@@ -11,7 +19,7 @@
 - Preserved strict Reminder/Card separation.
 
 
-## r039 - Backend Create API Foundation + Plain Plus Controls
+## r040 - Backend Create API Foundation + Plain Plus Controls
 
 - Added Manager WebSocket command `tuev_reminder/manager/vehicles/create`.
 - Added backend validation/normalization for manager-created vehicle data.

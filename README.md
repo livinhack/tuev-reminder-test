@@ -1,11 +1,12 @@
-# TÜV Reminder r039
+# TÜV Reminder r040
 
-**Reminder r039** adds the first backend write foundation for the Reminder-owned Sidebar manager: `tuev_reminder/manager/vehicles/create`. The Sidebar form still keeps UI saving disabled; r039 should wire the modal save button to the new backend command. The visible add controls were also simplified to plain `+` buttons above and below the list, without the previous `Neues Fahrzeug` label/badge treatment.
+**Reminder r040** keeps the Backend Create API foundation and further compacts the Reminder-owned Sidebar table. The remaining secondary lines under Name and HU were removed, while the Sidebar form still keeps UI saving disabled until the next step wires the modal save button to `tuev_reminder/manager/vehicles/create`.
 
 The Card remains a separate Dashboard/Lovelace project. Reminder owns data, entities, services, calendar and the Sidebar manager. The Card only consumes the Reminder entities/attributes.
 
-## r039 Sidebar table polish
+## r040 Sidebar table polish
 
+- Secondary lines under `Name` and `HU` were removed.
 - `Status` is now shown behind `Erinnerung`.
 - `Reminder` was renamed to `Erinnerung`.
 - Reminder dates are shown as `TT.MM.JJJJ`.
@@ -14,7 +15,7 @@ The Card remains a separate Dashboard/Lovelace project. Reminder owns data, enti
 - The row-end plate preview remains available.
 
 
-## r039 Backend Create API Foundation
+## r040 Backend Create API Foundation
 
 - Manager WebSocket command: `tuev_reminder/manager/vehicles/create`
 - Backend validation and normalization for manager-created vehicles
@@ -25,7 +26,7 @@ The Card remains a separate Dashboard/Lovelace project. Reminder owns data, enti
 
 ## Recommended next step
 
-r039 should connect the modal form to the create API and refresh the vehicle list after successful creation.
+r041 should connect the modal form to the create API and refresh the vehicle list after successful creation.
 
 ---
 
@@ -151,7 +152,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r039
+0.1.0-r040
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.

@@ -386,11 +386,9 @@ class TuevReminderPanel extends HTMLElement {
               <tr data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}" tabindex="0" title="Detail-/Formularansicht öffnen">
                 <td class="name-cell">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
-                  <div class="vehicle-sub">${this._escape(vehicle.entity_id || "Keine Sensor-Entity")}</div>
                 </td>
                 <td>
                   <div class="main-value">${this._escape(this._monthYear(vehicle))}</div>
-                  <div class="sub-value">${this._escape(this._dateLabel(vehicle.due_date))}</div>
                 </td>
                 <td>
                   <div class="main-value">${this._escape(this._dateLabel(vehicle.reminder_date))}</div>
@@ -676,7 +674,7 @@ class TuevReminderPanel extends HTMLElement {
         .col-preview { width: 240px; text-align: right; }
         .col-menu { width: 40px; }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
-        .vehicle-sub, .sub-value, .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
+        .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         .main-value { font-weight: 500; line-height: 1.25; }
         .status-pill {
           display: inline-flex;

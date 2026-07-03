@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r039 Backend Create API foundation and plain add controls."""
+"""Validate r040 Backend Create API foundation and plain add controls."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r039 backend create API check failed: {message}")
+    raise SystemExit(f"r040 backend create API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r039":
-        fail("manifest version must be 0.1.0-r039")
-    if read("REMINDER_VERSION.txt").strip() != "r039":
-        fail("REMINDER_VERSION.txt must be r039")
+    if manifest.get("version") != "0.1.0-r040":
+        fail("manifest version must be 0.1.0-r040")
+    if read("REMINDER_VERSION.txt").strip() != "r040":
+        fail("REMINDER_VERSION.txt must be r040")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -89,13 +89,13 @@ def main() -> None:
             fail(f"panel JS must not include {forbidden!r}")
 
     for relative in [
-        "docs/REMINDER_R039_BACKEND_CREATE_API_FOUNDATION.md",
-        "docs/COMPAT_CARD_B355_REMINDER_R039.md",
+        "docs/REMINDER_R040_BACKEND_CREATE_API_FOUNDATION.md",
+        "docs/COMPAT_CARD_B355_REMINDER_R040.md",
     ]:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r039 backend create API check OK")
+    print("r040 backend create API check OK")
 
 
 if __name__ == "__main__":
