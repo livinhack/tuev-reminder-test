@@ -1,6 +1,6 @@
-# Reminder r038 – Backend Create API Foundation
+# Reminder r039 – Backend Create API Foundation
 
-r038 adds the first write-side Manager backend path for the Reminder-owned Sidebar UI.
+r039 adds the first write-side Manager backend path for the Reminder-owned Sidebar UI.
 
 ## Scope
 
@@ -13,7 +13,7 @@ r038 adds the first write-side Manager backend path for the Reminder-owned Sideb
 
 ## Separation
 
-The Card remains a separate dashboard project. r038 does not import Card code, does not duplicate Card actions and does not add Lovelace/Dashboard management.
+The Card remains a separate dashboard project. r039 does not import Card code, does not duplicate Card actions and does not add Lovelace/Dashboard management.
 
 ## Next step
 

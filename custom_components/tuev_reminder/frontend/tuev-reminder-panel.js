@@ -133,7 +133,13 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _dateLabel(value) {
-    return value ? String(value) : "—";
+    if (!value) return "—";
+    const raw = String(value);
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return `${match[3]}.${match[2]}.${match[1]}`;
+    }
+    return raw;
   }
 
   _statusCounts() {
@@ -368,11 +374,10 @@ class TuevReminderPanel extends HTMLElement {
           <thead>
             <tr>
               <th class="col-name">Name</th>
-              <th>Status</th>
               <th>HU</th>
-              <th>Reminder</th>
-              <th>Typ</th>
-              <th class="col-preview">Vorschau</th>
+              <th>Erinnerung</th>
+              <th>Status</th>
+              <th class="col-preview">Kennzeichen</th>
               <th class="col-menu" aria-label="Menü"></th>
             </tr>
           </thead>
@@ -383,16 +388,14 @@ class TuevReminderPanel extends HTMLElement {
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
                   <div class="vehicle-sub">${this._escape(vehicle.entity_id || "Keine Sensor-Entity")}</div>
                 </td>
-                <td><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td>
                   <div class="main-value">${this._escape(this._monthYear(vehicle))}</div>
                   <div class="sub-value">${this._escape(this._dateLabel(vehicle.due_date))}</div>
                 </td>
                 <td>
                   <div class="main-value">${this._escape(this._dateLabel(vehicle.reminder_date))}</div>
-                  <div class="sub-value">Ablauf ${this._escape(this._dateLabel(vehicle.expired_date))}</div>
                 </td>
-                <td><div class="tag-row">${this._vehicleMeta(vehicle)}</div></td>
+                <td><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
                 <td class="menu-cell"><button class="row-menu" data-menu-index="${index}" title="Detail-/Formularansicht öffnen" aria-label="Zeilenmenü">⋮</button></td>
               </tr>
@@ -664,13 +667,13 @@ class TuevReminderPanel extends HTMLElement {
           background: rgba(0, 0, 0, .46);
         }
         .list-shell { overflow-x: auto; }
-        .manager-table { width: 100%; min-width: 1040px; border-collapse: collapse; }
+        .manager-table { width: 100%; min-width: 940px; border-collapse: collapse; }
         th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
         th { height: 32px; color: var(--secondary-text-color); font-size: 12px; font-weight: 600; }
         tbody tr { cursor: pointer; }
         tbody tr:hover { background: var(--secondary-background-color); }
-        .col-name { width: 30%; }
-        .col-preview { width: 220px; text-align: right; }
+        .col-name { width: 38%; }
+        .col-preview { width: 240px; text-align: right; }
         .col-menu { width: 40px; }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
         .vehicle-sub, .sub-value, .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }

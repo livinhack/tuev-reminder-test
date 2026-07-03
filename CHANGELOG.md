@@ -1,6 +1,17 @@
 # Changelog
 
-## r038 - Backend Create API Foundation + Plain Plus Controls
+## r039 - Sidebar Table Column Polish
+
+- Moved the Status column behind Erinnerung.
+- Renamed Reminder to Erinnerung.
+- Formatted reminder dates as TT.MM.JJJJ.
+- Removed the Typ column from the main Sidebar vehicle list.
+- Renamed Vorschau to Kennzeichen.
+- Preserved Backend Create API foundation and plain plus controls.
+- Preserved strict Reminder/Card separation.
+
+
+## r039 - Backend Create API Foundation + Plain Plus Controls
 
 - Added Manager WebSocket command `tuev_reminder/manager/vehicles/create`.
 - Added backend validation/normalization for manager-created vehicle data.
