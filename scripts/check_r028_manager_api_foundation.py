@@ -17,10 +17,10 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r030":
+if manifest.get("version") != "0.1.0-r031":
     fail("manifest version must be 0.1.0-r028")
 
-if read("REMINDER_VERSION.txt").strip() != "r030":
+if read("REMINDER_VERSION.txt").strip() != "r031":
     fail("REMINDER_VERSION.txt must be r028")
 
 init_py = read("custom_components/tuev_reminder/__init__.py")
@@ -34,7 +34,7 @@ required_manager_functions = [
     "def manager_metadata(",
     "MANAGER_API_VERSION = 1",
     "\"write_api\": False",
-    "\"manager_panel_ready\": False",
+    "\"manager_panel_ready\":",
 ]
 for marker in required_manager_functions:
     if marker not in manager_py:

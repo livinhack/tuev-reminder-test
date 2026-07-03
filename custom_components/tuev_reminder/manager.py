@@ -344,7 +344,7 @@ def manager_metadata() -> dict:
         "api_version": MANAGER_API_VERSION,
         "storage_model": "config_entries",
         "write_api": False,
-        "manager_panel_ready": False,
+        "manager_panel_ready": True,
         "plate_kinds": PLATE_KIND_OPTIONS,
         "plate_formats": PLATE_FORMAT_OPTIONS,
         "plate_formats_by_kind": PLATE_FORMATS_BY_KIND,

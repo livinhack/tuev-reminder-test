@@ -25,8 +25,8 @@ plan = read("docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R028.md")
 changelog = read("CHANGELOG.md")
 
-assert version == "r030"
-assert manifest["version"] == "0.1.0-r030"
+assert version == "r031"
+assert manifest["version"] == "0.1.0-r031"
 
 for text, label in [
     (readme, "README"),

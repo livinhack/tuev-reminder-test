@@ -30,6 +30,7 @@ from .const import (
 )
 from .helpers import build_plate_with_suffix
 from .manager_api import async_register_manager_api
+from .panel import async_register_manager_panel
 
 PLATFORMS = ["sensor"]
 
@@ -37,6 +38,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CALENDAR_PLATFORM_LOADED_KEY = "calendar_platform_loaded"
 MANAGER_API_REGISTERED_KEY = "manager_api_registered"
+MANAGER_PANEL_REGISTERED_KEY = "manager_panel_registered"
 
 
 def _coerce_bool(value: object) -> bool:
@@ -154,6 +156,10 @@ async def async_setup(hass: HomeAssistant, config: dict):
     if not hass.data[DOMAIN].get(MANAGER_API_REGISTERED_KEY):
         async_register_manager_api(hass)
         hass.data[DOMAIN][MANAGER_API_REGISTERED_KEY] = True
+
+    if not hass.data[DOMAIN].get(MANAGER_PANEL_REGISTERED_KEY):
+        await async_register_manager_panel(hass)
+        hass.data[DOMAIN][MANAGER_PANEL_REGISTERED_KEY] = True
 
     async def handle_confirm_passed(call: ServiceCall):
         entity_id = call.data[ATTR_ENTITY_ID]

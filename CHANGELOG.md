@@ -1,5 +1,13 @@
 # Changelog
 
+## r031 - Sidebar Panel Foundation
+
+- Added a Reminder-owned Home Assistant Sidebar panel foundation.
+- Added static frontend serving for `frontend/tuev-reminder-panel.js`.
+- Registered `/tuev-reminder` as `TÜV Reminder` panel with `mdi:car-clock`.
+- The panel calls the existing read-only Manager WebSocket API and shows a first vehicle overview shell.
+- Kept Card and Reminder strictly separated; no Lovelace Card code or Card actions were added to the Reminder panel.
+
 ## r030 - Sensor Boolean/Kind Consistency
 
 - Align sensor-side plate kind, green plate, seasonal and change-plate derivation with the Manager read model.

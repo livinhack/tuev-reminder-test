@@ -1,11 +1,11 @@
-# TÜV Reminder r030
+# TÜV Reminder r031
 
-**Reminder r030** aligns sensor boolean and plate-kind derivation with the Manager read model. The r028 Manager API foundation and r029 service-await fix remain preserved.
+**Reminder r031** adds the first Reminder-owned Home Assistant Sidebar panel foundation. The r028 Manager API foundation, r029 service-await fix and r030 sensor/readmodel consistency remain preserved.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r030
+Card b355 + Reminder r031
 ```
 
 ## What the integration does
@@ -120,7 +120,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r030
+0.1.0-r031
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
@@ -174,6 +174,13 @@ No Sidebar frontend, no write API and no Area-Code autocomplete UI are included 
 
 
 ---
+
+
+## r031 Sidebar Panel Foundation
+
+r031 adds a Reminder-only Home Assistant Sidebar panel foundation. It registers a `TÜV Reminder` panel at `/tuev-reminder`, serves `frontend/tuev-reminder-panel.js` from the integration, and uses the existing read-only Manager WebSocket API to show a first vehicle overview shell.
+
+The Sidebar panel intentionally does not contain Card code, plate renderer code or duplicated Card actions. Its target is a later Switch-Manager-style entity creation and management page for Reminder entities.
 
 ## r030 Sensor Boolean/Kind Consistency
 
