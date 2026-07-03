@@ -198,7 +198,7 @@ class TuevSensor(SensorEntity):
     @property
     def calendar_event_mode(self):
         # Legacy compatibility attribute only. The user-facing mode selector was
-        # removed in r019; the integration always keeps reminder and due events.
+        # removed in r020; the integration always keeps reminder and due events.
         return CALENDAR_EVENT_MODE_REMINDER_AND_DUE
 
     @property

@@ -1,44 +1,42 @@
-# TÜV Reminder r019
+# TÜV Reminder r020
 
-Reminder r019 is the current Reminder v3 stabilization runtime. It keeps the r017 detached virtual calendar and the r015 service lifecycle, but removes the user-facing calendar event mode selector from r013.
+Reminder r020 is the current **v3 stabilized checkpoint** for the TÜV Reminder integration.
 
 ## Current compatible stack
 
-- Card: b355
-- Reminder: r019
+- Card: **b355**
+- Reminder: **r020**
 
-## Calendar behavior
+## What this version does
 
-The Reminder still provides one shared virtual calendar:
+The integration stores one vehicle per config entry/device and exposes one TÜV sensor per vehicle. The shared virtual calendar is detached from vehicle devices and belongs to the TÜV Reminder manager/integration context.
+
+The calendar entity is:
 
 ```text
 calendar.tuev_reminder
 ```
 
-It is not written to `local_calendar`; events are generated dynamically from the vehicle entries.
+It is not written to `local_calendar`; events are generated dynamically from the configured vehicle entries.
 
-r019 always emits both event types for every vehicle:
+The calendar always emits both event types for every vehicle:
 
 - TÜV/HU Erinnerung
 - TÜV/HU fällig
 
-The configurable value that remains is:
+The remaining user-facing timing option is:
 
 ```text
 reminder_offset_days
 ```
 
-Existing old `calendar_event_mode` values are ignored.
+Old stored `calendar_event_mode` values are ignored.
 
 ## Card bridge
 
-Card b355 continues to read Reminder attributes for plate display, green plates, season plates, change plates, H/E flags and plate formats.
+Card b355 reads Reminder attributes for plate display, green plates, season plates, change plates, H/E flags and plate formats.
 
-## Compatibility history / checks
-
-Stable Reminder r009 runtime line remains documented for Card b355 compatibility. Reminder r009 introduced the tested Card bridge for new plate attributes; Reminder r017 detached the calendar entity from vehicle devices.
-
-Card b355 compatibility attributes:
+Important compatibility attributes include:
 
 ```text
 plate
@@ -59,5 +57,37 @@ change_plate_vehicle_digit
 change_plate_vehicle_text
 ```
 
-Leerzeichen im Kennzeichen bleiben erhalten; das ist für Card und Renderer wichtig. Green plate / grünes Kennzeichen unterdrückt H/E-Suffixe. Die frühere NONE-/none-Altlast wird nicht ans Kennzeichen angehängt.
+Whitespace in `plate` is preserved because the Card/renderer needs the block structure.
+
+## Not included
+
+- No Card code.
+- No renderer geometry changes.
+- No `local_calendar` sync.
+- No browser-style area-code autocomplete in the normal HA config flow.
+- No Sidebar/Manager UI yet.
+
+## Compatibility history / preserved decisions
+
+Stable Reminder r009 runtime line remains documented for Card b355 compatibility. Reminder r009 introduced the tested Card bridge for new plate attributes. Reminder r017 detached the calendar entity from vehicle devices.
+
+Reminder r017 is the calendar-detached architecture baseline preserved by r020.
+
+Important attribute names preserved for Card b355 and sensor compatibility:
+
+```text
+plate_suffix_h
+plate_suffix_e
+plate_color_mode
+seasonal
+season_start_month
+season_end_month
+change_plate_enabled
+change_plate_common_text
+change_plate_vehicle_text
+change_plate_vehicle_digit
+```
+
+Leerzeichen im Kennzeichen bleiben erhalten. green plate / grünes Kennzeichen unterdrückt H/E. NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt.
+
 stable Reminder r009 compatibility runtime line.

@@ -1,6 +1,6 @@
-# Reminder r019 – Calendar Always Due + Offset Only
+# Reminder r020 – Calendar Always Due + Offset Only
 
-r019 removes the user-facing calendar event mode selector. The reminder offset remains configurable, but the virtual calendar always emits both events per vehicle:
+r020 removes the user-facing calendar event mode selector. The reminder offset remains configurable, but the virtual calendar always emits both events per vehicle:
 
 - `TÜV/HU Erinnerung: <Fahrzeug>`
 - `TÜV/HU fällig: <Fahrzeug>`

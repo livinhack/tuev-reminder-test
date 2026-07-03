@@ -18,8 +18,8 @@ def assert_not_contains(text: str, needle: str, label: str) -> None:
         raise AssertionError(f"Unexpected {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r019"
-assert read("REMINDER_VERSION.txt").strip() == "r019"
+assert manifest["version"] == "0.1.0-r020"
+assert read("REMINDER_VERSION.txt").strip() == "r020"
 
 const = read("custom_components/tuev_reminder/const.py")
 helpers = read("custom_components/tuev_reminder/helpers.py")
@@ -29,7 +29,7 @@ calendar = read("custom_components/tuev_reminder/calendar.py")
 strings = read("custom_components/tuev_reminder/strings.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
-doc = read("docs/REMINDER_R019_CALENDAR_ALWAYS_DUE_OFFSET_ONLY.md")
+doc = read("docs/REMINDER_R020_CALENDAR_ALWAYS_DUE_OFFSET_ONLY.md")
 
 assert_contains(const, 'CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"', "reminder offset constant")
 assert_contains(const, 'CALENDAR_EVENT_MODE_REMINDER_AND_DUE = "reminder_and_due"', "legacy fixed mode constant")
@@ -58,7 +58,7 @@ assert_not_contains(calendar, "_calendar_event_mode", "calendar mode runtime bra
 assert_not_contains(calendar, "Kalendermodus:", "calendar mode description line")
 assert_contains(calendar, "async_setup_platform", "shared detached calendar platform setup")
 
-for text, label in [(strings, "strings"), (readme, "README"), (handover, "handover"), (doc, "r019 doc")]:
+for text, label in [(strings, "strings"), (readme, "README"), (handover, "handover"), (doc, "r020 doc")]:
     assert_contains(text, "reminder_offset_days", label)
 
-print("r013/r019 calendar interface check OK: offset remains, mode selector removed, both events are always emitted")
+print("r013/r020 calendar interface check OK: offset remains, mode selector removed, both events are always emitted")

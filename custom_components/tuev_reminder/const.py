@@ -66,7 +66,7 @@ PLATE_COLOR_MODES = [
     PLATE_COLOR_GREEN,
 ]
 
-# r019 calendar interface. The user-configurable mode selector was removed:
+# r020 calendar interface. The user-configurable mode selector was removed:
 # the virtual calendar always emits both reminder and due events because Card
 # and automations rely on both due/reminder values being present.
 CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"
