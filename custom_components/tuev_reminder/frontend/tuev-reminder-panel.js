@@ -10,6 +10,9 @@ class TuevReminderPanel extends HTMLElement {
     this._error = null;
     this._metadata = null;
     this._vehicles = [];
+    this._filter = "";
+    this._statusFilter = "all";
+    this._sort = "due";
   }
 
   set hass(hass) {
@@ -69,11 +72,82 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
+  _escape(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   _statusLabel(status) {
     if (status === "valid") return "gültig";
     if (status === "due") return "fällig";
     if (status === "expired") return "abgelaufen";
     return status || "unbekannt";
+  }
+
+  _kindLabel(kind) {
+    const options = this._metadata?.plate_kinds || [];
+    return options.find((option) => option.value === kind)?.label || kind || "Standard";
+  }
+
+  _formatLabel(format) {
+    const options = this._metadata?.plate_formats || [];
+    return options.find((option) => option.value === format)?.label || format || "Einzeilig";
+  }
+
+  _monthYear(vehicle) {
+    const month = String(vehicle.month || "--").padStart(2, "0");
+    const year = String(vehicle.year || "----");
+    return `${month}/${year}`;
+  }
+
+  _dateLabel(value) {
+    return value ? String(value) : "—";
+  }
+
+  _statusCounts() {
+    return this._vehicles.reduce((counts, vehicle) => {
+      const status = vehicle.status || "unknown";
+      counts[status] = (counts[status] || 0) + 1;
+      return counts;
+    }, {});
+  }
+
+  _visibleVehicles() {
+    const filter = this._filter.trim().toLowerCase();
+    const vehicles = this._vehicles.filter((vehicle) => {
+      if (this._statusFilter !== "all" && vehicle.status !== this._statusFilter) {
+        return false;
+      }
+      if (!filter) {
+        return true;
+      }
+      return [
+        vehicle.vehicle_name,
+        vehicle.title,
+        vehicle.plate_display,
+        vehicle.plate,
+        vehicle.entity_id,
+        vehicle.plate_kind,
+        vehicle.plate_format,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(filter));
+    });
+
+    return vehicles.sort((a, b) => {
+      if (this._sort === "name") {
+        return String(a.vehicle_name || a.title || "").localeCompare(String(b.vehicle_name || b.title || ""), "de", { sensitivity: "base" });
+      }
+      if (this._sort === "status") {
+        const order = { expired: 0, due: 1, valid: 2 };
+        return (order[a.status] ?? 9) - (order[b.status] ?? 9) || String(a.due_date || "").localeCompare(String(b.due_date || ""));
+      }
+      return String(a.due_date || "9999-99-99").localeCompare(String(b.due_date || "9999-99-99"));
+    });
   }
 
   _renderVehicles() {
@@ -89,32 +163,54 @@ class TuevReminderPanel extends HTMLElement {
       return `<p class="muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden.</p>`;
     }
 
+    const vehicles = this._visibleVehicles();
+    if (!vehicles.length) {
+      return `<p class="muted">Keine Fahrzeuge passen zum aktuellen Filter.</p>`;
+    }
+
     return `
-      <div class="vehicle-list">
-        ${this._vehicles.map((vehicle) => `
-          <article class="vehicle-card">
-            <div>
-              <h3>${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</h3>
-              <p class="plate">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</p>
-            </div>
-            <dl>
-              <div><dt>HU</dt><dd>${this._escape(String(vehicle.month || "--")).padStart(2, "0")}/${this._escape(String(vehicle.year || "----"))}</dd></div>
-              <div><dt>Status</dt><dd>${this._escape(this._statusLabel(vehicle.status))}</dd></div>
-              <div><dt>Typ</dt><dd>${this._escape(vehicle.plate_kind || "standard")}</dd></div>
-            </dl>
-          </article>
-        `).join("")}
+      <div class="table-wrap">
+        <table class="vehicle-table">
+          <thead>
+            <tr>
+              <th>Fahrzeug</th>
+              <th>Kennzeichen</th>
+              <th>HU</th>
+              <th>Status</th>
+              <th>Reminder</th>
+              <th>Typ</th>
+              <th>Entity</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${vehicles.map((vehicle) => `
+              <tr>
+                <td>
+                  <strong>${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</strong>
+                  <small>${this._escape(this._formatLabel(vehicle.plate_format))}</small>
+                </td>
+                <td><span class="plate">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</span></td>
+                <td>
+                  <span>${this._escape(this._monthYear(vehicle))}</span>
+                  <small>${this._escape(this._dateLabel(vehicle.due_date))}</small>
+                </td>
+                <td><span class="status status-${this._escape(vehicle.status || "unknown")}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
+                <td>
+                  <span>${this._escape(this._dateLabel(vehicle.reminder_date))}</span>
+                  <small>Ablauf: ${this._escape(this._dateLabel(vehicle.expired_date))}</small>
+                </td>
+                <td>
+                  <span>${this._escape(this._kindLabel(vehicle.plate_kind))}</span>
+                  ${vehicle.seasonal ? `<small>Saison ${this._escape(vehicle.season_start_month)}–${this._escape(vehicle.season_end_month)}</small>` : ""}
+                  ${vehicle.change_plate_enabled ? `<small>Wechselkennzeichen</small>` : ""}
+                </td>
+                <td><code>${this._escape(vehicle.entity_id || "—")}</code></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
       </div>
     `;
-  }
-
-  _escape(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
   }
 
   _render() {
@@ -125,6 +221,8 @@ class TuevReminderPanel extends HTMLElement {
     const apiVersion = this._metadata?.api_version ?? "—";
     const writeApi = this._metadata?.write_api === true ? "aktiv" : "read-only";
     const vehicleCount = this._vehicles.length;
+    const counts = this._statusCounts();
+    const visibleCount = this._visibleVehicles().length;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -137,7 +235,7 @@ class TuevReminderPanel extends HTMLElement {
           font-family: var(--paper-font-body1_-_font-family, Roboto, sans-serif);
         }
         .page {
-          max-width: 1040px;
+          max-width: 1180px;
           margin: 0 auto;
           padding: 24px;
         }
@@ -167,16 +265,16 @@ class TuevReminderPanel extends HTMLElement {
           font-size: 28px;
           font-weight: 500;
         }
-        .subtitle, .muted {
+        .subtitle, .muted, small {
           color: var(--secondary-text-color);
         }
         .grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
           gap: 16px;
           margin-bottom: 16px;
         }
-        .card, .vehicle-card {
+        .card {
           border-radius: 12px;
           background: var(--card-background-color);
           box-shadow: var(--ha-card-box-shadow, none);
@@ -188,16 +286,20 @@ class TuevReminderPanel extends HTMLElement {
           line-height: 1.2;
           font-weight: 500;
         }
-        .actions {
+        .actions, .filters {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
           margin: 16px 0;
+          align-items: center;
+        }
+        button.action, select, input {
+          border-radius: 8px;
+          padding: 10px 12px;
+          font: inherit;
         }
         button.action {
           border: 0;
-          border-radius: 8px;
-          padding: 10px 14px;
           background: var(--primary-color);
           color: var(--text-primary-color);
           cursor: pointer;
@@ -207,48 +309,79 @@ class TuevReminderPanel extends HTMLElement {
           cursor: not-allowed;
           opacity: 0.55;
         }
-        .vehicle-list {
-          display: grid;
-          gap: 12px;
+        input, select {
+          min-height: 40px;
+          border: 1px solid var(--divider-color);
+          background: var(--card-background-color);
+          color: var(--primary-text-color);
         }
-        .vehicle-card {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) auto;
-          gap: 16px;
-          align-items: center;
+        input[type="search"] {
+          min-width: min(360px, 100%);
+          flex: 1 1 260px;
         }
-        .vehicle-card h3 {
-          margin-bottom: 4px;
-          font-size: 18px;
+        .table-wrap {
+          overflow-x: auto;
+          border: 1px solid var(--divider-color);
+          border-radius: 12px;
         }
-        .plate {
-          margin-bottom: 0;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-          font-size: 20px;
-          letter-spacing: 0.04em;
+        .vehicle-table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 920px;
         }
-        dl {
-          display: grid;
-          grid-template-columns: repeat(3, auto);
-          gap: 14px;
-          margin: 0;
+        th, td {
+          padding: 12px;
+          text-align: left;
+          vertical-align: top;
+          border-bottom: 1px solid var(--divider-color);
         }
-        dt {
+        th {
           color: var(--secondary-text-color);
           font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
-        dd {
-          margin: 2px 0 0;
-          text-align: right;
+        tbody tr:last-child td {
+          border-bottom: 0;
+        }
+        td strong, td span, td code, td small {
+          display: block;
+        }
+        .plate {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 18px;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
+        }
+        code {
+          color: var(--secondary-text-color);
+          font-size: 12px;
+          word-break: break-all;
+        }
+        .status {
+          display: inline-block;
+          width: max-content;
+          border-radius: 999px;
+          padding: 3px 9px;
+          border: 1px solid var(--divider-color);
+          background: var(--secondary-background-color);
+        }
+        .status-expired {
+          color: var(--error-color);
+        }
+        .status-due {
+          color: var(--warning-color, var(--state-icon-active-color));
+        }
+        .status-valid {
+          color: var(--success-color, var(--primary-color));
         }
         .error {
           color: var(--error-color);
         }
         @media (max-width: 700px) {
           .page { padding: 16px; }
-          .vehicle-card { grid-template-columns: 1fr; }
-          dl { grid-template-columns: repeat(3, 1fr); }
-          dd { text-align: left; }
+          .grid { grid-template-columns: 1fr 1fr; }
         }
       </style>
       <main class="page">
@@ -256,7 +389,7 @@ class TuevReminderPanel extends HTMLElement {
           <button class="menu" title="Menü öffnen" aria-label="Menü öffnen">☰</button>
           <div>
             <h1>TÜV Reminder</h1>
-            <p class="subtitle">Manager-Shell für die spätere komfortable Entitäten-Erstellung. Keine Card-Funktionen, keine Dashboard-Vermischung.</p>
+            <p class="subtitle">Reminder-eigene Manager-Seite für Fahrzeug-/Entitäten-Verwaltung. Keine Card-Funktionen, keine Dashboard-Vermischung.</p>
           </div>
         </header>
 
@@ -266,12 +399,17 @@ class TuevReminderPanel extends HTMLElement {
             <div class="metric">${vehicleCount}</div>
           </div>
           <div class="card">
-            <p class="muted">Manager API</p>
-            <div class="metric">v${apiVersion}</div>
+            <p class="muted">Gefiltert</p>
+            <div class="metric">${visibleCount}</div>
           </div>
           <div class="card">
-            <p class="muted">Schreibzugriff</p>
-            <div class="metric">${writeApi}</div>
+            <p class="muted">Fällig / abgelaufen</p>
+            <div class="metric">${(counts.due || 0) + (counts.expired || 0)}</div>
+          </div>
+          <div class="card">
+            <p class="muted">Manager API</p>
+            <div class="metric">v${apiVersion}</div>
+            <small>Schreibzugriff: ${writeApi}</small>
           </div>
         </section>
 
@@ -281,6 +419,20 @@ class TuevReminderPanel extends HTMLElement {
             <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>Aktualisieren</button>
             <button class="action" disabled title="Kommt mit der Create-API in einer späteren Reminder-Version">Neues Fahrzeug anlegen</button>
           </div>
+          <div class="filters" aria-label="Fahrzeugliste filtern und sortieren">
+            <input id="filter" type="search" placeholder="Suche nach Fahrzeug, Kennzeichen oder Entity" value="${this._escape(this._filter)}">
+            <select id="status-filter" aria-label="Statusfilter">
+              <option value="all" ${this._statusFilter === "all" ? "selected" : ""}>Alle Status</option>
+              <option value="expired" ${this._statusFilter === "expired" ? "selected" : ""}>Nur abgelaufen</option>
+              <option value="due" ${this._statusFilter === "due" ? "selected" : ""}>Nur fällig</option>
+              <option value="valid" ${this._statusFilter === "valid" ? "selected" : ""}>Nur gültig</option>
+            </select>
+            <select id="sort" aria-label="Sortierung">
+              <option value="due" ${this._sort === "due" ? "selected" : ""}>Sortierung: HU-Datum</option>
+              <option value="status" ${this._sort === "status" ? "selected" : ""}>Sortierung: Status</option>
+              <option value="name" ${this._sort === "name" ? "selected" : ""}>Sortierung: Name</option>
+            </select>
+          </div>
           ${this._renderVehicles()}
         </section>
       </main>
@@ -289,6 +441,30 @@ class TuevReminderPanel extends HTMLElement {
     const refreshButton = this.shadowRoot.querySelector("#refresh");
     if (refreshButton) {
       refreshButton.addEventListener("click", () => this._refresh());
+    }
+
+    const filterInput = this.shadowRoot.querySelector("#filter");
+    if (filterInput) {
+      filterInput.addEventListener("input", (event) => {
+        this._filter = event.target.value;
+        this._render();
+      });
+    }
+
+    const statusFilter = this.shadowRoot.querySelector("#status-filter");
+    if (statusFilter) {
+      statusFilter.addEventListener("change", (event) => {
+        this._statusFilter = event.target.value;
+        this._render();
+      });
+    }
+
+    const sortSelect = this.shadowRoot.querySelector("#sort");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", (event) => {
+        this._sort = event.target.value;
+        this._render();
+      });
     }
 
     const menuButton = this.shadowRoot.querySelector(".menu");

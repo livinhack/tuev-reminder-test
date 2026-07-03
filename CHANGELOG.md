@@ -1,5 +1,15 @@
 # Changelog
 
+## r032 - Sidebar Vehicle List
+
+- Keeps the Reminder/Card repository separation unchanged.
+- Expands the Reminder-owned Sidebar panel from the r031 shell into a read-only vehicle overview.
+- Adds search/filtering by vehicle, plate, entity id, kind and format.
+- Adds status filtering for all/expired/due/valid.
+- Adds sorting by HU date, status or vehicle name.
+- Adds status metrics for total, filtered and due/expired vehicles.
+- Still does not include Card code, Dashboard code, plate renderer code or duplicated Card/service actions.
+
 ## r031 - Sidebar Panel Foundation
 
 - Added a Reminder-owned Home Assistant Sidebar panel foundation.

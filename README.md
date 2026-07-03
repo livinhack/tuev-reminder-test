@@ -1,11 +1,11 @@
-# TÜV Reminder r031
+# TÜV Reminder r032
 
-**Reminder r031** adds the first Reminder-owned Home Assistant Sidebar panel foundation. The r028 Manager API foundation, r029 service-await fix and r030 sensor/readmodel consistency remain preserved.
+**Reminder r032** extends the Reminder-owned Home Assistant Sidebar panel into a read-only vehicle list with search, status filtering and sorting. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031 Sidebar registration remain preserved.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r031
+Card b355 + Reminder r032
 ```
 
 ## What the integration does
@@ -120,7 +120,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r031
+0.1.0-r032
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
@@ -201,3 +201,9 @@ r029 fixes the internal async handling of the service entry resolver used by:
 - `tuev_reminder.set_due_date`
 
 Both service handlers now await `_resolve_tuev_entry(...)` before reading config entry data/options and reloading the entry. Card attributes, calendar behavior and the read-only r028 Manager API remain unchanged.
+
+## r032 Sidebar Vehicle List
+
+r032 keeps the Sidebar panel Reminder-only and improves the first manager page from a shell into a read-only vehicle overview. The page now shows status metrics, a searchable/filterable/sortable vehicle table, HU date, reminder date, expired date, plate kind, plate format and sensor entity id.
+
+It still intentionally contains no Card code, no plate renderer, no Dashboard configuration and no duplicated actions such as `confirm_passed` or `set_due_date`.

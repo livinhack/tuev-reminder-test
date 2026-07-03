@@ -1,6 +1,34 @@
+# Handover – Reminder r032 Sidebar Vehicle List
+
+Current Reminder version: **r032**.
+
+## What changed in r032
+
+- Updated `REMINDER_VERSION.txt` to `r032`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r032`.
+- Preserved r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031 Sidebar registration.
+- Changed the panel config mode to `vehicle_list`.
+- Improved `frontend/tuev-reminder-panel.js` from a Sidebar shell into a read-only vehicle overview with search, status filter and sorting.
+- Still no Card code, no plate renderer, no Dashboard configuration and no duplicated `confirm_passed` / `set_due_date` actions.
+
+## HA smoke test focus for r032
+
+1. Sidebar entry `TÜV Reminder` appears.
+2. `/tuev-reminder` loads without browser console errors.
+3. The read-only vehicle table loads through `tuev_reminder/manager/vehicles/list`.
+4. Search, status filter and sorting work.
+5. The disabled `Neues Fahrzeug anlegen` button remains disabled until a later create API exists.
+6. Existing Dashboard Card behavior remains unchanged.
+
+## Suggested next step
+
+r033 should add a read-only detail/form skeleton for one selected vehicle. It should still not save data yet.
+
+---
+
 # Handover – Reminder r031 Sidebar Panel Foundation
 
-Current Reminder version: **r031**.
+Historical base section from r031; current version is r032.
 
 Current compatible stack:
 
@@ -13,7 +41,7 @@ r031 adds the first Reminder-owned Home Assistant Sidebar panel foundation on to
 ## What changed in r031
 
 - Updated `REMINDER_VERSION.txt` to `r031`.
-- Updated `manifest.json` to `0.1.0-r031`.
+- Updated `manifest.json` to `0.1.0-r032`.
 - Added frontend-related dependencies:
   - `http`
   - `frontend`
