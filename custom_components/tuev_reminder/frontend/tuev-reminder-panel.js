@@ -286,7 +286,8 @@ class TuevReminderPanel extends HTMLElement {
     this._render();
   }
 
-  _setFormValue(name, value) {
+  _setFormValue(name, value, options = {}) {
+    const render = options.render !== false;
     this._form = { ...this._form, [name]: value };
     if (name === "plate_kind" && !["seasonal", "green_seasonal"].includes(value)) {
       this._form.season_start_month = "4";
@@ -296,7 +297,51 @@ class TuevReminderPanel extends HTMLElement {
       this._form.plate_suffix_h = false;
       this._form.plate_suffix_e = false;
     }
-    this._render();
+    if (render) {
+      this._render();
+      return;
+    }
+    this._syncFormSummary();
+  }
+
+  _syncFormSummary() {
+    if (!this.shadowRoot || this._view === "list") {
+      return;
+    }
+
+    const seasonal = ["seasonal", "green_seasonal"].includes(this._form.plate_kind);
+    const green = ["green", "green_seasonal"].includes(this._form.plate_kind);
+    const errors = this._formValidation();
+
+    const preview = this.shadowRoot.querySelector(".large-preview");
+    if (preview) {
+      preview.innerHTML = this._platePreviewFromText(this._formPlateText(), {
+        green,
+        seasonal,
+        seasonStart: this._form.season_start_month,
+        seasonEnd: this._form.season_end_month,
+      });
+    }
+
+    const summary = {
+      name: this._form.vehicle_name || "—",
+      hu: `${String(this._form.month || "—").padStart(2, "0")}/${this._form.year || "—"}`,
+      kind: this._kindLabel(this._form.plate_kind),
+      format: this._formatLabel(this._form.plate_format),
+    };
+    Object.entries(summary).forEach(([key, value]) => {
+      const node = this.shadowRoot.querySelector(`[data-summary="${key}"]`);
+      if (node) node.textContent = value;
+    });
+
+    const validation = this.shadowRoot.querySelector(".validation");
+    if (validation) {
+      validation.classList.toggle("has-errors", errors.length > 0);
+      validation.classList.toggle("ok", errors.length === 0);
+      validation.innerHTML = errors.length
+        ? `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>`
+        : `<strong>Formular lokal plausibel</strong><p>Die echte Speicherung bleibt deaktiviert, bis die Reminder-Write-API implementiert ist.</p>`;
+    }
   }
 
   _renderVehicles() {
@@ -390,14 +435,17 @@ class TuevReminderPanel extends HTMLElement {
     ];
 
     return `
-      <section class="form-shell" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}">
+      <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true">
+        <div class="form-shell">
         <div class="form-head">
-          <button class="ghost" id="back-to-list">← Zurück</button>
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
             <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Formular-Skeleton für die spätere ConfigEntry-Erstellung über eine Reminder-Write-API."}</p>
           </div>
-          <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "Erstellen folgt später"}</button>
+          <div class="form-actions">
+            <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "Erstellen folgt später"}</button>
+            <button class="ghost" id="back-to-list">Schließen</button>
+          </div>
         </div>
 
         <div class="form-grid">
@@ -448,10 +496,10 @@ class TuevReminderPanel extends HTMLElement {
               seasonEnd: this._form.season_end_month,
             })}</div>
             <dl>
-              <div><dt>Name</dt><dd>${this._escape(this._form.vehicle_name || "—")}</dd></div>
-              <div><dt>HU</dt><dd>${this._escape(String(this._form.month).padStart(2, "0"))}/${this._escape(this._form.year || "—")}</dd></div>
-              <div><dt>Art</dt><dd>${this._escape(this._kindLabel(this._form.plate_kind))}</dd></div>
-              <div><dt>Format</dt><dd>${this._escape(this._formatLabel(this._form.plate_format))}</dd></div>
+              <div><dt>Name</dt><dd data-summary="name">${this._escape(this._form.vehicle_name || "—")}</dd></div>
+              <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(this._form.month).padStart(2, "0"))}/${this._escape(this._form.year || "—")}</dd></div>
+              <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(this._form.plate_kind))}</dd></div>
+              <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(this._form.plate_format))}</dd></div>
             </dl>
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               <strong>${errors.length ? "Noch nicht speicherbar" : "Formular lokal plausibel"}</strong>
@@ -459,6 +507,7 @@ class TuevReminderPanel extends HTMLElement {
             </div>
             <p class="note">Dieser Stand erzeugt noch keine Entity. Er bereitet die Switch-Manager-artige Erstellseite optisch und fachlich vor.</p>
           </aside>
+        </div>
         </div>
       </section>
     `;
@@ -474,7 +523,8 @@ class TuevReminderPanel extends HTMLElement {
     const vehicleCount = this._vehicles.length;
     const counts = this._statusCounts();
     const visibleCount = this._visibleVehicles().length;
-    const listMode = this._view === "list";
+    const listMode = true;
+    const formOpen = this._view !== "list";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -576,6 +626,17 @@ class TuevReminderPanel extends HTMLElement {
         }
         .summary-strip strong { color: var(--primary-text-color); font-weight: 500; }
         .content { padding: 0; }
+        .modal-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          padding: 32px 20px;
+          background: rgba(0, 0, 0, .46);
+        }
         .list-shell { overflow-x: auto; }
         .manager-table { width: 100%; min-width: 1040px; border-collapse: collapse; }
         th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
@@ -683,15 +744,26 @@ class TuevReminderPanel extends HTMLElement {
         }
         .state { padding: 24px 16px; }
         .error { color: var(--error-color); }
-        .form-shell { padding: 18px 20px 32px; }
+        .form-shell {
+          width: min(1120px, 100%);
+          max-height: min(860px, calc(100vh - 64px));
+          overflow: auto;
+          padding: 18px 20px 24px;
+          box-sizing: border-box;
+          border: 1px solid var(--divider-color);
+          border-radius: 12px;
+          background: var(--primary-background-color);
+          box-shadow: 0 16px 48px rgba(0,0,0,.32);
+        }
         .form-head {
           display: grid;
-          grid-template-columns: auto minmax(0, 1fr) auto;
+          grid-template-columns: minmax(0, 1fr) auto;
           align-items: center;
           gap: 14px;
           margin-bottom: 18px;
         }
         .form-head p { margin: 0; color: var(--secondary-text-color); }
+        .form-actions { display: flex; gap: 8px; align-items: center; }
         .form-grid { display: grid; grid-template-columns: minmax(360px, 680px) minmax(280px, 420px); gap: 18px; align-items: start; }
         .form-card {
           border: 1px solid var(--divider-color);
@@ -765,8 +837,9 @@ class TuevReminderPanel extends HTMLElement {
         </section>
 
         <section class="content">
-          ${listMode ? this._renderVehicles() : this._renderCreateForm()}
+          ${this._renderVehicles()}
         </section>
+        ${formOpen ? this._renderCreateForm() : ""}
       </main>
     `;
 
@@ -821,14 +894,36 @@ class TuevReminderPanel extends HTMLElement {
     if (backButton) backButton.addEventListener("click", () => this._closeForm());
 
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
-      field.addEventListener(field.type === "checkbox" ? "change" : "input", (event) => {
-        const target = event.target;
-        this._setFormValue(target.dataset.field, target.type === "checkbox" ? target.checked : target.value);
-      });
       if (field.tagName === "SELECT") {
-        field.addEventListener("change", (event) => this._setFormValue(event.target.dataset.field, event.target.value));
+        field.addEventListener("change", (event) => {
+          const name = event.target.dataset.field;
+          const needsLayout = name === "plate_kind";
+          this._setFormValue(name, event.target.value, { render: needsLayout });
+        });
+        return;
       }
+
+      if (field.type === "checkbox") {
+        field.addEventListener("change", (event) => {
+          this._setFormValue(event.target.dataset.field, event.target.checked, { render: false });
+        });
+        return;
+      }
+
+      field.addEventListener("input", (event) => {
+        this._setFormValue(event.target.dataset.field, event.target.value, { render: false });
+      });
     });
+
+    const modalBackdrop = this.shadowRoot.querySelector(".modal-backdrop");
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener("click", (event) => {
+        if (event.target === modalBackdrop) this._closeForm();
+      });
+      modalBackdrop.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") this._closeForm();
+      });
+    }
 
     const menuButton = this.shadowRoot.querySelector(".menu");
     if (menuButton) {

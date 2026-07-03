@@ -1,5 +1,13 @@
 # Changelog
 
+## r036 - Sidebar Modal Form + Focus Fix
+
+- Keeps the r035 create/detail form skeleton read-only, but changes it from a second page view into a centered modal overlay above the vehicle list.
+- Fixes the input focus loss after one character by updating form state, preview and validation in place for normal text/number inputs instead of rebuilding the entire panel on every keystroke.
+- Keeps full re-rendering only for layout-changing controls such as `plate_kind`.
+- Adds outside-click close behavior and a compact modal header with disabled future Save/Create action plus Close.
+- Keeps Card repository and Dashboard Card behavior separate.
+
 ## r035 - Sidebar Create Form Skeleton
 
 - Intentionally skips r034 because action duplication is out of scope for the Reminder Sidebar.
