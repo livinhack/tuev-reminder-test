@@ -1,6 +1,6 @@
-# Reminder r040 – Sidebar Table Compact Polish
+# Reminder r041 – Sidebar Table Compact Polish
 
-r040 keeps the r038 Backend Create API foundation and r039 table column cleanup, then removes the remaining secondary table lines requested from the Sidebar vehicle list.
+r041 keeps the r038 Backend Create API foundation and r039 table column cleanup, then removes the remaining secondary table lines requested from the Sidebar vehicle list.
 
 ## Changes
 

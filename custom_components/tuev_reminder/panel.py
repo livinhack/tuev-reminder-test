@@ -52,7 +52,7 @@ async def async_register_manager_panel(hass: HomeAssistant) -> None:
             },
             "domain": DOMAIN,
             "api_prefix": "tuev_reminder/manager",
-            "mode": "vehicle_list_create_api_foundation",
+            "mode": "vehicle_list_create_form_save",
             "write_api": True,
         },
     )

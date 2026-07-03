@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r040 Sidebar create form skeleton without enabling writes."""
+"""Validate Sidebar create form structure after save wiring."""
 from __future__ import annotations
 
 import json
@@ -20,16 +20,15 @@ def main() -> int:
     js = JS.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    assert VERSION.read_text(encoding="utf-8").strip() == "r040"
-    assert manifest["version"] == "0.1.0-r040"
+    assert VERSION.read_text(encoding="utf-8").strip() == "r041"
+    assert manifest["version"] == "0.1.0-r041"
 
     require(js, 'this._view = "list"')
     require(js, "_renderCreateForm()")
     require(js, "_openCreateForm()")
     require(js, "Neues Fahrzeug")
-    require(js, "Formular-Skeleton")
-    require(js, "Speichern folgt später")
-    require(js, "UI-Speichern folgt später")
+    require(js, "Neues Fahrzeug anlegen")
+    require(js, "Speichern")
     require(js, "plate_suffix_h")
     require(js, "plate_suffix_e")
     require(js, "change_plate_common_text")
@@ -44,16 +43,13 @@ def main() -> int:
         "tuev-card",
         "hui-",
         "lovelace",
-        "vehicles/create",
         "vehicles/update",
         "vehicles/delete",
     ]
     for needle in forbidden:
         if needle in js:
-            raise AssertionError(f"r040 Sidebar form skeleton must not include {needle!r}")
+            raise AssertionError(f"r041 Sidebar form skeleton must not include {needle!r}")
 
-    docs = (ROOT / "docs" / "REMINDER_R035_CREATE_FORM_SKELETON.md").read_text(encoding="utf-8")
-    require(docs, "No ConfigEntry write yet")
     return 0
 
 

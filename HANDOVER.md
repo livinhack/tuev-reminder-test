@@ -1,3 +1,56 @@
+# Handover – Reminder r041 Sidebar Create Form Save
+
+Current Reminder version: **r041** / manifest `0.1.0-r041`.
+
+## What changed in r041
+
+- Wired the Sidebar modal save button to `tuev_reminder/manager/vehicles/create`.
+- Added frontend payload construction for new vehicles.
+- Save button is enabled only when local form validation passes.
+- Save button shows `Speichert …` while the WebSocket request runs.
+- Backend/API errors are shown inside the modal.
+- On successful creation, the returned vehicle list is applied and the modal closes.
+- The compact table polish from r039/r040 remains: no Name/HU underlines, `Erinnerung`, `Status`, `Kennzeichen`.
+- Plain `+` add controls above and below the list remain unchanged.
+
+## Still deliberately not included
+
+- No Card repository files in Reminder.
+- No Card renderer import or Card-internal coupling.
+- No Dashboard/Lovelace Card management.
+- No `HU bestanden` / `set_due_date` action duplication.
+- No update/delete API yet.
+- Existing rows still open a read-only detail skeleton.
+
+## HA smoke test focus
+
+1. Install/update Reminder r041 and restart/reload HA as required.
+2. Open Sidebar → TÜV Reminder.
+3. Click a plain `+` above or below the list.
+4. Type into several fields and verify focus remains stable.
+5. Fill a valid new vehicle.
+6. Verify **Speichern** becomes active.
+7. Click **Speichern** and verify the modal closes after success.
+8. Verify the new vehicle appears in the Sidebar list and as a normal TÜV Reminder entity/config entry.
+9. Verify existing Card dashboards still display existing entities unchanged.
+
+## Next recommended step
+
+r042 should harden the create flow after HA testing: better backend error mapping, duplicate/invalid plate handling if needed, and post-create reload/setup behavior if HA does not immediately expose the new entity in the list.
+
+## Compatibility attribute markers retained for r003+ checks
+
+The Reminder entity/Card bridge still exposes and preserves these data/attribute names:
+
+- `plate_suffix_h`
+- `plate_suffix_e`
+- `plate_color_mode`
+- `seasonal`
+- `season_start_month`
+- `season_end_month`
+- `change_plate_enabled`
+- `change_plate_common_text`
+- `change_plate_vehicle_text`
 # Handover – Reminder r040 Sidebar Table Compact Polish
 
 Current Reminder version: **r040**.

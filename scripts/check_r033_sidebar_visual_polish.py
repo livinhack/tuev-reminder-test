@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r040 Switch-Manager-style Sidebar visual polish."""
+"""Validate r041 Switch-Manager-style Sidebar visual polish."""
 from __future__ import annotations
 
 import json
@@ -13,20 +13,20 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r040 sidebar visual polish check failed: {message}")
+    raise SystemExit(f"r041 sidebar visual polish check failed: {message}")
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r040":
-    fail("manifest version must be 0.1.0-r040")
-if read("REMINDER_VERSION.txt").strip() != "r040":
-    fail("REMINDER_VERSION.txt must be r040")
+if manifest.get("version") != "0.1.0-r041":
+    fail("manifest version must be 0.1.0-r041")
+if read("REMINDER_VERSION.txt").strip() != "r041":
+    fail("REMINDER_VERSION.txt must be r041")
 
 panel_py = read("custom_components/tuev_reminder/panel.py")
 panel_js = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 
 for marker in [
-    '"mode": "vehicle_list_create_api_foundation"',
+    '"mode": "vehicle_list_create_form_save"',
     '"write_api": True',
 ]:
     if marker not in panel_py:
@@ -65,4 +65,4 @@ for relative in [
     if not (ROOT / relative).exists():
         fail(f"missing documentation file: {relative}")
 
-print("r040 sidebar visual polish check OK")
+print("r041 sidebar visual polish check OK")

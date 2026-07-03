@@ -17,16 +17,16 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r040":
-    fail("manifest version must be 0.1.0-r040")
-if read("REMINDER_VERSION.txt").strip() != "r040":
+if manifest.get("version") != "0.1.0-r041":
+    fail("manifest version must be 0.1.0-r041")
+if read("REMINDER_VERSION.txt").strip() != "r041":
     fail("REMINDER_VERSION.txt must be r032")
 
 panel_py = read("custom_components/tuev_reminder/panel.py")
 panel_js = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 
 for marker in [
-    '"mode": "vehicle_list_create_api_foundation"',
+    '"mode": "vehicle_list_create_form_save"',
     '"write_api": True',
 ]:
     if marker not in panel_py:

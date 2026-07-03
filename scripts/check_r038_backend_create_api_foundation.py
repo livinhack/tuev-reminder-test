@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r040 Backend Create API foundation and plain add controls."""
+"""Validate r041 Backend Create API foundation and plain add controls."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r040 backend create API check failed: {message}")
+    raise SystemExit(f"r041 backend create API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r040":
-        fail("manifest version must be 0.1.0-r040")
-    if read("REMINDER_VERSION.txt").strip() != "r040":
-        fail("REMINDER_VERSION.txt must be r040")
+    if manifest.get("version") != "0.1.0-r041":
+        fail("manifest version must be 0.1.0-r041")
+    if read("REMINDER_VERSION.txt").strip() != "r041":
+        fail("REMINDER_VERSION.txt must be r041")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -60,7 +60,7 @@ def main() -> None:
             fail(f"config_flow.py missing {marker!r}")
 
     for marker in [
-        '"mode": "vehicle_list_create_api_foundation"',
+        '"mode": "vehicle_list_create_form_save"',
         '"write_api": True',
     ]:
         if marker not in panel_py:
@@ -73,7 +73,7 @@ def main() -> None:
         'data-create-trigger="bottom"',
         "button.icon-action",
         "background: transparent;",
-        "UI-Speichern folgt später",
+        "#save-create",
     ]:
         if marker not in panel:
             fail(f"panel JS missing {marker!r}")
@@ -95,7 +95,7 @@ def main() -> None:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r040 backend create API check OK")
+    print("r041 backend create API check OK")
 
 
 if __name__ == "__main__":

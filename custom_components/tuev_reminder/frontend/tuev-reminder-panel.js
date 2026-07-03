@@ -16,6 +16,9 @@ class TuevReminderPanel extends HTMLElement {
     this._view = "list";
     this._selectedVehicle = null;
     this._form = this._defaultForm();
+    this._saving = false;
+    this._formError = null;
+    this._formInfo = null;
   }
 
   set hass(hass) {
@@ -259,12 +262,16 @@ class TuevReminderPanel extends HTMLElement {
   _openCreateForm() {
     this._form = this._defaultForm();
     this._selectedVehicle = null;
+    this._formError = null;
+    this._formInfo = null;
     this._view = "create";
     this._render();
   }
 
   _openDetailForm(vehicle) {
     this._selectedVehicle = vehicle;
+    this._formError = null;
+    this._formInfo = null;
     this._form = {
       ...this._defaultForm(),
       vehicle_name: vehicle.vehicle_name || vehicle.title || "",
@@ -287,13 +294,79 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _closeForm() {
+    if (this._saving) return;
     this._view = "list";
     this._selectedVehicle = null;
+    this._formError = null;
+    this._formInfo = null;
     this._render();
+  }
+
+  _formPayload() {
+    const payload = {
+      vehicle_name: String(this._form.vehicle_name || "").trim(),
+      plate: this._normalizePlate(this._form.plate),
+      month: Number(this._form.month),
+      year: Number(this._form.year),
+      interval: Number(this._form.interval || 2),
+      reminder_offset_days: Number(this._form.reminder_offset_days || 0),
+      plate_kind: this._form.plate_kind || "standard",
+      plate_format: this._form.plate_format || "single_line",
+      plate_suffix_h: this._form.plate_suffix_h === true,
+      plate_suffix_e: this._form.plate_suffix_e === true,
+      season_start_month: Number(this._form.season_start_month || 4),
+      season_end_month: Number(this._form.season_end_month || 10),
+      change_plate_common_text: this._normalizePlate(this._form.change_plate_common_text),
+      change_plate_vehicle_digit: String(this._form.change_plate_vehicle_digit || "").trim(),
+    };
+    return payload;
+  }
+
+  async _saveCreateForm() {
+    if (!this._hass || this._view !== "create" || this._saving) {
+      return;
+    }
+
+    const errors = this._formValidation();
+    if (errors.length) {
+      this._formError = "Bitte zuerst die markierten Angaben korrigieren.";
+      this._syncFormSummary();
+      return;
+    }
+
+    this._saving = true;
+    this._formError = null;
+    this._formInfo = "Fahrzeug wird angelegt …";
+    this._render();
+
+    try {
+      const result = await this._hass.connection.sendMessagePromise({
+        type: "tuev_reminder/manager/vehicles/create",
+        vehicle: this._formPayload(),
+      });
+      if (Array.isArray(result?.vehicles)) {
+        this._vehicles = result.vehicles;
+        this._loaded = true;
+      } else {
+        await this._refresh();
+      }
+      this._view = "list";
+      this._selectedVehicle = null;
+      this._form = this._defaultForm();
+      this._formInfo = null;
+      this._formError = null;
+    } catch (err) {
+      this._formError = err?.message || String(err);
+    } finally {
+      this._saving = false;
+      this._render();
+    }
   }
 
   _setFormValue(name, value, options = {}) {
     const render = options.render !== false;
+    this._formError = null;
+    this._formInfo = null;
     this._form = { ...this._form, [name]: value };
     if (name === "plate_kind" && !["seasonal", "green_seasonal"].includes(value)) {
       this._form.season_start_month = "4";
@@ -344,10 +417,24 @@ class TuevReminderPanel extends HTMLElement {
     if (validation) {
       validation.classList.toggle("has-errors", errors.length > 0);
       validation.classList.toggle("ok", errors.length === 0);
-      validation.innerHTML = errors.length
-        ? `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>`
-        : `<strong>Formular lokal plausibel</strong><p>Die Backend-Create-API ist vorbereitet; die UI-Verdrahtung des Speichern-Buttons folgt separat.</p>`;
+      validation.innerHTML = this._validationHtml(errors);
     }
+
+    const saveButton = this.shadowRoot.querySelector("#save-create");
+    if (saveButton) {
+      saveButton.disabled = this._saving || errors.length > 0 || this._view !== "create";
+      saveButton.textContent = this._saving ? "Speichert …" : "Speichern";
+    }
+  }
+
+  _validationHtml(errors) {
+    const state = [];
+    if (this._formError) state.push(`<p class="form-error">${this._escape(this._formError)}</p>`);
+    if (this._formInfo) state.push(`<p>${this._escape(this._formInfo)}</p>`);
+    if (errors.length) {
+      return `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>${state.join("")}`;
+    }
+    return `<strong>Speicherbereit</strong><p>Das Formular kann jetzt über die Reminder-Manager-API als normale ConfigEntry-Entität angelegt werden.</p>${state.join("")}`;
   }
 
   _renderVehicles() {
@@ -360,7 +447,7 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     if (!this._vehicles.length) {
-      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „+“, um die geplante Erstellstrecke zu prüfen.</p>`;
+      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „+“, um ein neues Fahrzeug anzulegen.</p>`;
     }
 
     const vehicles = this._visibleVehicles();
@@ -441,10 +528,12 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-head">
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
-            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Formular-Skeleton; die Backend-Create-API ist vorbereitet, die UI-Speicherung folgt im nächsten Schritt."}</p>
+            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Legt ein neues Fahrzeug als normale TÜV-Reminder-ConfigEntry-Entität an."}</p>
           </div>
           <div class="form-actions">
-            <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "UI-Speichern folgt später"}</button>
+            ${isDetail
+              ? `<button class="action" id="save-placeholder" disabled>Bearbeiten folgt später</button>`
+              : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
             <button class="ghost" id="back-to-list">Schließen</button>
           </div>
         </div>
@@ -503,10 +592,9 @@ class TuevReminderPanel extends HTMLElement {
               <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(this._form.plate_format))}</dd></div>
             </dl>
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
-              <strong>${errors.length ? "Noch nicht speicherbar" : "Formular lokal plausibel"}</strong>
-              ${errors.length ? `<ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>` : `<p>Die Backend-Create-API ist vorbereitet; die UI-Verdrahtung des Speichern-Buttons folgt separat.</p>`}
+              ${this._validationHtml(errors)}
             </div>
-            <p class="note">Dieser Stand hält den Speichern-Button noch deaktiviert. Die neue Backend-Create-API ist für die folgende UI-Verdrahtung vorbereitet.</p>
+            <p class="note">Neue Fahrzeuge werden über die Reminder-eigene WebSocket-API angelegt. Bestehende Fahrzeuge bleiben in diesem Stand noch read-only.</p>
           </aside>
         </div>
         </div>
@@ -813,6 +901,7 @@ class TuevReminderPanel extends HTMLElement {
         .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }
         .validation ul { margin: 8px 0 0 18px; padding: 0; }
         .validation p { margin: 8px 0 0; }
+        .form-error { color: var(--error-color); }
         .validation.has-errors { color: var(--error-color); }
         .validation.ok { color: var(--success-color, var(--primary-color)); }
         .note { color: var(--secondary-text-color); font-size: 12px; line-height: 1.45; }
@@ -859,7 +948,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Backend-Create-API vorbereitet · UI-Speichern noch deaktiviert · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-API aktiv · Formular speichert neue Entitäten · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
@@ -927,6 +1016,9 @@ class TuevReminderPanel extends HTMLElement {
 
     const backButton = this.shadowRoot.querySelector("#back-to-list");
     if (backButton) backButton.addEventListener("click", () => this._closeForm());
+
+    const saveButton = this.shadowRoot.querySelector("#save-create");
+    if (saveButton) saveButton.addEventListener("click", () => this._saveCreateForm());
 
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       if (field.tagName === "SELECT") {
