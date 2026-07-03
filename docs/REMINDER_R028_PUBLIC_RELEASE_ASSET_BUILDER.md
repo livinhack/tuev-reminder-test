@@ -68,3 +68,8 @@ hacs.json
 ```
 
 Runtime guardrails remain unchanged: `calendar.tuev_reminder` is detached from vehicle devices, the integration does not write to `local_calendar`, and `reminder_offset_days` remains the only user-facing calendar timing option.
+
+
+## r028 Manager API note
+
+Reminder r028 also includes the read-only Manager API foundation. The public release asset builder remains available for later release packaging, but no release is implied by this development step.

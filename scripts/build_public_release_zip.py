@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a public TÜV Reminder release ZIP from the internal r-series checkout.
 
-The working tree keeps the test/checkpoint version such as 0.1.0-r027.
+The working tree keeps the test/checkpoint version such as 0.1.0-r028.
 This script creates a staging copy, patches the public release metadata to
 v0.1.0 / manifest 0.1.0, removes generated artifacts and writes a ZIP that can
 be used as a release-candidate asset.

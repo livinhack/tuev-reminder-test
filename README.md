@@ -1,11 +1,11 @@
-# TÜV Reminder r027
+# TÜV Reminder r029
 
-**Reminder r027** is the release tag and package plan checkpoint for the stabilized v3 line. Runtime behavior is intentionally unchanged from r020–r025.
+**Reminder r029** fixes the async service-entry resolver bug in the stabilized v3 line. Reminder r028 Manager API foundation remains preserved.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r027
+Card b355 + Reminder r029
 ```
 
 ## What the integration does
@@ -120,10 +120,10 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r027
+0.1.0-r029
 ```
 
-r027 adds `scripts/build_public_release_zip.py` for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r027`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R027_PUBLIC_RELEASE_ASSET_BUILDER.md`.
+r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
 
 ## Local validation
 
@@ -154,4 +154,32 @@ There is no browser-style live autocomplete in the normal HA Config Flow. The id
 Reminder r009 remains the tested Card-bridge runtime baseline for Card b355. Leerzeichen im Kennzeichen bleiben erhalten.
 The stable Reminder r009 runtime line remains preserved for Card b355 compatibility.
 
-Historical runtime baseline: TÜV Reminder r020 / Reminder r020 is the Calendar Always Due stabilization line preserved by Reminder r027.
+Historical runtime baseline: TÜV Reminder r020 / Reminder r020 is the Calendar Always Due stabilization line preserved by Reminder r028.
+
+---
+
+## r028 Manager API Foundation
+
+r028 adds a read-only Manager API foundation for a later Sidebar/Manager UI.
+
+New WebSocket commands:
+
+- `tuev_reminder/manager/metadata`
+- `tuev_reminder/manager/vehicles/list`
+- `tuev_reminder/manager/vehicles/get`
+
+The API returns normalized vehicle data for a future manager frontend. The existing Home Assistant Config-/Options-Flow remains the active UI.
+
+No Sidebar frontend, no write API and no Area-Code autocomplete UI are included yet.
+
+
+---
+
+## r029 Service Await Fix
+
+r029 fixes the internal async handling of the service entry resolver used by:
+
+- `tuev_reminder.confirm_passed`
+- `tuev_reminder.set_due_date`
+
+Both service handlers now await `_resolve_tuev_entry(...)` before reading config entry data/options and reloading the entry. Card attributes, calendar behavior and the read-only r028 Manager API remain unchanged.

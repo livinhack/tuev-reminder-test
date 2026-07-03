@@ -1,6 +1,6 @@
-# Compatibility – Card b355 + Reminder r027
+# Compatibility – Card b355 + Reminder r028
 
-Reminder r027 preserves the stabilized v3 runtime line and remains compatible with Card b355.
+Reminder r028 preserves the stabilized v3 runtime line and remains compatible with Card b355.
 
 ## Card bridge attributes preserved
 
@@ -33,6 +33,6 @@ reminder_offset_days
 - `tuev_reminder.confirm_passed` and `tuev_reminder.set_due_date` remain available.
 - No `local_calendar` writes are performed.
 
-## r027-specific note
+## r028-specific note
 
-r027 adds release asset tooling only. It does not require a Card change.
+r028 adds release asset tooling only. It does not require a Card change.

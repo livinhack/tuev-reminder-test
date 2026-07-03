@@ -21,8 +21,8 @@ runner = read("scripts/run_all_checks.py")
 doc = read("docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md")
 compat_doc = read("docs/COMPAT_CARD_B355_REMINDER_R024.md")
 
-assert version == "r027"
-assert manifest["version"] == "0.1.0-r027"
+assert version == "r029"
+assert manifest["version"] == "0.1.0-r029"
 assert_contains(runner, "py_compile.compile", "Python syntax check")
 assert_contains(runner, "remove_generated_artifacts()", "cache cleanup")
 assert_contains(runner, "check_json()", "JSON validation")
@@ -31,8 +31,8 @@ assert_contains(runner, "__pycache__", "cache directory guard")
 assert_contains(runner, ".pyc", "bytecode guard")
 
 for text, label, current_label in [
-    (readme, "README", "Reminder r027"),
-    (handover, "HANDOVER", "Reminder r027"),
+    (readme, "README", "Reminder r028"),
+    (handover, "HANDOVER", "Reminder r028"),
     (doc, "r024 doc", "Reminder r024"),
     (compat_doc, "r024 compat doc", "Reminder r024"),
 ]:

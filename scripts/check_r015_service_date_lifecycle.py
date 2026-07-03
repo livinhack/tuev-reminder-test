@@ -11,8 +11,8 @@ def assert_contains(text: str, needle: str, label: str):
         raise AssertionError(f"Missing {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r027"
-assert read("REMINDER_VERSION.txt").strip() == "r027"
+assert manifest["version"] == "0.1.0-r029"
+assert read("REMINDER_VERSION.txt").strip() == "r029"
 
 const = read("custom_components/tuev_reminder/const.py")
 init = read("custom_components/tuev_reminder/__init__.py")
@@ -32,7 +32,7 @@ assert_contains(init, "new_options[CONF_YEAR] = year", "set_due_date year update
 assert_contains(services, "passed_date:", "passed_date service field")
 assert_contains(services, "set_due_date:", "set_due_date service")
 assert_contains(doc, "Service Date Lifecycle", "r015 doc")
-assert_contains(readme, "Reminder r027", "README current")
-assert_contains(handover, "Reminder r027", "handover current")
+assert_contains(readme, "Reminder r028", "README current")
+assert_contains(handover, "Reminder r028", "handover current")
 
 print("r015 service date lifecycle check OK")

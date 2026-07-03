@@ -23,21 +23,21 @@ version = read("REMINDER_VERSION.txt").strip()
 readme = read("README.md")
 handover = read("HANDOVER.md")
 builder = read("scripts/build_public_release_zip.py")
-doc = read("docs/REMINDER_R027_PUBLIC_RELEASE_ASSET_BUILDER.md")
-compat = read("docs/COMPAT_CARD_B355_REMINDER_R027.md")
+doc = read("docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md")
+compat = read("docs/COMPAT_CARD_B355_REMINDER_R028.md")
 changelog = read("CHANGELOG.md")
 
-assert version == "r027"
-assert manifest["version"] == "0.1.0-r027"
+assert version == "r029"
+assert manifest["version"] == "0.1.0-r029"
 
 for text, label in [
     (readme, "README"),
     (handover, "HANDOVER"),
-    (doc, "r027 builder doc"),
-    (compat, "r027 compatibility doc"),
+    (doc, "r028 builder doc"),
+    (compat, "r028 compatibility doc"),
 ]:
     assert_contains(text, "Card b355", label)
-    assert_contains(text, "Reminder r027", label)
+    assert_contains(text, "Reminder r028", label)
 
 for needle in [
     "PUBLIC_VERSION = \"0.1.0\"",
@@ -53,12 +53,12 @@ for needle in [
 for needle in [
     "v0.1.0",
     "manifest version: 0.1.0",
-    "0.1.0-r027",
+    "0.1.0-r028",
     "build_public_release_zip.py",
     "calendar.tuev_reminder",
     "local_calendar",
 ]:
-    assert_contains(doc, needle, "r027 builder doc")
+    assert_contains(doc, needle, "r028 builder doc")
 
 for needle in [
     "plate_suffix_h",
@@ -66,9 +66,9 @@ for needle in [
     "plate_color_mode",
     "No `local_calendar` writes",
 ]:
-    assert_contains(compat, needle, "r027 compatibility doc")
+    assert_contains(compat, needle, "r028 compatibility doc")
 
-assert_contains(changelog, "r027", "CHANGELOG r027 entry")
+assert_contains(changelog, "r028", "CHANGELOG r028 entry")
 assert_not_contains(readme, "plate_area_code", "removed r011 area-code selector")
 
 with tempfile.TemporaryDirectory() as td:
@@ -88,4 +88,4 @@ with tempfile.TemporaryDirectory() as td:
         if forbidden:
             raise AssertionError(f"Generated public ZIP contains cache artifacts: {forbidden[:5]}")
 
-print("r027 release asset builder check OK")
+print("r028 release asset builder check OK")

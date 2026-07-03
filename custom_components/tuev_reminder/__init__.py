@@ -29,12 +29,14 @@ from .const import (
     ATTR_PASSED_DATE,
 )
 from .helpers import build_plate_with_suffix
+from .manager_api import async_register_manager_api
 
 PLATFORMS = ["sensor"]
 
 _LOGGER = logging.getLogger(__name__)
 
 CALENDAR_PLATFORM_LOADED_KEY = "calendar_platform_loaded"
+MANAGER_API_REGISTERED_KEY = "manager_api_registered"
 
 
 def _coerce_bool(value: object) -> bool:
@@ -149,9 +151,13 @@ async def async_setup(hass: HomeAssistant, config: dict):
             discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)
         )
 
+    if not hass.data[DOMAIN].get(MANAGER_API_REGISTERED_KEY):
+        async_register_manager_api(hass)
+        hass.data[DOMAIN][MANAGER_API_REGISTERED_KEY] = True
+
     async def handle_confirm_passed(call: ServiceCall):
         entity_id = call.data[ATTR_ENTITY_ID]
-        entry = _resolve_tuev_entry(hass, entity_id)
+        entry = await _resolve_tuev_entry(hass, entity_id)
 
         passed_date = _parse_passed_date(call.data.get(ATTR_PASSED_DATE))
         current_values = _merged_entry_values(entry)
@@ -173,7 +179,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
     async def handle_set_due_date(call: ServiceCall):
         entity_id = call.data[ATTR_ENTITY_ID]
-        entry = _resolve_tuev_entry(hass, entity_id)
+        entry = await _resolve_tuev_entry(hass, entity_id)
 
         month = int(call.data[CONF_MONTH])
         year = int(call.data[CONF_YEAR])

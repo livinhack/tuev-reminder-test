@@ -1,10 +1,23 @@
 # Changelog
 
-## r027 – Public Release Asset Builder
+## r029 - Service Await Fix
+
+- Fixed the async ConfigEntry resolver call in `tuev_reminder.confirm_passed`.
+- Fixed the async ConfigEntry resolver call in `tuev_reminder.set_due_date`.
+- Preserved Card b355 bridge attributes, calendar behavior and the read-only r028 Manager API foundation.
+
+## r028 - Manager API Foundation
+
+- Added read-only Manager API foundation for a future Sidebar/Manager UI.
+- Added stable manager-facing vehicle record helpers.
+- Added WebSocket commands for metadata, vehicle list and one-vehicle lookup.
+- No Card change, no frontend panel yet, no write API yet.
+
+## r028 – Public Release Asset Builder
 
 - Adds `scripts/build_public_release_zip.py` to create a public `v0.1.0` release-candidate ZIP from the internal r-series checkout.
-- Keeps the development manifest on `0.1.0-r027`; the generated public ZIP patches the manifest to `0.1.0`.
-- Adds release-asset guard checks and Card b355 compatibility notes for r027.
+- Keeps the development manifest on `0.1.0-r028`; the generated public ZIP patches the manifest to `0.1.0`.
+- Adds release-asset guard checks and Card b355 compatibility notes for r028.
 - Runtime unchanged from the stabilized v3 line.
 
 ## r026 – Release Tag + Package Plan

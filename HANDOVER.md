@@ -1,26 +1,34 @@
-# Handover – Reminder r027 Public Release Asset Builder
+# Handover – Reminder r029 Service Await Fix
 
-Current Reminder version: **r026**.
+Current Reminder version: **r029**.
 
 Current compatible stack:
 
 ```text
-Card b355 + Reminder r027
+Card b355+ / Card b356 RC + Reminder r029
 ```
 
-r026 is a release tag/package decision checkpoint. Runtime behavior is intentionally unchanged from the stabilized r020–r025 line.
+r029 is a focused runtime bugfix on top of r028. It fixes the service handlers while preserving the r028 read-only Manager API foundation.
 
-## What changed in r026
+## What changed in r029
 
-- Updated `REMINDER_VERSION.txt` to `r026`.
-- Updated `manifest.json` to `0.1.0-r027`.
-- Added `docs/REMINDER_R027_PUBLIC_RELEASE_ASSET_BUILDER.md`.
-- Added `docs/COMPAT_CARD_B355_REMINDER_R027.md`.
-- Added `scripts/build_public_release_zip.py`.
-- Added `scripts/check_r027_release_asset_builder.py`.
-- Added `scripts/check_r026_release_tag_plan.py`.
-- Added a builder that creates a public `v0.1.0` release-candidate ZIP while keeping this working tree on `0.1.0-r027`.
-- Kept the r023 check runner and r022 package-hygiene guard.
+- Updated `REMINDER_VERSION.txt` to `r029`.
+- Updated `manifest.json` to `0.1.0-r029`.
+- Fixed missing `await` in `tuev_reminder.confirm_passed`.
+- Fixed missing `await` in `tuev_reminder.set_due_date`.
+- Added `docs/REMINDER_R029_SERVICE_AWAIT_FIX.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R029.md`.
+- Added `scripts/check_r029_service_await_fix.py`.
+
+## Bug fixed
+
+`_resolve_tuev_entry(...)` is async. In the previous line the service handlers assigned its coroutine object directly to `entry`. That would break subsequent access to config entry data/options and reload handling.
+
+The handlers now use:
+
+```python
+entry = await _resolve_tuev_entry(hass, entity_id)
+```
 
 ## Runtime preserved
 
@@ -28,22 +36,18 @@ r026 is a release tag/package decision checkpoint. Runtime behavior is intention
 - Shared virtual calendar: `calendar.tuev_reminder`.
 - Calendar detached from vehicle devices.
 - No writes to `local_calendar`.
-- Calendar always emits:
-  - `TÜV/HU Erinnerung`
-  - `TÜV/HU fällig`
+- Calendar always emits `TÜV/HU Erinnerung` and `TÜV/HU fällig`.
 - `reminder_offset_days` remains the only user-facing calendar timing option.
 - Card b355 bridge attributes remain preserved.
-- Services remain preserved:
-  - `tuev_reminder.confirm_passed`
-  - `tuev_reminder.set_due_date`
+- r028 Manager API foundation remains read-only and additive.
 
 ## Not changed
 
 - No Card change.
 - No renderer geometry change.
-- No new calendar mode selector.
-- No area-code autocomplete UI.
-- No Sidebar/Manager UI.
+- No frontend/sidebar panel yet.
+- No Manager write API yet.
+- No Area-Code autocomplete UI yet.
 - No `local_calendar` sync.
 
 ## Checks
@@ -54,20 +58,19 @@ Run from repository root:
 python scripts/run_all_checks.py
 ```
 
-The runner performs Python syntax checks, JSON validation and all `check_r*.py` checks. It also removes generated cache artifacts before and after the suite so the package-hygiene guard can run reliably.
+The runner performs Python syntax checks, JSON validation and all `check_r*.py` checks.
 
 ## Next recommended step
 
-Install/test r026 in HA with Card b355. If it passes, the next useful step is either:
+Install/test Reminder r029 in Home Assistant with Card b356 RC. Specifically test:
 
-```text
-1. create the actual public release tag/asset
-2. or pause Reminder work and return to Card/HACS release packaging
-```
+1. `tuev_reminder.confirm_passed` on an existing TÜV Reminder sensor.
+2. `tuev_reminder.set_due_date` on an existing TÜV Reminder sensor.
+3. Existing Card display after service-driven config entry reload.
 
 ## Historical compatibility baselines
 
-Reminder r009 remains the tested Card-bridge runtime line for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due runtime baseline. Reminder r023 remains the check-runner/release-guard baseline. Reminder r025 remains the public-release documentation baseline preserved by r026.
+Reminder r009 remains the tested Card-bridge runtime baseline for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due runtime baseline. Reminder r023 remains the check-runner/release-guard baseline. Reminder r028 remains the Manager API foundation baseline.
 
 NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt. Green plate / grünes Kennzeichen suppresses H/E. Leerzeichen im Kennzeichen bleiben erhalten.
 
@@ -86,6 +89,4 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-Reminder r009 remains the tested Card-bridge runtime baseline for Card b355. Leerzeichen im Kennzeichen bleiben erhalten.
-
-Historical runtime baseline: Reminder r020 is the Calendar Always Due stabilization line preserved by Reminder r027.
+Reminder r028 Manager API Foundation remains preserved.
