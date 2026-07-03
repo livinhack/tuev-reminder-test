@@ -1,5 +1,15 @@
 # Changelog
 
+## r035 - Sidebar Create Form Skeleton
+
+- Intentionally skips r034 because action duplication is out of scope for the Reminder Sidebar.
+- Adds a Switch-Manager-style `Neues Fahrzeug` form skeleton to the Reminder-owned Sidebar panel.
+- Adds a read-only detail/form skeleton when opening existing rows.
+- Adds local fields for vehicle name, HU date, interval, reminder offset, plate kind, plate format, H/E suffixes, seasonal months and change-plate values.
+- Adds local plausibility feedback and a lightweight Reminder preview.
+- Keeps Save/Create disabled until a dedicated Reminder write API exists.
+- Keeps Card repository and Dashboard Card behavior separate.
+
 ## r033 - Switch-Manager-style Sidebar Polish
 
 - Keeps the Reminder Sidebar page Reminder-only and read-only.

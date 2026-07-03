@@ -13,6 +13,9 @@ class TuevReminderPanel extends HTMLElement {
     this._filter = "";
     this._statusFilter = "all";
     this._sort = "due";
+    this._view = "list";
+    this._selectedVehicle = null;
+    this._form = this._defaultForm();
   }
 
   set hass(hass) {
@@ -70,6 +73,26 @@ class TuevReminderPanel extends HTMLElement {
       this._loading = false;
       this._render();
     }
+  }
+
+  _defaultForm() {
+    const now = new Date();
+    return {
+      vehicle_name: "",
+      plate: "",
+      month: String(now.getMonth() + 1),
+      year: String(now.getFullYear()),
+      interval: "2",
+      reminder_offset_days: "7",
+      plate_kind: "standard",
+      plate_format: "single_line",
+      plate_suffix_h: false,
+      plate_suffix_e: false,
+      season_start_month: "4",
+      season_end_month: "10",
+      change_plate_common_text: "",
+      change_plate_vehicle_digit: "",
+    };
   }
 
   _escape(value) {
@@ -155,17 +178,40 @@ class TuevReminderPanel extends HTMLElement {
     });
   }
 
-  _platePreview(vehicle) {
-    const text = this._escape(vehicle.plate_display || vehicle.plate || "—");
-    const green = vehicle.plate_color_mode === "green";
-    const seasonal = vehicle.seasonal;
+  _platePreviewFromText(text, options = {}) {
+    const green = options.green === true;
+    const seasonal = options.seasonal === true;
     return `
       <span class="plate-preview ${green ? "plate-preview-green" : ""}" title="Kennzeichenvorschau">
         <span class="plate-eu">D</span>
-        <span class="plate-text">${text}</span>
-        ${seasonal ? `<span class="plate-season">${this._escape(vehicle.season_start_month)}–${this._escape(vehicle.season_end_month)}</span>` : ""}
+        <span class="plate-text">${this._escape(text || "—")}</span>
+        ${seasonal ? `<span class="plate-season">${this._escape(options.seasonStart)}–${this._escape(options.seasonEnd)}</span>` : ""}
       </span>
     `;
+  }
+
+  _platePreview(vehicle) {
+    return this._platePreviewFromText(vehicle.plate_display || vehicle.plate || "—", {
+      green: vehicle.plate_color_mode === "green",
+      seasonal: vehicle.seasonal,
+      seasonStart: vehicle.season_start_month,
+      seasonEnd: vehicle.season_end_month,
+    });
+  }
+
+  _formPlateText() {
+    if (this._form.plate_kind === "change") {
+      const common = this._normalizePlate(this._form.change_plate_common_text);
+      const digit = String(this._form.change_plate_vehicle_digit || "").trim();
+      return `${common}${digit ? ` ${digit}` : ""}`.trim();
+    }
+    let plate = this._normalizePlate(this._form.plate);
+    const suffix = `${this._form.plate_suffix_h ? "H" : ""}${this._form.plate_suffix_e ? "E" : ""}`;
+    return `${plate}${suffix ? ` ${suffix}` : ""}`.trim();
+  }
+
+  _normalizePlate(value) {
+    return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
   }
 
   _vehicleMeta(vehicle) {
@@ -179,6 +225,80 @@ class TuevReminderPanel extends HTMLElement {
     return tags.filter(Boolean).map((tag) => `<span class="tag">${this._escape(tag)}</span>`).join("");
   }
 
+  _formValidation() {
+    const errors = [];
+    if (!String(this._form.vehicle_name || "").trim()) errors.push("Fahrzeugname fehlt.");
+    if (this._form.plate_kind === "change") {
+      if (!String(this._form.change_plate_common_text || "").trim()) errors.push("Gemeinsamer Wechselkennzeichen-Text fehlt.");
+      if (!String(this._form.change_plate_vehicle_digit || "").trim()) errors.push("Fahrzeugziffer für Wechselkennzeichen fehlt.");
+    } else if (!String(this._form.plate || "").trim()) {
+      errors.push("Kennzeichen fehlt.");
+    }
+    const month = Number(this._form.month);
+    const year = Number(this._form.year);
+    const offset = Number(this._form.reminder_offset_days);
+    if (!Number.isInteger(month) || month < 1 || month > 12) errors.push("HU-Monat muss zwischen 1 und 12 liegen.");
+    if (!Number.isInteger(year) || year < 2000 || year > 2100) errors.push("HU-Jahr muss zwischen 2000 und 2100 liegen.");
+    if (!Number.isInteger(offset) || offset < 0 || offset > 365) errors.push("Reminder-Vorlauf muss zwischen 0 und 365 Tagen liegen.");
+    if (["seasonal", "green_seasonal"].includes(this._form.plate_kind)) {
+      const start = Number(this._form.season_start_month);
+      const end = Number(this._form.season_end_month);
+      if (!Number.isInteger(start) || start < 1 || start > 12 || !Number.isInteger(end) || end < 1 || end > 12) {
+        errors.push("Saisonmonate müssen zwischen 1 und 12 liegen.");
+      }
+    }
+    return errors;
+  }
+
+  _openCreateForm() {
+    this._form = this._defaultForm();
+    this._selectedVehicle = null;
+    this._view = "create";
+    this._render();
+  }
+
+  _openDetailForm(vehicle) {
+    this._selectedVehicle = vehicle;
+    this._form = {
+      ...this._defaultForm(),
+      vehicle_name: vehicle.vehicle_name || vehicle.title || "",
+      plate: vehicle.plate_base || vehicle.plate_display || vehicle.plate || "",
+      month: String(vehicle.month || ""),
+      year: String(vehicle.year || ""),
+      interval: String(vehicle.interval || "2"),
+      reminder_offset_days: String(vehicle.reminder_offset_days ?? "7"),
+      plate_kind: vehicle.plate_kind || "standard",
+      plate_format: vehicle.plate_format || "single_line",
+      plate_suffix_h: vehicle.plate_suffix_h === true,
+      plate_suffix_e: vehicle.plate_suffix_e === true,
+      season_start_month: String(vehicle.season_start_month || "4"),
+      season_end_month: String(vehicle.season_end_month || "10"),
+      change_plate_common_text: vehicle.change_plate_common_text || "",
+      change_plate_vehicle_digit: vehicle.change_plate_vehicle_digit || "",
+    };
+    this._view = "detail";
+    this._render();
+  }
+
+  _closeForm() {
+    this._view = "list";
+    this._selectedVehicle = null;
+    this._render();
+  }
+
+  _setFormValue(name, value) {
+    this._form = { ...this._form, [name]: value };
+    if (name === "plate_kind" && !["seasonal", "green_seasonal"].includes(value)) {
+      this._form.season_start_month = "4";
+      this._form.season_end_month = "10";
+    }
+    if (name === "plate_kind" && value === "green") {
+      this._form.plate_suffix_h = false;
+      this._form.plate_suffix_e = false;
+    }
+    this._render();
+  }
+
   _renderVehicles() {
     if (this._loading && !this._loaded) {
       return `<p class="state muted">Manager-Daten werden geladen …</p>`;
@@ -189,7 +309,7 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     if (!this._vehicles.length) {
-      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden.</p>`;
+      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „Neues Fahrzeug“, um die geplante Erstellstrecke zu prüfen.</p>`;
     }
 
     const vehicles = this._visibleVehicles();
@@ -212,8 +332,8 @@ class TuevReminderPanel extends HTMLElement {
             </tr>
           </thead>
           <tbody>
-            ${vehicles.map((vehicle) => `
-              <tr>
+            ${vehicles.map((vehicle, index) => `
+              <tr data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}" tabindex="0" title="Detail-/Formularansicht öffnen">
                 <td class="name-cell">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
                   <div class="vehicle-sub">${this._escape(vehicle.entity_id || "Keine Sensor-Entity")}</div>
@@ -229,12 +349,118 @@ class TuevReminderPanel extends HTMLElement {
                 </td>
                 <td><div class="tag-row">${this._vehicleMeta(vehicle)}</div></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
-                <td class="menu-cell"><button class="row-menu" disabled title="Bearbeiten kommt mit der Create-/Update-Strecke" aria-label="Zeilenmenü">⋮</button></td>
+                <td class="menu-cell"><button class="row-menu" data-menu-index="${index}" title="Detail-/Formularansicht öffnen" aria-label="Zeilenmenü">⋮</button></td>
               </tr>
             `).join("")}
           </tbody>
         </table>
       </div>
+    `;
+  }
+
+  _renderOptionList(options, selected) {
+    return options.map((option) => `<option value="${this._escape(option.value)}" ${selected === option.value ? "selected" : ""}>${this._escape(option.label)}</option>`).join("");
+  }
+
+  _renderMonthOptions(selected) {
+    return Array.from({ length: 12 }, (_, index) => {
+      const value = String(index + 1);
+      return `<option value="${value}" ${String(selected) === value ? "selected" : ""}>${value.padStart(2, "0")}</option>`;
+    }).join("");
+  }
+
+  _renderCreateForm() {
+    const isDetail = this._view === "detail";
+    const errors = this._formValidation();
+    const seasonal = ["seasonal", "green_seasonal"].includes(this._form.plate_kind);
+    const green = ["green", "green_seasonal"].includes(this._form.plate_kind);
+    const change = this._form.plate_kind === "change";
+    const plateKinds = this._metadata?.plate_kinds || [
+      { value: "standard", label: "Standard" },
+      { value: "seasonal", label: "Saisonkennzeichen" },
+      { value: "change", label: "Wechselkennzeichen" },
+      { value: "green", label: "Grünes Kennzeichen" },
+      { value: "green_seasonal", label: "Grünes Kennzeichen + Saison" },
+    ];
+    const plateFormats = this._metadata?.plate_formats || [
+      { value: "single_line", label: "Einzeilig" },
+      { value: "two_line", label: "Zweizeilig" },
+      { value: "small_two_line", label: "Verkleinert zweizeilig" },
+      { value: "motorcycle", label: "Motorrad" },
+    ];
+
+    return `
+      <section class="form-shell" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}">
+        <div class="form-head">
+          <button class="ghost" id="back-to-list">← Zurück</button>
+          <div>
+            <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
+            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Formular-Skeleton für die spätere ConfigEntry-Erstellung über eine Reminder-Write-API."}</p>
+          </div>
+          <button class="action" id="save-placeholder" disabled>${isDetail ? "Speichern folgt später" : "Erstellen folgt später"}</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-card fields-card">
+            <h3>Basisdaten</h3>
+            <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(this._form.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
+            <div class="field-pair">
+              <label>HU-Monat<select data-field="month">${this._renderMonthOptions(this._form.month)}</select></label>
+              <label>HU-Jahr<input data-field="year" inputmode="numeric" value="${this._escape(this._form.year)}"></label>
+            </div>
+            <div class="field-pair">
+              <label>Intervall<input data-field="interval" inputmode="numeric" value="${this._escape(this._form.interval)}"></label>
+              <label>Reminder-Vorlauf Tage<input data-field="reminder_offset_days" inputmode="numeric" value="${this._escape(this._form.reminder_offset_days)}"></label>
+            </div>
+
+            <h3>Kennzeichen</h3>
+            <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, this._form.plate_kind)}</select></label>
+            <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, this._form.plate_format)}</select></label>
+
+            ${change ? `
+              <div class="field-pair">
+                <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(this._form.change_plate_common_text)}" placeholder="z. B. B AB"></label>
+                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" value="${this._escape(this._form.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+              </div>
+            ` : `
+              <label>Kennzeichen<input data-field="plate" value="${this._escape(this._form.plate)}" placeholder="z. B. B AB 123"></label>
+              <div class="check-row ${green ? "disabled-row" : ""}">
+                <label><input type="checkbox" data-field="plate_suffix_h" ${this._form.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
+                <label><input type="checkbox" data-field="plate_suffix_e" ${this._form.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
+              </div>
+            `}
+
+            ${seasonal ? `
+              <h3>Saison</h3>
+              <div class="field-pair">
+                <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(this._form.season_start_month)}</select></label>
+                <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(this._form.season_end_month)}</select></label>
+              </div>
+            ` : ""}
+          </div>
+
+          <aside class="form-card preview-card">
+            <h3>Vorschau</h3>
+            <div class="large-preview">${this._platePreviewFromText(this._formPlateText(), {
+              green,
+              seasonal,
+              seasonStart: this._form.season_start_month,
+              seasonEnd: this._form.season_end_month,
+            })}</div>
+            <dl>
+              <div><dt>Name</dt><dd>${this._escape(this._form.vehicle_name || "—")}</dd></div>
+              <div><dt>HU</dt><dd>${this._escape(String(this._form.month).padStart(2, "0"))}/${this._escape(this._form.year || "—")}</dd></div>
+              <div><dt>Art</dt><dd>${this._escape(this._kindLabel(this._form.plate_kind))}</dd></div>
+              <div><dt>Format</dt><dd>${this._escape(this._formatLabel(this._form.plate_format))}</dd></div>
+            </dl>
+            <div class="validation ${errors.length ? "has-errors" : "ok"}">
+              <strong>${errors.length ? "Noch nicht speicherbar" : "Formular lokal plausibel"}</strong>
+              ${errors.length ? `<ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>` : `<p>Die echte Speicherung bleibt deaktiviert, bis die Reminder-Write-API implementiert ist.</p>`}
+            </div>
+            <p class="note">Dieser Stand erzeugt noch keine Entity. Er bereitet die Switch-Manager-artige Erstellseite optisch und fachlich vor.</p>
+          </aside>
+        </div>
+      </section>
     `;
   }
 
@@ -248,6 +474,7 @@ class TuevReminderPanel extends HTMLElement {
     const vehicleCount = this._vehicles.length;
     const counts = this._statusCounts();
     const visibleCount = this._visibleVehicles().length;
+    const listMode = this._view === "list";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -259,10 +486,7 @@ class TuevReminderPanel extends HTMLElement {
           background: var(--primary-background-color);
           font-family: var(--paper-font-body1_-_font-family, Roboto, Arial, sans-serif);
         }
-        .page {
-          min-height: 100%;
-          background: var(--primary-background-color);
-        }
+        .page { min-height: 100%; background: var(--primary-background-color); }
         .topbar {
           height: 48px;
           display: flex;
@@ -273,12 +497,7 @@ class TuevReminderPanel extends HTMLElement {
           border-bottom: 1px solid var(--divider-color);
           background: var(--app-header-background-color, var(--primary-background-color));
         }
-        .title-wrap {
-          display: flex;
-          align-items: center;
-          min-width: 0;
-          gap: 12px;
-        }
+        .title-wrap { display: flex; align-items: center; min-width: 0; gap: 12px; }
         .menu {
           display: ${this._narrow ? "inline-flex" : "none"};
           align-items: center;
@@ -291,30 +510,20 @@ class TuevReminderPanel extends HTMLElement {
           background: transparent;
           cursor: pointer;
         }
-        h1 {
-          margin: 0;
-          font-size: 20px;
-          line-height: 1;
-          font-weight: 500;
-          white-space: nowrap;
-        }
-        .version {
-          color: var(--secondary-text-color);
-          font-size: 12px;
-          white-space: nowrap;
-        }
+        h1 { margin: 0; font-size: 20px; line-height: 1; font-weight: 500; white-space: nowrap; }
+        h2 { margin: 0 0 4px; font-size: 22px; font-weight: 500; }
+        h3 { margin: 18px 0 10px; font-size: 14px; font-weight: 600; color: var(--secondary-text-color); text-transform: uppercase; letter-spacing: .04em; }
+        h3:first-child { margin-top: 0; }
+        .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
         .toolbar {
-          display: grid;
-          grid-template-columns: minmax(240px, 1fr) auto auto auto;
+          display: ${listMode ? "grid" : "none"};
+          grid-template-columns: minmax(240px, 1fr) auto auto auto auto;
           gap: 8px;
           padding: 10px 16px;
           border-bottom: 1px solid var(--divider-color);
           background: var(--secondary-background-color);
         }
-        .search-wrap {
-          position: relative;
-          min-width: 0;
-        }
+        .search-wrap { position: relative; min-width: 0; }
         .search-icon {
           position: absolute;
           left: 12px;
@@ -323,7 +532,7 @@ class TuevReminderPanel extends HTMLElement {
           color: var(--secondary-text-color);
           pointer-events: none;
         }
-        input, select, button.action {
+        input, select, button.action, button.ghost {
           height: 40px;
           box-sizing: border-box;
           border-radius: 4px;
@@ -331,17 +540,13 @@ class TuevReminderPanel extends HTMLElement {
         }
         input, select {
           width: 100%;
-          border: 1px solid transparent;
+          border: 1px solid var(--divider-color);
           background: var(--card-background-color);
           color: var(--primary-text-color);
         }
-        input[type="search"] {
-          padding: 0 12px 0 40px;
-        }
-        select {
-          min-width: 160px;
-          padding: 0 28px 0 10px;
-        }
+        input[type="search"] { padding: 0 12px 0 40px; }
+        input:not([type="search"]), select { padding: 0 10px; }
+        select { min-width: 160px; padding-right: 28px; }
         button.action {
           border: 0;
           padding: 0 14px;
@@ -351,12 +556,17 @@ class TuevReminderPanel extends HTMLElement {
           cursor: pointer;
           white-space: nowrap;
         }
-        button.action[disabled] {
-          opacity: 0.52;
-          cursor: not-allowed;
+        button.action[disabled] { opacity: 0.52; cursor: not-allowed; }
+        button.ghost {
+          border: 1px solid var(--divider-color);
+          padding: 0 12px;
+          background: var(--card-background-color);
+          color: var(--primary-text-color);
+          cursor: pointer;
+          white-space: nowrap;
         }
         .summary-strip {
-          display: flex;
+          display: ${listMode ? "flex" : "none"};
           flex-wrap: wrap;
           gap: 16px;
           padding: 10px 16px;
@@ -364,59 +574,20 @@ class TuevReminderPanel extends HTMLElement {
           font-size: 13px;
           border-bottom: 1px solid var(--divider-color);
         }
-        .summary-strip strong {
-          color: var(--primary-text-color);
-          font-weight: 500;
-        }
-        .content {
-          padding: 0;
-        }
-        .list-shell {
-          overflow-x: auto;
-        }
-        .manager-table {
-          width: 100%;
-          min-width: 1040px;
-          border-collapse: collapse;
-        }
-        th, td {
-          padding: 10px 14px;
-          text-align: left;
-          vertical-align: middle;
-          border-bottom: 1px solid var(--divider-color);
-        }
-        th {
-          height: 32px;
-          color: var(--secondary-text-color);
-          font-size: 12px;
-          font-weight: 600;
-        }
-        tbody tr:hover {
-          background: var(--secondary-background-color);
-        }
-        .col-name {
-          width: 30%;
-        }
-        .col-preview {
-          width: 220px;
-          text-align: right;
-        }
-        .col-menu {
-          width: 40px;
-        }
-        .vehicle-title {
-          font-weight: 600;
-          line-height: 1.25;
-        }
-        .vehicle-sub, .sub-value, .muted {
-          color: var(--secondary-text-color);
-          font-size: 12px;
-          line-height: 1.35;
-        }
-        .main-value {
-          font-weight: 500;
-          line-height: 1.25;
-        }
+        .summary-strip strong { color: var(--primary-text-color); font-weight: 500; }
+        .content { padding: 0; }
+        .list-shell { overflow-x: auto; }
+        .manager-table { width: 100%; min-width: 1040px; border-collapse: collapse; }
+        th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
+        th { height: 32px; color: var(--secondary-text-color); font-size: 12px; font-weight: 600; }
+        tbody tr { cursor: pointer; }
+        tbody tr:hover { background: var(--secondary-background-color); }
+        .col-name { width: 30%; }
+        .col-preview { width: 220px; text-align: right; }
+        .col-menu { width: 40px; }
+        .vehicle-title { font-weight: 600; line-height: 1.25; }
+        .vehicle-sub, .sub-value, .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
+        .main-value { font-weight: 500; line-height: 1.25; }
         .status-pill {
           display: inline-flex;
           align-items: center;
@@ -427,20 +598,10 @@ class TuevReminderPanel extends HTMLElement {
           font-weight: 500;
           background: var(--card-background-color);
         }
-        .status-expired {
-          color: var(--error-color);
-        }
-        .status-due {
-          color: var(--warning-color, var(--state-icon-active-color));
-        }
-        .status-valid {
-          color: var(--success-color, var(--primary-color));
-        }
-        .tag-row {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 5px;
-        }
+        .status-expired { color: var(--error-color); }
+        .status-due { color: var(--warning-color, var(--state-icon-active-color)); }
+        .status-valid { color: var(--success-color, var(--primary-color)); }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .tag {
           display: inline-flex;
           align-items: center;
@@ -452,9 +613,7 @@ class TuevReminderPanel extends HTMLElement {
           font-size: 11px;
           white-space: nowrap;
         }
-        .preview-cell {
-          text-align: right;
-        }
+        .preview-cell { text-align: right; }
         .plate-preview {
           display: inline-flex;
           align-items: stretch;
@@ -470,10 +629,11 @@ class TuevReminderPanel extends HTMLElement {
           box-shadow: inset 0 0 0 1px rgba(0,0,0,0.16);
           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         }
-        .plate-preview-green {
-          color: #0a7d28;
-          border-color: #0a7d28;
-        }
+        .large-preview .plate-preview { height: 54px; max-width: 320px; min-width: 220px; }
+        .large-preview .plate-text { font-size: 24px; }
+        .large-preview .plate-eu { width: 32px; font-size: 12px; }
+        .large-preview .plate-season { min-width: 36px; font-size: 11px; }
+        .plate-preview-green { color: #0a7d28; border-color: #0a7d28; }
         .plate-eu {
           display: inline-flex;
           align-items: flex-end;
@@ -519,24 +679,53 @@ class TuevReminderPanel extends HTMLElement {
           color: var(--secondary-text-color);
           font-size: 22px;
           line-height: 1;
-          cursor: not-allowed;
+          cursor: pointer;
         }
-        .state {
-          padding: 24px 16px;
+        .state { padding: 24px 16px; }
+        .error { color: var(--error-color); }
+        .form-shell { padding: 18px 20px 32px; }
+        .form-head {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 18px;
         }
-        .error {
-          color: var(--error-color);
+        .form-head p { margin: 0; color: var(--secondary-text-color); }
+        .form-grid { display: grid; grid-template-columns: minmax(360px, 680px) minmax(280px, 420px); gap: 18px; align-items: start; }
+        .form-card {
+          border: 1px solid var(--divider-color);
+          border-radius: 10px;
+          background: var(--card-background-color);
+          padding: 18px;
+          box-sizing: border-box;
         }
-        @media (max-width: 860px) {
-          .toolbar {
-            grid-template-columns: 1fr;
-          }
-          select, button.action {
-            width: 100%;
-          }
-          .summary-strip {
-            gap: 8px 14px;
-          }
+        label { display: block; color: var(--secondary-text-color); font-size: 12px; font-weight: 500; }
+        label input, label select { margin-top: 6px; color: var(--primary-text-color); font-size: 14px; }
+        .field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .check-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; }
+        .check-row label { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-text-color); font-size: 13px; }
+        .check-row input { width: auto; height: auto; margin: 0; }
+        .disabled-row { opacity: .55; }
+        .preview-card dl { margin: 18px 0; }
+        .preview-card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--divider-color); }
+        dt { color: var(--secondary-text-color); }
+        dd { margin: 0; text-align: right; }
+        .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }
+        .validation ul { margin: 8px 0 0 18px; padding: 0; }
+        .validation p { margin: 8px 0 0; }
+        .validation.has-errors { color: var(--error-color); }
+        .validation.ok { color: var(--success-color, var(--primary-color)); }
+        .note { color: var(--secondary-text-color); font-size: 12px; line-height: 1.45; }
+        @media (max-width: 980px) {
+          .toolbar { grid-template-columns: 1fr; }
+          select, button.action { width: 100%; }
+          .summary-strip { gap: 8px 14px; }
+          .form-head { grid-template-columns: 1fr; }
+          .form-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+          .field-pair { grid-template-columns: 1fr; }
         }
       </style>
       <main class="page">
@@ -565,25 +754,27 @@ class TuevReminderPanel extends HTMLElement {
             <option value="name" ${this._sort === "name" ? "selected" : ""}>Name</option>
           </select>
           <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>Aktualisieren</button>
+          <button class="action" id="new-vehicle">Neues Fahrzeug</button>
         </section>
 
         <section class="summary-strip" aria-label="Manager Status">
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · keine Card-Funktionen · keine Dashboard-Vermischung</span>
+          <span>Reminder-eigene Seite · Formular-Skeleton · noch read-only · keine Card-Funktionen</span>
         </section>
 
         <section class="content">
-          ${this._renderVehicles()}
+          ${listMode ? this._renderVehicles() : this._renderCreateForm()}
         </section>
       </main>
     `;
 
     const refreshButton = this.shadowRoot.querySelector("#refresh");
-    if (refreshButton) {
-      refreshButton.addEventListener("click", () => this._refresh());
-    }
+    if (refreshButton) refreshButton.addEventListener("click", () => this._refresh());
+
+    const newVehicleButton = this.shadowRoot.querySelector("#new-vehicle");
+    if (newVehicleButton) newVehicleButton.addEventListener("click", () => this._openCreateForm());
 
     const filterInput = this.shadowRoot.querySelector("#filter");
     if (filterInput) {
@@ -608,6 +799,36 @@ class TuevReminderPanel extends HTMLElement {
         this._render();
       });
     }
+
+    this.shadowRoot.querySelectorAll("tr[data-row-index], button[data-menu-index]").forEach((element) => {
+      element.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const index = Number(element.dataset.rowIndex ?? element.dataset.menuIndex);
+        const vehicle = this._visibleVehicles()[index];
+        if (vehicle) this._openDetailForm(vehicle);
+      });
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          const index = Number(element.dataset.rowIndex ?? element.dataset.menuIndex);
+          const vehicle = this._visibleVehicles()[index];
+          if (vehicle) this._openDetailForm(vehicle);
+        }
+      });
+    });
+
+    const backButton = this.shadowRoot.querySelector("#back-to-list");
+    if (backButton) backButton.addEventListener("click", () => this._closeForm());
+
+    this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
+      field.addEventListener(field.type === "checkbox" ? "change" : "input", (event) => {
+        const target = event.target;
+        this._setFormValue(target.dataset.field, target.type === "checkbox" ? target.checked : target.value);
+      });
+      if (field.tagName === "SELECT") {
+        field.addEventListener("change", (event) => this._setFormValue(event.target.dataset.field, event.target.value));
+      }
+    });
 
     const menuButton = this.shadowRoot.querySelector(".menu");
     if (menuButton) {

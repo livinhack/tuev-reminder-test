@@ -1,3 +1,45 @@
+# Handover – Reminder r035 Sidebar Create Form Skeleton
+
+Current Reminder version: **r035**.
+
+## What changed in r035
+
+- Skipped r034 intentionally; no duplicated Card actions such as HU bestanden.
+- Updated `REMINDER_VERSION.txt` to `r035`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r035`.
+- Extended the Reminder-owned Sidebar panel with a Switch-Manager-style form skeleton.
+- Added `Neues Fahrzeug` as the entry point for the future creation workflow.
+- Existing rows now open a read-only detail/form skeleton.
+- Added local form fields for `vehicle_name`, `plate`, `month`, `year`, `interval`, `reminder_offset_days`, `plate_kind`, `plate_format`, `plate_suffix_h`, `plate_suffix_e`, `season_start_month`, `season_end_month`, `change_plate_common_text` and `change_plate_vehicle_digit`.
+- Added local plausibility validation and a lightweight Reminder preview.
+- Save/Create buttons remain disabled; no ConfigEntry write API exists yet.
+
+## Still deliberately not included
+
+- No Card renderer import.
+- No Card repository files.
+- No Dashboard/Lovelace management.
+- No `confirm_passed` or `set_due_date` duplication.
+- No `vehicles/create`, `vehicles/update` or `vehicles/delete` WebSocket command yet.
+
+## HA smoke test focus for r035
+
+1. Install/update the Reminder integration.
+2. Restart Home Assistant or reload custom components as required.
+3. Open Sidebar → TÜV Reminder.
+4. Verify the list from r033 still loads.
+5. Click `Neues Fahrzeug`.
+6. Verify the form opens and fields update the preview/validation.
+7. Verify Save/Create is disabled.
+8. Click an existing row and verify the detail/form skeleton opens read-only.
+9. Verify no Card behavior changed.
+
+## Next recommended step
+
+r036 should add the backend validation/write API foundation for creating a Reminder ConfigEntry, while keeping actual UI save behavior conservative and testable.
+
+---
+
 # Handover – Reminder r033 Switch-Manager-style Sidebar Polish
 
 Current Reminder version: **r033**.
