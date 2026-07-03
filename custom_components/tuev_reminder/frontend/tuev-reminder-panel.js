@@ -350,6 +350,23 @@ class TuevReminderPanel extends HTMLElement {
     return payload;
   }
 
+  _applySaveResult(result) {
+    if (Array.isArray(result?.vehicles)) {
+      this._vehicles = result.vehicles;
+      this._loaded = true;
+      return;
+    }
+    this._loaded = false;
+  }
+
+  _finishSuccessfulSave() {
+    this._view = "list";
+    this._selectedVehicle = null;
+    this._form = this._defaultForm();
+    this._formInfo = null;
+    this._formError = null;
+  }
+
   async _saveCreateForm() {
     if (!this._hass || this._view !== "create" || this._saving) {
       return;
@@ -372,17 +389,43 @@ class TuevReminderPanel extends HTMLElement {
         type: "tuev_reminder/manager/vehicles/create",
         vehicle: this._formPayload(),
       });
-      if (Array.isArray(result?.vehicles)) {
-        this._vehicles = result.vehicles;
-        this._loaded = true;
-      } else {
-        await this._refresh();
-      }
-      this._view = "list";
-      this._selectedVehicle = null;
-      this._form = this._defaultForm();
-      this._formInfo = null;
-      this._formError = null;
+      this._applySaveResult(result);
+      if (!this._loaded) await this._refresh();
+      this._finishSuccessfulSave();
+    } catch (err) {
+      this._formError = err?.message || String(err);
+    } finally {
+      this._saving = false;
+      this._render();
+    }
+  }
+
+  async _saveUpdateForm() {
+    if (!this._hass || this._view !== "detail" || this._saving || !this._selectedVehicle?.entry_id) {
+      return;
+    }
+
+    const errors = this._formValidation();
+    if (errors.length) {
+      this._formError = "Bitte zuerst die markierten Angaben korrigieren.";
+      this._syncFormSummary();
+      return;
+    }
+
+    this._saving = true;
+    this._formError = null;
+    this._formInfo = "Änderungen werden gespeichert …";
+    this._render();
+
+    try {
+      const result = await this._hass.connection.sendMessagePromise({
+        type: "tuev_reminder/manager/vehicles/update",
+        entry_id: this._selectedVehicle.entry_id,
+        vehicle: this._formPayload(),
+      });
+      this._applySaveResult(result);
+      if (!this._loaded) await this._refresh();
+      this._finishSuccessfulSave();
     } catch (err) {
       this._formError = err?.message || String(err);
     } finally {
@@ -448,9 +491,9 @@ class TuevReminderPanel extends HTMLElement {
       validation.innerHTML = this._validationHtml(errors);
     }
 
-    const saveButton = this.shadowRoot.querySelector("#save-create");
+    const saveButton = this.shadowRoot.querySelector("#save-create, #save-update");
     if (saveButton) {
-      saveButton.disabled = this._saving || errors.length > 0 || this._view !== "create";
+      saveButton.disabled = this._saving || errors.length > 0 || !["create", "detail"].includes(this._view);
       saveButton.textContent = this._saving ? "Speichert …" : "Speichern";
     }
   }
@@ -462,7 +505,10 @@ class TuevReminderPanel extends HTMLElement {
     if (errors.length) {
       return `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>${state.join("")}`;
     }
-    return `<strong>Speicherbereit</strong><p>Das Formular kann jetzt über die Reminder-Manager-API als normale ConfigEntry-Entität angelegt werden.</p>${state.join("")}`;
+    const actionText = this._view === "detail"
+      ? "Die Änderungen können über die Reminder-Manager-API in der bestehenden ConfigEntry-Entität gespeichert werden."
+      : "Das Formular kann über die Reminder-Manager-API als normale ConfigEntry-Entität angelegt werden.";
+    return `<strong>Speicherbereit</strong><p>${this._escape(actionText)}</p>${state.join("")}`;
   }
 
   _renderVehicles() {
@@ -564,7 +610,7 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-head">
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
-            <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Legt ein neues Fahrzeug als normale TÜV-Reminder-ConfigEntry-Entität an."}</p>
+            <p>${isDetail ? "Bestehende Reminder-Entität bearbeiten und über die Manager-API speichern." : "Legt ein neues Fahrzeug als normale TÜV-Reminder-ConfigEntry-Entität an."}</p>
           </div>
         </div>
 
@@ -624,10 +670,10 @@ class TuevReminderPanel extends HTMLElement {
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               ${this._validationHtml(errors)}
             </div>
-            <p class="note">Neue Fahrzeuge werden über die Reminder-eigene WebSocket-API angelegt. Bestehende Fahrzeuge bleiben in diesem Stand noch read-only.</p>
+            <p class="note">Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Card bleibt davon getrennt und liest danach nur die aktualisierten Entities/Attribute.</p>
             <div class="form-actions modal-bottom-actions">
               ${isDetail
-                ? `<button class="action" id="save-placeholder" disabled>Bearbeiten folgt später</button>`
+                ? `<button class="action" id="save-update" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
                 : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
               <button class="ghost" id="back-to-list">Schließen</button>
             </div>
@@ -1013,7 +1059,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-API aktiv · Formular speichert neue Entitäten · Drei-Punkte-Menü vorbereitet · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-API aktiv · Formular speichert Entitäten · Drei-Punkte-Menü vorbereitet · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
@@ -1096,8 +1142,11 @@ class TuevReminderPanel extends HTMLElement {
     const backButton = this.shadowRoot.querySelector("#back-to-list");
     if (backButton) backButton.addEventListener("click", () => this._closeForm());
 
-    const saveButton = this.shadowRoot.querySelector("#save-create");
-    if (saveButton) saveButton.addEventListener("click", () => this._saveCreateForm());
+    const saveCreateButton = this.shadowRoot.querySelector("#save-create");
+    if (saveCreateButton) saveCreateButton.addEventListener("click", () => this._saveCreateForm());
+
+    const saveUpdateButton = this.shadowRoot.querySelector("#save-update");
+    if (saveUpdateButton) saveUpdateButton.addEventListener("click", () => this._saveUpdateForm());
 
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       if (field.tagName === "SELECT") {

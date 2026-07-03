@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r044 Sidebar modal bottom action placement."""
+"""Validate r045 Sidebar modal bottom action placement."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,7 +10,7 @@ def read(path: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r044 modal actions bottom check failed: {message}")
+    raise SystemExit(f"r045 modal actions bottom check failed: {message}")
 
 
 def main() -> None:
@@ -19,10 +19,10 @@ def main() -> None:
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
     handover = read("HANDOVER.md")
 
-    if '"version": "0.1.0-r044"' not in manifest:
-        fail("manifest version must be 0.1.0-r044")
-    if version != "r044":
-        fail("REMINDER_VERSION.txt must be r044")
+    if '"version": "0.1.0-r045"' not in manifest:
+        fail("manifest version must be 0.1.0-r045")
+    if version != "r045":
+        fail("REMINDER_VERSION.txt must be r045")
 
     head_start = panel.index('<div class="form-head">')
     head_end = panel.index('<div class="form-grid">', head_start)
@@ -33,9 +33,11 @@ def main() -> None:
     preview_start = panel.index('<aside class="form-card preview-card">')
     preview_end = panel.index('</aside>', preview_start)
     preview_block = panel[preview_start:preview_end]
-    for needle in ["modal-bottom-actions", "save-create", "back-to-list", "save-placeholder"]:
+    for needle in ["modal-bottom-actions", "save-create", "back-to-list"]:
         if needle not in preview_block:
             fail(f"preview card must contain {needle}")
+    if "save-update" not in preview_block:
+        fail("preview card should contain edit save action in newer versions")
 
     if ".modal-bottom-actions" not in panel:
         fail("missing modal-bottom-actions CSS")
@@ -46,7 +48,7 @@ def main() -> None:
     if "No Card repository files" not in handover:
         fail("handover must preserve Reminder/Card separation")
 
-    print("r044 modal actions bottom check OK")
+    print("r045 modal actions bottom check OK")
 
 
 if __name__ == "__main__":

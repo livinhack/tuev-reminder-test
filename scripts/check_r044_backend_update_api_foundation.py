@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r044 Backend Update API foundation."""
+"""Validate r045 Backend Update API foundation."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r044 backend update API check failed: {message}")
+    raise SystemExit(f"r045 backend update API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r044":
-        fail("manifest version must be 0.1.0-r044")
-    if read("REMINDER_VERSION.txt").strip() != "r044":
-        fail("REMINDER_VERSION.txt must be r044")
+    if manifest.get("version") != "0.1.0-r045":
+        fail("manifest version must be 0.1.0-r045")
+    if read("REMINDER_VERSION.txt").strip() != "r045":
+        fail("REMINDER_VERSION.txt must be r045")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -51,21 +51,21 @@ def main() -> None:
         if marker not in manager_api:
             fail(f"manager_api.py missing {marker!r}")
 
-    if "vehicles/update" in panel:
-        fail("r044 must not wire the frontend edit save path yet")
+    if "vehicles/delete" in panel:
+        fail("r045 must not wire the delete path yet")
     if "vehicles/delete" in manager_api:
-        fail("r044 must not add delete API")
+        fail("r045 must not add delete API")
     if "No Card repository files" not in handover:
         fail("handover must preserve Reminder/Card separation")
 
     for relative in [
-        "docs/REMINDER_R044_BACKEND_UPDATE_API_FOUNDATION.md",
-        "docs/COMPAT_CARD_B355_REMINDER_R044.md",
+        "docs/REMINDER_R045_BACKEND_UPDATE_API_FOUNDATION.md",
+        "docs/COMPAT_CARD_B355_REMINDER_R045.md",
     ]:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r044 backend update API check OK")
+    print("r045 backend update API check OK")
 
 
 if __name__ == "__main__":

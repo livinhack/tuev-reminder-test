@@ -1,6 +1,13 @@
+# r045 – Sidebar Update Form Save
+
+- Bearbeiten-Modus im Sidebar-Modal mit `vehicles/update` verbunden.
+- Speichern aktualisiert bestehende Reminder-ConfigEntries über die Manager-API.
+- Liste wird nach erfolgreichem Update aus der API-Antwort aktualisiert.
+- Kein Delete, keine Card-Vermischung.
+
 # Changelog
 
-## r044 - Backend Update API Foundation
+## r045 - Backend Update API Foundation
 
 - Added Reminder Manager WebSocket command `tuev_reminder/manager/vehicles/update`.
 - Reuses the same backend vehicle validation/normalization contract as create.

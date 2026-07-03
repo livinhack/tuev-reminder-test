@@ -1,8 +1,29 @@
-# Handover – Reminder r044 Backend Update API Foundation
+# Handover – Reminder r045 Sidebar Update Form Save
 
-Current Reminder version: **r044** / manifest `0.1.0-r044`.
+## Stand
 
-## What changed in r044
+r045 basiert auf r044 und verdrahtet das Sidebar-Bearbeitungsmodal mit `tuev_reminder/manager/vehicles/update`.
+
+## Enthalten
+
+- Drei-Punkte-Menü → Bearbeiten öffnet das Modal mit bestehenden Daten.
+- Speichern ist im Bearbeiten-Modus aktiv, wenn die lokale Validierung passt.
+- Das Frontend sendet `entry_id` + Formular-Payload an `vehicles/update`.
+- Nach Erfolg wird die Liste aktualisiert und das Modal geschlossen.
+- No Card repository files were added to the Reminder repository.
+
+## Nicht enthalten
+
+- keine Delete-API
+- kein Löschdialog
+- keine Card-Dateien
+- keine `confirm_passed`-/`set_due_date`-Dopplung
+
+# Handover – Reminder r045 Backend Update API Foundation
+
+Current Reminder version: **r045** / manifest `0.1.0-r045`.
+
+## What changed in r045
 
 - Added backend WebSocket command: `tuev_reminder/manager/vehicles/update`.
 - The update command accepts `entry_id` plus a normalized `vehicle` payload.

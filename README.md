@@ -1,10 +1,16 @@
-Reminder r044
+# TÜV Reminder r045
+
+Dieser Arbeitsstand aktiviert das Speichern bestehender Fahrzeuge im Sidebar-Bearbeitungsmodal. Neue Fahrzeuge werden weiter über `vehicles/create` angelegt; bestehende Fahrzeuge werden über `vehicles/update` aktualisiert.
+
+Card und Reminder bleiben getrennte Projekte.
+
+Reminder r045
 
 # TÜV Reminder
 
-Current development build: **r044** – Backend update API foundation for Sidebar vehicle editing.
+Current development build: **r045** – Backend update API foundation for Sidebar vehicle editing.
 
-r044 adds the Reminder-owned WebSocket command `tuev_reminder/manager/vehicles/update`. Existing vehicles can now be updated through the backend contract, but the Sidebar edit save button is intentionally not wired yet. That belongs in r045.
+r045 adds the Reminder-owned WebSocket command `tuev_reminder/manager/vehicles/update`. Existing vehicles can now be updated through the backend contract, but the Sidebar edit save button is intentionally not wired yet. That belongs in r045.
 
 The Lovelace/Dashboard Card remains a separate repository/project.
 

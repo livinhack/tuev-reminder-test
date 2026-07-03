@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r044 Sidebar create form save wiring."""
+"""Validate r045 Sidebar create form save wiring."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r044 create form save check failed: {message}")
+    raise SystemExit(f"r045 create form save check failed: {message}")
 
 
 def main() -> None:
@@ -21,10 +21,10 @@ def main() -> None:
     panel_py = PANEL_PY.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    if manifest.get("version") != "0.1.0-r044":
-        fail("manifest version must be 0.1.0-r044")
-    if VERSION.read_text(encoding="utf-8").strip() != "r044":
-        fail("REMINDER_VERSION.txt must be r044")
+    if manifest.get("version") != "0.1.0-r045":
+        fail("manifest version must be 0.1.0-r045")
+    if VERSION.read_text(encoding="utf-8").strip() != "r045":
+        fail("REMINDER_VERSION.txt must be r045")
 
     for marker in [
         "_formPayload()",
@@ -50,11 +50,11 @@ def main() -> None:
     if '"mode": "vehicle_list_create_form_save"' not in panel_py:
         fail("panel.py mode should describe the save-wired UI")
 
-    for forbidden in ["tuev-card", "confirm_passed", "set_due_date", "vehicles/update", "vehicles/delete"]:
+    for forbidden in ["tuev-card", "confirm_passed", "set_due_date", "vehicles/delete"]:
         if forbidden in panel:
             fail(f"panel JS must not include {forbidden!r}")
 
-    print("r044 create form save check OK")
+    print("r045 create form save check OK")
 
 
 if __name__ == "__main__":
