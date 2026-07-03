@@ -8,6 +8,7 @@ from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import discovery
 from homeassistant.helpers import entity_registry as er
 
 from .const import (
@@ -29,9 +30,11 @@ from .const import (
 )
 from .helpers import build_plate_with_suffix
 
-PLATFORMS = ["sensor", "calendar"]
+PLATFORMS = ["sensor"]
 
 _LOGGER = logging.getLogger(__name__)
+
+CALENDAR_PLATFORM_LOADED_KEY = "calendar_platform_loaded"
 
 
 def _coerce_bool(value: object) -> bool:
@@ -139,6 +142,13 @@ async def _async_store_updated_options(
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
+    hass.data.setdefault(DOMAIN, {})
+    if not hass.data[DOMAIN].get(CALENDAR_PLATFORM_LOADED_KEY):
+        hass.data[DOMAIN][CALENDAR_PLATFORM_LOADED_KEY] = True
+        hass.async_create_task(
+            discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)
+        )
+
     async def handle_confirm_passed(call: ServiceCall):
         entity_id = call.data[ATTR_ENTITY_ID]
         entry = _resolve_tuev_entry(hass, entity_id)

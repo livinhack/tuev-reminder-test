@@ -12,13 +12,14 @@ calendar.tuev_reminder
 
 It is virtual: events are generated from current TÜV Reminder Config Entries. The integration does not write persistent events into `local_calendar`.
 
-The current calendar uses one shared owner key:
+The r017 runtime target is that the shared calendar is not owned by any vehicle Config Entry. It is loaded once at integration level and gets its own manager device info.
 
 ```text
-CALENDAR_OWNER_KEY = "calendar_owner_entry_id"
+calendar.tuev_reminder -> TÜV Reminder manager/integration context
+vehicle entries -> sensors only
 ```
 
-This is good and should be kept. It prevents every vehicle Config Entry from adding another duplicate calendar entity.
+This avoids coupling the shared calendar lifecycle to one selected vehicle.
 
 ## Target v3 behavior
 
@@ -187,7 +188,7 @@ Manual HA checks:
 ```text
 one vehicle → one calendar entity
 many vehicles → still one calendar entity
-unload owner vehicle → calendar ownership recovers after reload
+delete/reload one vehicle → detached calendar remains available
 reminder_only → reminder events only
 due_only → due events only
 reminder_and_due → two events per vehicle

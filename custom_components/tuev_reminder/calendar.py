@@ -3,6 +3,7 @@ from datetime import timedelta
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
@@ -60,7 +61,8 @@ from .helpers import (
 )
 
 
-CALENDAR_OWNER_KEY = "calendar_owner_entry_id"
+CALENDAR_ENTITY_ADDED_KEY = "calendar_entity_added"
+CALENDAR_MANAGER_DEVICE_ID = "calendar_manager"
 
 
 STATUS_LABELS = {
@@ -229,24 +231,18 @@ def _description_lines(
     return "\n".join(lines)
 
 
-async def async_setup_entry(
+async def async_setup_platform(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    config: dict,
     async_add_entities: AddEntitiesCallback,
+    discovery_info=None,
 ):
+    """Set up one integration-level virtual calendar, detached from vehicle entries."""
     hass.data.setdefault(DOMAIN, {})
-
-    if hass.data[DOMAIN].get(CALENDAR_OWNER_KEY):
+    if hass.data[DOMAIN].get(CALENDAR_ENTITY_ADDED_KEY):
         return
 
-    hass.data[DOMAIN][CALENDAR_OWNER_KEY] = entry.entry_id
-
-    def _clear_calendar_owner():
-        if hass.data.get(DOMAIN, {}).get(CALENDAR_OWNER_KEY) == entry.entry_id:
-            hass.data[DOMAIN].pop(CALENDAR_OWNER_KEY, None)
-
-    entry.async_on_unload(_clear_calendar_owner)
-
+    hass.data[DOMAIN][CALENDAR_ENTITY_ADDED_KEY] = True
     async_add_entities([TuevReminderCalendar(hass)])
 
 
@@ -257,6 +253,15 @@ class TuevReminderCalendar(CalendarEntity):
         self._attr_name = "TÜV Reminder"
         self._attr_unique_id = f"{DOMAIN}_calendar"
         self._attr_icon = "mdi:calendar-clock"
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(
+            identifiers={(DOMAIN, CALENDAR_MANAGER_DEVICE_ID)},
+            name="TÜV Reminder",
+            manufacturer="TÜV Reminder",
+            model="Integration",
+        )
 
     @property
     def event(self):

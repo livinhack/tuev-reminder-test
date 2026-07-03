@@ -14,8 +14,8 @@ def assert_contains(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r015"
-assert read("REMINDER_VERSION.txt").strip() == "r015"
+assert manifest["version"] == "0.1.0-r017"
+assert read("REMINDER_VERSION.txt").strip() == "r017"
 
 const = read("custom_components/tuev_reminder/const.py")
 helpers = read("custom_components/tuev_reminder/helpers.py")
@@ -52,9 +52,9 @@ assert_contains(calendar, 'uid=f"{entry.entry_id}-tuev-reminder"', "reminder eve
 assert_contains(calendar, 'uid=f"{entry.entry_id}-tuev-due"', "due event UID")
 assert_contains(calendar, "TÜV/HU Erinnerung", "reminder summary")
 assert_contains(calendar, "TÜV/HU fällig", "due summary")
-assert_contains(calendar, "CALENDAR_OWNER_KEY", "shared calendar owner preserved")
+assert_contains(calendar, "async_setup_platform", "shared detached calendar platform setup")
 for text, label in [(strings, "strings"), (readme, "README"), (handover, "handover"), (doc, "r013 doc")]:
     assert_contains(text, "calendar_event_mode", label)
     assert_contains(text, "reminder_offset_days", label)
 
-print("r013 calendar interface compatibility check OK under r014")
+print("r013 calendar interface compatibility check OK under r017")
