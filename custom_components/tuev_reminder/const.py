@@ -2,6 +2,11 @@ DOMAIN = "tuev_reminder"
 
 CONF_VEHICLE_NAME = "vehicle_name"
 CONF_PLATE = "plate"
+
+# Optional area-code suggestion/label. This is never a validity check; users can
+# still enter any plate text manually.
+CONF_PLATE_AREA_CODE = "plate_area_code"
+CONF_PLATE_AREA_LABEL = "plate_area_label"
 CONF_MONTH = "month"
 CONF_YEAR = "year"
 CONF_INTERVAL = "interval"

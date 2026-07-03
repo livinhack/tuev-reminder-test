@@ -12,8 +12,9 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. Der Kennzeichenbereich-Vorschlag ist nur eine Hilfe; freie Eingabe bleibt erlaubt. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
         "data": {
+          "plate_area_code": "Kennzeichenbereich-Vorschlag (optional)",
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
@@ -62,8 +63,9 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
+        "description": "Kennzeichendaten bearbeiten. Leerzeichen bleiben für die Card erhalten. Der Kennzeichenbereich-Vorschlag ist nur eine Hilfe; freie Eingabe bleibt erlaubt. H/E wird nur bei nicht-grünen Kennzeichen angeboten.",
         "data": {
+          "plate_area_code": "Kennzeichenbereich-Vorschlag (optional)",
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",

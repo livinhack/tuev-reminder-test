@@ -18,7 +18,7 @@ config_flow = read("custom_components/tuev_reminder/config_flow.py")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r009"', "manifest r009 version")
+assert_contains(manifest, '"version": "0.1.0-r011"', "manifest r011 version")
 assert_contains(
     config_flow,
     "PLATE_KIND_CHANGE: {\n        PLATE_FORMAT_SINGLE_LINE,\n        PLATE_FORMAT_TWO_LINE,\n        PLATE_FORMAT_MOTORCYCLE,\n    }",
@@ -42,8 +42,8 @@ assert_contains(
 # Ensure the preservation pattern appears twice: ConfigFlow user + OptionsFlow init.
 if config_flow.count("data_schema=_user_schema({**self._data, **(user_input or {})})") < 2:
     raise AssertionError("First-step input preservation must exist in both config and options flow")
-assert_contains(readme, "Reminder r009", "README r009")
-assert_contains(handover, "Reminder r009", "handover r009")
+assert_contains(readme, "Reminder r009", "README r011")
+assert_contains(handover, "Reminder r009", "handover r011")
 assert_contains(handover, "Card b355", "Card b355 compatibility reference")
 
 print("r009 change motorcycle + validation form state check OK")

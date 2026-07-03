@@ -8,6 +8,8 @@ from .const import (
     DOMAIN,
     CONF_VEHICLE_NAME,
     CONF_PLATE,
+    CONF_PLATE_AREA_CODE,
+    CONF_PLATE_AREA_LABEL,
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
@@ -42,6 +44,12 @@ from .const import (
     PLATE_SUFFIX_E,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
+)
+from .area_codes import (
+    area_code_selector_options,
+    extract_area_code_candidate,
+    get_area_code_label,
+    normalize_area_code,
 )
 from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
 
@@ -265,8 +273,31 @@ def _user_schema(defaults: dict):
     )
 
 
+def _derive_area_code_default(defaults: dict, plate_field: str = CONF_PLATE) -> str:
+    configured = normalize_area_code(defaults.get(CONF_PLATE_AREA_CODE))
+    if configured:
+        return configured
+    return extract_area_code_candidate(defaults.get(plate_field, ""))
+
+
 def _plate_schema(defaults: dict, kind: str):
     schema = {}
+
+    area_default = _derive_area_code_default(
+        defaults,
+        CONF_CHANGE_PLATE_COMMON_TEXT if kind == PLATE_KIND_CHANGE else CONF_PLATE,
+    )
+    schema[
+        vol.Optional(
+            CONF_PLATE_AREA_CODE,
+            default=area_default if get_area_code_label(area_default) else "",
+        )
+    ] = selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=area_code_selector_options(),
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
 
     if kind == PLATE_KIND_CHANGE:
         schema[
@@ -397,6 +428,10 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     normalized[CONF_PLATE_SUFFIX_E] = suffix_e
     normalized[CONF_PLATE_SUFFIX] = _build_suffix_summary(suffix_h, suffix_e)
 
+    selected_area_code = normalize_area_code(user_input.get(CONF_PLATE_AREA_CODE, ""))
+    normalized[CONF_PLATE_AREA_CODE] = selected_area_code
+    normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(selected_area_code)
+
     if kind == PLATE_KIND_CHANGE:
         common_text = normalize_plate_text(user_input.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))
         vehicle_digit = str(user_input.get(CONF_CHANGE_PLATE_VEHICLE_DIGIT, "")).strip()
@@ -411,11 +446,19 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
         # Compatibility alias for r003/Card probes; r004 canonical field is digit.
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = vehicle_digit
         normalized[CONF_PLATE] = build_change_plate_text(common_text, vehicle_digit)
+        if not normalized[CONF_PLATE_AREA_CODE]:
+            derived_area = extract_area_code_candidate(common_text)
+            normalized[CONF_PLATE_AREA_CODE] = derived_area
+            normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(derived_area)
     else:
         plate = normalize_plate_text(user_input.get(CONF_PLATE, ""))
         if not plate:
             errors[CONF_PLATE] = "required"
         normalized[CONF_PLATE] = plate
+        if not normalized[CONF_PLATE_AREA_CODE]:
+            derived_area = extract_area_code_candidate(plate)
+            normalized[CONF_PLATE_AREA_CODE] = derived_area
+            normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(derived_area)
         normalized[CONF_CHANGE_PLATE_COMMON_TEXT] = ""
         normalized[CONF_CHANGE_PLATE_VEHICLE_DIGIT] = ""
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = ""

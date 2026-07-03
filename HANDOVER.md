@@ -1,47 +1,55 @@
-# Handover – Reminder r009 Change-Plate Motorcycle + Validation Form State Fix
+# Handover – Reminder r011 Area Code Suggestions
 
-Current Reminder stand: **r009**.
+Current Reminder stand: **r011**.
 
-Card compatibility reference: **Card b355**. Card and Reminder are separate projects with separate versioning.
+r011 builds on the tested combination **Card b355 + Reminder r009/r010**. Runtime vehicle logic from r009 remains intact; r011 adds a local German area-code suggestion database and optional flow field.
 
-## Why r009 exists
+## Changed
 
-The HA test matrix showed two issues after r008:
+- Added bundled data file:
+  - `custom_components/tuev_reminder/data/kfz_area_codes_de.json`
+- Added license file for bundled data:
+  - `custom_components/tuev_reminder/data/LICENSE_ODBL-1.0.txt`
+- Added helper module:
+  - `custom_components/tuev_reminder/area_codes.py`
+- Added optional config/options-flow field:
+  - `plate_area_code`
+- Added sensor attributes:
+  - `plate_area_code`
+  - `plate_area_label`
+- Added check:
+  - `scripts/check_r011_area_code_suggestions.py`
 
-1. Wechselkennzeichen + Motorrad could not be tested because the r008 format check blocked it together with `small_two_line`.
-2. When the first-step type/format validation rejected a combination, Home Assistant re-rendered the form with the previous stored defaults instead of the submitted values. This made the fields look cleared/reset.
+## Important behavior
 
-## What changed in r009
+The area-code list is only a suggestion aid.
 
-- Wechselkennzeichen now allow:
-  - `single_line`
-  - `two_line`
-  - `motorcycle`
-- Wechselkennzeichen still reject:
-  - `small_two_line`
-- ConfigFlow `async_step_user` now re-renders `_user_schema({**self._data, **(user_input or {})})` on errors.
-- OptionsFlow `async_step_init` does the same.
-- Result: invalid type/format combinations keep the user's entered values when showing the error.
+- Free plate input remains allowed.
+- Unknown codes are not blocked.
+- The selected suggestion does not replace the manually entered plate string.
+- The Card still receives the full visible `plate` attribute.
 
-## Preserved
+## Not changed
 
-- r008 `plate_format` in first step.
-- r007 NONE/suffix reset fix.
-- r007 single-step season validation.
-- r006/Card bridge: `plate` is full display string; `plate_base` is suffix-free.
-- Green plate types hide and reset H/E fields.
-- Season ranges must cover at least 2 and at most 11 months.
-- Card b355 structured mapping remains the current Card-side partner.
+- No Card change; current compatible Card stand remains **Card b355**.
+- No renderer change.
+- No calendar-v3 change.
+- No local_calendar sync.
+- No Manager/Sidebar UI.
 
-## Sensor attributes relevant for Card b355
+## Next likely steps
+
+- Test whether the HA selector is comfortable with the 714-entry dropdown.
+- If the stock HA flow UI is not good enough, defer real live autocomplete to a later Manager/Sidebar UI.
+- Continue with either r012 UI cleanup or the next Roadmap item after user feedback.
+
+## Compatibility notes carried forward
+
+Reminder r009 remains the tested runtime baseline and Card b355 remains the compatible Card version.
+
+Existing Reminder/Card attributes remain documented and available:
 
 ```text
-plate
-plate_base
-plate_display
-plate_kind
-plate_format
-plate_suffix
 plate_suffix_h
 plate_suffix_e
 plate_color_mode
@@ -50,30 +58,7 @@ season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
-change_plate_vehicle_digit
 change_plate_vehicle_text
 ```
 
-## Not changed
-
-- no Card change
-- no renderer geometry change
-- no calendar-v3 change
-- no `local_calendar` sync
-- no Sidebar/Manager UI
-- no Area-Code autocomplete list
-
-## Test focus for r009
-
-In HA, specifically retest:
-
-```text
-Wechselkennzeichen + Motorrad
-Wechselkennzeichen + verkleinert zweizeilig -> must still show format error
-After that format error, vehicle name/type/format must remain filled
-Same check in the edit/options dialog
-```
-
-## Next likely step
-
-If r009 passes, continue the Card b355 + Reminder r009 E2E matrix. If no further mapping bugs appear, create a compatibility note/checkpoint for the tested combination.
+NONE handling from r007 remains fixed: `plate_suffix: none` is not appended and is not interpreted as E. Green plate suffix suppression remains active.

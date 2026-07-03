@@ -1,92 +1,58 @@
-# TÜV Reminder – Reminder r009
+# TÜV Reminder r011
 
-Reminder r009 is the current Reminder-side stand. Card and Reminder remain separate projects. The current tested Card mapping baseline is **Card b355** with Reminder r008/r009 attributes.
+Reminder r011 is the first area-code suggestion build.
 
-## r009 focus
-
-**Change-Plate Motorcycle + Validation Form State Fix**
-
-r009 is a targeted correction after the first HA test matrix with Card b355:
-
-- Wechselkennzeichen + Motorrad is now allowed.
-- Wechselkennzeichen still blocks only `small_two_line` / verkleinert zweizeilig.
-- If the type/format validation rejects a combination, the first-step form keeps the entered values instead of clearing/resetting them.
-- The same preservation fix applies to both Add and Edit/Options flows.
-
-Flow remains unchanged:
+Stable combination before this change:
 
 ```text
-1. Fahrzeugname + Kennzeichentyp + Kennzeichenformat
-2. Kennzeichendaten passend zum Typ
-3. HU-Monat + HU-Jahr + Intervall
+Card b355 + Reminder r009/r010
 ```
 
-## `plate_format` values
+r011 keeps that runtime behavior and adds a local German license-plate area-code list for suggestions.
+
+## What r011 adds
+
+- Optional area-code selector in the plate step:
+  - `plate_area_code`
+- New sensor attributes:
+  - `plate_area_code`
+  - `plate_area_label`
+- Bundled local suggestion database:
+  - `custom_components/tuev_reminder/data/kfz_area_codes_de.json`
+- ODbL source license file next to the data.
+
+## Important
+
+The database is not used as a validity check.
+
+- The license-plate input remains free.
+- Unknown area codes are allowed.
+- The suggestion field is optional.
+- Card b355 still reads the full `plate`/`plate_display` bridge.
+
+## Current compatible Card
 
 ```text
-single_line       Einzeilig
-two_line          Zweizeilig
-small_two_line    Verkleinert zweizeilig
-motorcycle        Motorrad
+Card b355
 ```
 
-## Type/format validation
+## Not included
 
-All formats are shown in the first step. On submit, the selected combination is validated.
+- No Card update.
+- No renderer update.
+- No calendar-v3 update.
+- No Manager/Sidebar UI.
+- No online lookup.
 
-Current rule after r009:
+## Compatibility notes carried forward
 
-```text
-Wechselkennzeichen:
-  allowed: single_line, two_line, motorcycle
-  rejected: small_two_line
+Runtime logic is unchanged from r009 for the tested vehicle flow. Card b355 remains the compatible Card version.
 
-Standard / Saison / Grün / Grün+Saison:
-  allowed: single_line, two_line, small_two_line, motorcycle
-```
-
-This intentionally avoids a fourth flow step that would only contain the format selector.
-
-## Preserved
-
-- r008 `plate_format` in the first step.
-- r007 suffix reset fix.
-- r007 single-step season validation.
-- r006/Card bridge: `plate` is the full display string; `plate_base` is suffix-free.
-- Green plate types hide and reset H/E fields.
-- Season ranges must cover at least 2 and at most 11 months.
-- Card b355 reads the structured Reminder attributes.
-
-## Card bridge compatibility
-
-Card b355 reads the structured Reminder attributes, while the legacy `plate` bridge remains intact:
+Existing Reminder/Card attributes remain documented and available:
 
 ```text
-plate: "TR EI 100E"
-plate_base: "TR EI 100"
-plate_display: "TR EI 100E"
-plate_suffix_h: false
-plate_suffix_e: true
-plate_suffix: "E"
-plate_format: "motorcycle"
-```
-
-`plate_base` is the suffix-free base text. `plate` remains the full visible display value for older Card paths.
-
-## Not changed
-
-- no Card change
-- no renderer geometry change
-- no calendar-v3 change
-- no `local_calendar` sync
-- no Sidebar/Manager UI
-- no Area-Code autocomplete list
-
-## Structured attributes retained
-
-Leerzeichen in `plate` bleiben erhalten. The following attributes remain part of the Reminder/Card interface:
-
-```text
+plate_suffix_h
+plate_suffix_e
 plate_color_mode
 seasonal
 season_start_month
@@ -94,10 +60,6 @@ season_end_month
 change_plate_enabled
 change_plate_common_text
 change_plate_vehicle_text
-change_plate_vehicle_digit
-plate_suffix_h
-plate_suffix_e
-plate_format
 ```
 
-Compatibility note: green plate types still hide and reset H/E suffix inputs.
+Leerzeichen in Kennzeichen bleiben erhalten; sie werden nicht intern entfernt. For green plate types, H/E suffix fields remain hidden/suppressed as decided in r007.

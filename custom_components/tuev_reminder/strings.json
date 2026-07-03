@@ -12,8 +12,9 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. The optional area-code suggestion is only a helper; free input remains allowed. H/E is offered only for non-green plates. Season start and end are validated together.",
         "data": {
+          "plate_area_code": "Area-code suggestion (optional)",
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",
@@ -62,8 +63,9 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
+        "description": "Update the license plate data. Spaces are preserved for the card. The optional area-code suggestion is only a helper; free input remains allowed. H/E is offered only for non-green plates.",
         "data": {
+          "plate_area_code": "Area-code suggestion (optional)",
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",

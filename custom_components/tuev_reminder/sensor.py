@@ -9,6 +9,8 @@ from .const import (
     DOMAIN,
     CONF_VEHICLE_NAME,
     CONF_PLATE,
+    CONF_PLATE_AREA_CODE,
+    CONF_PLATE_AREA_LABEL,
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
@@ -41,6 +43,8 @@ from .const import (
     PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
 )
+
+from .area_codes import extract_area_code_candidate, get_area_code_label, normalize_area_code
 
 from .helpers import (
     build_change_plate_text,
@@ -152,6 +156,20 @@ class TuevSensor(SensorEntity):
             if built_plate:
                 return built_plate
         return normalize_plate_text(self.data.get(CONF_PLATE, ""))
+
+    @property
+    def plate_area_code(self):
+        configured = normalize_area_code(self.data.get(CONF_PLATE_AREA_CODE, ""))
+        if configured:
+            return configured
+        return extract_area_code_candidate(self.plate)
+
+    @property
+    def plate_area_label(self):
+        configured_label = str(self.data.get(CONF_PLATE_AREA_LABEL, "")).strip()
+        if configured_label:
+            return configured_label
+        return get_area_code_label(self.plate_area_code)
 
     @property
     def plate_suffix_h(self):
@@ -284,6 +302,8 @@ class TuevSensor(SensorEntity):
             "plate": self.plate_display,
             "plate_base": self.plate,
             "plate_display": self.plate_display,
+            "plate_area_code": self.plate_area_code,
+            "plate_area_label": self.plate_area_label,
             "month": self.month,
             "year": self.year,
             "interval": self.interval,
