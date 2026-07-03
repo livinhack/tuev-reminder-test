@@ -1,6 +1,45 @@
+# Handover – Reminder r043 Sidebar Modal Actions Bottom
+
+Current Reminder version: **r043** / manifest `0.1.0-r043`.
+
+## What changed in r043
+
+- Moved the modal action buttons from the top-right header area to the bottom of the right preview column.
+- `Speichern` / `Bearbeiten folgt später` and `Schließen` now sit visually below the preview/validation block.
+- The modal header now contains only title and explanatory text.
+- r041 create/save flow remains intact.
+- r042 three-dot action menu remains intact.
+- Reminder/Card repository separation remains unchanged.
+
+## Still deliberately not included
+
+- No Card repository files in Reminder.
+- No Card renderer import or Card-internal coupling.
+- No Dashboard/Lovelace Card management.
+- No `HU bestanden` / `set_due_date` action duplication.
+- No `vehicles/update` backend command yet.
+- No `vehicles/delete` backend command yet.
+
+## HA smoke test focus
+
+1. Install/update Reminder r043 and restart/reload HA as required.
+2. Open Sidebar → TÜV Reminder.
+3. Open a new vehicle modal using either `+`.
+4. Verify the header has no buttons on the right.
+5. Verify `Speichern` and `Schließen` are at the bottom of the right preview column.
+6. Type into form fields and verify the r036 focus fix is still intact.
+7. Create one vehicle and verify the r041 create path still works.
+8. Open an existing row via the three-dot menu → Bearbeiten and verify `Bearbeiten folgt später` / `Schließen` are also bottom-aligned.
+
+## Next recommended step
+
+After this layout fix, the next functional step should be `vehicles/update` plus activating the edit flow behind the existing three-dot `Bearbeiten` action. Delete should remain behind a later confirmation dialog and dedicated backend command.
+
+---
+
 # Handover – Reminder r042 Sidebar Three-Dot Action Menu
 
-Current Reminder version: **r042** / manifest `0.1.0-r042`.
+Current Reminder version: **r043** / manifest `0.1.0-r043`.
 
 ## What changed in r042
 
@@ -42,7 +81,7 @@ r043 should introduce a Reminder-owned `vehicles/update` backend command or a de
 
 # Handover – Reminder r042 Sidebar Create Form Save
 
-Current Reminder version: **r042** / manifest `0.1.0-r042`.
+Current Reminder version: **r043** / manifest `0.1.0-r043`.
 
 ## What changed in r042
 

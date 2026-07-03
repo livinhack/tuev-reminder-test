@@ -1,12 +1,15 @@
 # TÜV Reminder
 
-Current working version: **r042**.
+Current development build: **r043** – Sidebar modal action buttons moved to the bottom of the right preview column.
 
-r042 keeps the working r041 Sidebar create flow and adds a Switch-Manager-style three-dot row action menu. Each vehicle row now exposes explicit **Bearbeiten** and **Löschen** entries at the end of the row. Editing currently opens the existing detail/form modal; deleting is prepared in the UI but deliberately does not call a backend delete command yet.
+
+Current working version: **r043**.
+
+r043 keeps the working r041 Sidebar create flow and adds a Switch-Manager-style three-dot row action menu. Each vehicle row now exposes explicit **Bearbeiten** and **Löschen** entries at the end of the row. Editing currently opens the existing detail/form modal; deleting is prepared in the UI but deliberately does not call a backend delete command yet.
 
 The Dashboard Card remains a separate repository/project and is not bundled or imported here.
 
-## r042 Sidebar three-dot action menu
+## r043 Sidebar three-dot action menu
 
 - Row-end menu button opens explicit vehicle actions.
 - `Bearbeiten` opens the selected vehicle in the existing modal.
@@ -22,16 +25,16 @@ Build a dedicated Reminder-owned `vehicles/update` API and wire the `Bearbeiten`
 
 # TÜV Reminder
 
-Current working version: **r042**.
+Current working version: **r043**.
 
-r042 adds the first save-wired Reminder Sidebar create flow: the centered modal can now create new Reminder ConfigEntries through the Reminder-owned Manager WebSocket API. The Dashboard Card remains a separate repository/project and is not bundled or imported here.
+r043 adds the first save-wired Reminder Sidebar create flow: the centered modal can now create new Reminder ConfigEntries through the Reminder-owned Manager WebSocket API. The Dashboard Card remains a separate repository/project and is not bundled or imported here.
 
 
-**Reminder r042** keeps the Backend Create API foundation and further compacts the Reminder-owned Sidebar table. The remaining secondary lines under Name and HU were removed, while the Sidebar form still keeps UI saving disabled until the next step wires the modal save button to `tuev_reminder/manager/vehicles/create`.
+**Reminder r043** keeps the Backend Create API foundation and further compacts the Reminder-owned Sidebar table. The remaining secondary lines under Name and HU were removed, while the Sidebar form still keeps UI saving disabled until the next step wires the modal save button to `tuev_reminder/manager/vehicles/create`.
 
 The Card remains a separate Dashboard/Lovelace project. Reminder owns data, entities, services, calendar and the Sidebar manager. The Card only consumes the Reminder entities/attributes.
 
-## r042 Sidebar table polish
+## r043 Sidebar table polish
 
 - Secondary lines under `Name` and `HU` were removed.
 - `Status` is now shown behind `Erinnerung`.
@@ -42,7 +45,7 @@ The Card remains a separate Dashboard/Lovelace project. Reminder owns data, enti
 - The row-end plate preview remains available.
 
 
-## r042 Backend Create API Foundation
+## r043 Backend Create API Foundation
 
 - Manager WebSocket command: `tuev_reminder/manager/vehicles/create`
 - Backend validation and normalization for manager-created vehicles
@@ -53,7 +56,7 @@ The Card remains a separate Dashboard/Lovelace project. Reminder owns data, enti
 
 ## Recommended next step
 
-r042 should connect the modal form to the create API and refresh the vehicle list after successful creation.
+r043 should connect the modal form to the create API and refresh the vehicle list after successful creation.
 
 ---
 
@@ -179,7 +182,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r042
+0.1.0-r043
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.

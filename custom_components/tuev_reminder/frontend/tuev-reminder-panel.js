@@ -566,12 +566,6 @@ class TuevReminderPanel extends HTMLElement {
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
             <p>${isDetail ? "Read-only Detail-/Bearbeitungs-Skeleton für die spätere Update-Strecke." : "Legt ein neues Fahrzeug als normale TÜV-Reminder-ConfigEntry-Entität an."}</p>
           </div>
-          <div class="form-actions">
-            ${isDetail
-              ? `<button class="action" id="save-placeholder" disabled>Bearbeiten folgt später</button>`
-              : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
-            <button class="ghost" id="back-to-list">Schließen</button>
-          </div>
         </div>
 
         <div class="form-grid">
@@ -631,6 +625,12 @@ class TuevReminderPanel extends HTMLElement {
               ${this._validationHtml(errors)}
             </div>
             <p class="note">Neue Fahrzeuge werden über die Reminder-eigene WebSocket-API angelegt. Bestehende Fahrzeuge bleiben in diesem Stand noch read-only.</p>
+            <div class="form-actions modal-bottom-actions">
+              ${isDetail
+                ? `<button class="action" id="save-placeholder" disabled>Bearbeiten folgt später</button>`
+                : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
+              <button class="ghost" id="back-to-list">Schließen</button>
+            </div>
           </aside>
         </div>
         </div>
@@ -933,14 +933,17 @@ class TuevReminderPanel extends HTMLElement {
           box-shadow: 0 16px 48px rgba(0,0,0,.32);
         }
         .form-head {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) auto;
-          align-items: center;
-          gap: 14px;
+          display: block;
           margin-bottom: 18px;
         }
         .form-head p { margin: 0; color: var(--secondary-text-color); }
         .form-actions { display: flex; gap: 8px; align-items: center; }
+        .modal-bottom-actions {
+          justify-content: flex-end;
+          margin-top: 22px;
+          padding-top: 16px;
+          border-top: 1px solid var(--divider-color);
+        }
         .form-grid { display: grid; grid-template-columns: minmax(360px, 680px) minmax(280px, 420px); gap: 18px; align-items: start; }
         .form-card {
           border: 1px solid var(--divider-color);

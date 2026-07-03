@@ -1,5 +1,12 @@
 # Changelog
 
+## r043 - Sidebar Modal Actions Bottom
+
+- Moves the modal action buttons out of the top-right header area.
+- Places `Speichern`/`Bearbeiten folgt später` and `Schließen` at the bottom of the right preview column.
+- Keeps the centered modal overlay, input focus fix, create/save flow, and three-dot row action menu intact.
+- Preserves strict Reminder/Card separation.
+
 ## r042 - Sidebar Three-Dot Action Menu
 
 - Adds a Switch-Manager-style three-dot row action menu.
