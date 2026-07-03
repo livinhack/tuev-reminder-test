@@ -14,8 +14,8 @@ def assert_contains(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r017"
-assert read("REMINDER_VERSION.txt").strip() == "r017"
+assert manifest["version"] == "0.1.0-r018"
+assert read("REMINDER_VERSION.txt").strip() == "r018"
 
 calendar = read("custom_components/tuev_reminder/calendar.py")
 readme = read("README.md")

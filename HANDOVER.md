@@ -1,62 +1,65 @@
-# Handover – Reminder r017 Detached Calendar Entity
+# Handover – Reminder r018 V3 Stabilization Test Matrix
 
-Current Reminder stand: **r017**.
+Current Reminder stand: **r018**.
 
-Stable combined baseline:
+r018 is a documentation/checkpoint build after r017. It keeps the r017 runtime unchanged and adds the stabilization test matrix plus updated compatibility docs for Card b355.
 
-```text
-Card b355 + Reminder r017
-```
+## Runtime status
 
-r017 keeps the r015 service/date lifecycle and the r014 calendar description polish. It changes the calendar setup architecture so the shared virtual calendar is no longer owned by a vehicle Config Entry.
+Same as r017:
 
-## Implemented in r017
+- vehicle entries forward only the sensor platform
+- `calendar.tuev_reminder` is integration-level / manager-device based
+- no vehicle Config Entry semantically owns the shared calendar
+- calendar events are dynamically generated from all vehicle entries
+- services from r015 remain available
+- Card b355 bridge remains intact
 
-- The shared virtual calendar remains `calendar.tuev_reminder`.
-- Vehicle Config Entries now forward only the sensor platform.
-- `calendar.tuev_reminder` is loaded once from integration-level `async_setup`.
-- The calendar entity gets manager device info named `TÜV Reminder`.
-- Removed the r016 vehicle-owner/handoff mechanism.
-- Calendar events are still generated dynamically from all current TÜV Reminder vehicle entries.
+## Added in r018
 
-## Preserved
-
-- r015 `confirm_passed` with optional `passed_date`.
-- r015 `set_due_date` service.
-- r014 calendar titles/descriptions.
-- r013 calendar event mode and reminder offset.
-- One shared virtual calendar entity.
-- No writes to `local_calendar`.
-- Card b355 compatibility.
-- Reminder r009/r012 runtime plate behavior.
-
-## Suggested HA tests
-
-1. Confirm `calendar.tuev_reminder` appears with multiple vehicles.
-2. Confirm it is associated with the integration/manager device `TÜV Reminder`, not one vehicle device.
-3. Delete or reload one vehicle entry.
-4. Confirm `calendar.tuev_reminder` remains available and no duplicate TÜV Reminder calendars appear.
-5. Confirm Card b355 still displays vehicle plate variants as before.
+- `docs/REMINDER_R018_V3_STABILIZATION_TEST_MATRIX.md`
+- `docs/REMINDER_R018_RELEASE_READINESS_AUDIT.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R017.md`
+- `scripts/check_r018_v3_stabilization.py`
+- version markers updated to r018
 
 ## Not changed
 
-- No Card change.
-- No renderer geometry change.
-- No calendar event/date logic change.
-- No `local_calendar` write/sync.
-- No area-code autocomplete UI.
-- No sidebar/manager UI.
+- no Card change
+- no Runtime behavior change beyond version marker
+- no Renderer geometry
+- no `local_calendar` sync
+- no Area-Code selector in Config Flow
+- no Sidebar/Manager UI
 
-## Compatibility carry-over
+## Next suggested step
 
-This release preserves the stable Reminder r009 runtime line for Card b355.
-
-Card/attribute compatibility remains documented for:
+Install/test the stack:
 
 ```text
+Card b355 + Reminder r018
+```
+
+Use the r018 test matrix. If it passes, the Reminder v3 first phase can be marked as a tested baseline.
+
+## Compatibility attribute list
+
+```text
+vehicle_name
 plate
 plate_base
 plate_display
+month
+year
+interval
+calendar_event_mode
+reminder_offset_days
+rotation
+due_date
+reminder_date
+expired_date
+status
+blurred
 plate_kind
 plate_format
 plate_suffix
@@ -70,10 +73,22 @@ change_plate_enabled
 change_plate_common_text
 change_plate_vehicle_digit
 change_plate_vehicle_text
-calendar_event_mode
-reminder_offset_days
 ```
 
-Leerzeichen in Kennzeichen remain preserved. The green plate flow still suppresses H/E suffixes; green plate entries do not expose suffix checkboxes in the current config flow. The old NONE suffix bug remains fixed.
+Historical compatibility note: Reminder r009 is the tested runtime baseline for the Card b355 bridge before later calendar lifecycle and detached-calendar work.
 
-Calendar Description Polish remains active from r014, including titles `TÜV/HU Erinnerung` and `TÜV/HU fällig`. No writes to `local_calendar`.
+The stable Reminder r009 Card bridge remains preserved in r018.
+
+Green plate note: green plate entries do not expose or carry H/E suffixes in the current flow.
+
+Reminder r017 detached-calendar runtime remains the baseline runtime behavior for r018.
+
+Spacing decision: Leerzeichen in Kennzeichen bleiben erhalten und werden nicht intern entfernt.
+
+Historical note: r014 Calendar Description Polish remains preserved in this build.
+
+Historical r007 note: NONE suffix handling remains fixed; NONE is not appended to plates and is not misread as E.
+
+Calendar summaries preserved: TÜV/HU Erinnerung: <Fahrzeug> and TÜV/HU fällig: <Fahrzeug>.
+
+No writes to `local_calendar`; the Reminder calendar remains virtual.

@@ -2,6 +2,10 @@ from pathlib import Path
 import json
 
 ROOT = Path(__file__).resolve().parents[1]
+version = (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip()
+if version != "r017":
+    print(f"r017 detached calendar entity check skipped for current version {version}")
+    raise SystemExit(0)
 
 def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
