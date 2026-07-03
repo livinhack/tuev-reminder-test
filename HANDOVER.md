@@ -1,39 +1,43 @@
-# Handover – Reminder r014 Calendar Description Polish
+# Handover – Reminder r015 Service Date Lifecycle
 
-Current Reminder stand: **r014**.
+Current Reminder stand: **r015**.
 
-Stable combined baseline remains:
+Stable combined baseline:
 
 ```text
-Card b355 + Reminder r009/r010/r012/r013/r014
+Card b355 + Reminder r015
 ```
 
-r014 is a small calendar-polish step. It does not change the Card, plate renderer, config-flow structure, calendar storage model, or local-calendar behavior.
+r015 keeps the r014 calendar description polish and the stable r009/r012 plate runtime behavior. It does not change the Card, renderer, config-flow structure, calendar storage model, or local-calendar behavior.
 
-## Implemented in r014
+## Implemented in r015
 
-- Reminder calendar summary: `TÜV/HU Erinnerung: <Fahrzeug>`.
-- Due calendar summary: `TÜV/HU fällig: <Fahrzeug>`.
-- Calendar descriptions now include friendly German labels for:
-  - status
-  - calendar mode
-  - plate kind
-  - plate format
-- Calendar descriptions now show:
-  - Termin type
-  - Fahrzeug
-  - Kennzeichen
-  - HU month/year
-  - Fällig am
-  - Erinnerung am
-  - reminder offset
-  - calendar mode
-  - status
-  - interval
-  - optional green/season/change-plate metadata
+- `tuev_reminder.confirm_passed` remains backward compatible.
+- `confirm_passed` now supports optional `passed_date` in `YYYY-MM-DD` format.
+- Without `passed_date`, `confirm_passed` still uses today's date.
+- New service `tuev_reminder.set_due_date` sets HU month/year directly.
+- Service handling now shares TÜV-Reminder entity resolution and option update helpers.
+
+## Services
+
+```yaml
+service: tuev_reminder.confirm_passed
+data:
+  entity_id: sensor.focus_st_tuv
+  passed_date: "2027-04-23"
+```
+
+```yaml
+service: tuev_reminder.set_due_date
+data:
+  entity_id: sensor.focus_st_tuv
+  month: 7
+  year: 2027
+```
 
 ## Preserved
 
+- r014 calendar titles/descriptions.
 - r013 calendar event mode and reminder offset.
 - One shared virtual `calendar.tuev_reminder` entity.
 - No writes to `local_calendar`.
@@ -43,19 +47,28 @@ r014 is a small calendar-polish step. It does not change the Card, plate rendere
 
 ## Suggested HA tests
 
-1. Open `calendar.tuev_reminder` and click a reminder event.
-2. Confirm the summary/title is readable.
-3. Confirm the description contains vehicle, plate, HU, due date, reminder date and status.
-4. Confirm `reminder_only`, `due_only` and `reminder_and_due` still behave like r013.
-5. Confirm the old local calendar `TÜV` remains separate and is not written by the integration.
+1. Call `tuev_reminder.confirm_passed` without `passed_date` and verify HU updates from today's date.
+2. Call `tuev_reminder.confirm_passed` with `passed_date: "YYYY-MM-DD"` and verify HU month/year use that date plus interval.
+3. Call `tuev_reminder.set_due_date` with month/year and verify the sensor, Card and calendar update.
+4. Confirm Card b355 still displays plate variants as before.
+5. Confirm `calendar.tuev_reminder` still shows reminder/due events according to r013 mode/offset.
 
-## Compatibility carry-over notes
+## Not changed
 
-Reminder r009 plate behavior remains the runtime base for this release. Card b355 compatibility is retained.
+- No Card change.
+- No renderer geometry change.
+- No calendar storage model change.
+- No `local_calendar` write/sync.
+- No area-code autocomplete UI.
+- No sidebar/manager UI.
 
-The r007 `NONE` suffix bug remains fixed. Leerzeichen in Kennzeichen remain preserved.
+Calendar Description Polish from r014 remains in place; r015 only extends the service/date lifecycle.
 
-Relevant retained attributes include:
+## Compatibility carry-over from Reminder r009/r014
+
+This release preserves the stable Reminder r009 runtime line for Card b355.
+
+Card/attribute compatibility remains documented for:
 
 ```text
 plate_suffix_h
@@ -68,8 +81,15 @@ change_plate_enabled
 change_plate_common_text
 change_plate_vehicle_text
 change_plate_vehicle_digit
+plate_kind
+plate_format
+plate_suffix
+plate_display
+plate_base
 calendar_event_mode
 reminder_offset_days
 ```
 
-Calendar Description Polish keeps the r013 fields `calendar_event_mode` and `reminder_offset_days` unchanged while improving event titles/descriptions.
+Leerzeichen in Kennzeichen remain preserved. The green plate flow still suppresses H/E suffixes; green plate entries do not expose suffix checkboxes in the current config flow. The old NONE suffix bug remains fixed.
+
+Calendar Description Polish remains active from r014, including titles `TÜV/HU Erinnerung` and `TÜV/HU fällig`. No writes to `local_calendar`.

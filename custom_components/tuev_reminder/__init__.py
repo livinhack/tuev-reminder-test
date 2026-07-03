@@ -24,6 +24,8 @@ from .const import (
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
     SERVICE_CONFIRM_PASSED,
+    SERVICE_SET_DUE_DATE,
+    ATTR_PASSED_DATE,
 )
 from .helpers import build_plate_with_suffix
 
@@ -65,73 +67,119 @@ def _entry_title_from_values(values: dict, fallback: str = "Fahrzeug") -> str:
     return f"{vehicle_name} ({plate})" if plate else vehicle_name
 
 
+async def _resolve_tuev_entry(hass: HomeAssistant, entity_id: str) -> ConfigEntry:
+    if not entity_id.startswith("sensor."):
+        raise HomeAssistantError(
+            f"Der Service kann nur mit TÜV-Reminder-Sensoren verwendet werden: {entity_id}"
+        )
+
+    entity_registry = er.async_get(hass)
+    registry_entry = entity_registry.async_get(entity_id)
+
+    if registry_entry is None:
+        raise HomeAssistantError(f"Entität nicht gefunden: {entity_id}")
+
+    if registry_entry.platform != DOMAIN:
+        raise HomeAssistantError(
+            f"Entität gehört nicht zur Integration {DOMAIN}: {entity_id}"
+        )
+
+    config_entry_id = registry_entry.config_entry_id
+
+    if config_entry_id is None:
+        raise HomeAssistantError(
+            f"Entität gehört zu keinem Config Entry: {entity_id}"
+        )
+
+    entry = hass.config_entries.async_get_entry(config_entry_id)
+
+    if entry is None:
+        raise HomeAssistantError(
+            f"Config Entry nicht gefunden für Entität: {entity_id}"
+        )
+
+    if entry.domain != DOMAIN:
+        raise HomeAssistantError(
+            f"Config Entry gehört nicht zu {DOMAIN}: {entity_id}"
+        )
+
+    return entry
+
+
+def _merged_entry_values(entry: ConfigEntry) -> dict:
+    return {
+        **entry.data,
+        **entry.options,
+    }
+
+
+def _parse_passed_date(value: object | None) -> date:
+    if value in {None, ""}:
+        return date.today()
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(str(value))
+    except ValueError as err:
+        raise HomeAssistantError(
+            f"passed_date muss im Format YYYY-MM-DD angegeben werden: {value}"
+        ) from err
+
+
+async def _async_store_updated_options(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    updated_values: dict,
+) -> None:
+    hass.config_entries.async_update_entry(
+        entry,
+        options=updated_values,
+    )
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
 async def async_setup(hass: HomeAssistant, config: dict):
     async def handle_confirm_passed(call: ServiceCall):
         entity_id = call.data[ATTR_ENTITY_ID]
+        entry = _resolve_tuev_entry(hass, entity_id)
 
-        if not entity_id.startswith("sensor."):
-            raise HomeAssistantError(
-                f"Der Service kann nur mit TÜV-Reminder-Sensoren verwendet werden: {entity_id}"
-            )
-
-        entity_registry = er.async_get(hass)
-        registry_entry = entity_registry.async_get(entity_id)
-
-        if registry_entry is None:
-            raise HomeAssistantError(
-                f"Entität nicht gefunden: {entity_id}"
-            )
-
-        if registry_entry.platform != DOMAIN:
-            raise HomeAssistantError(
-                f"Entität gehört nicht zur Integration {DOMAIN}: {entity_id}"
-            )
-
-        config_entry_id = registry_entry.config_entry_id
-
-        if config_entry_id is None:
-            raise HomeAssistantError(
-                f"Entität gehört zu keinem Config Entry: {entity_id}"
-            )
-
-        entry = hass.config_entries.async_get_entry(config_entry_id)
-
-        if entry is None:
-            raise HomeAssistantError(
-                f"Config Entry nicht gefunden für Entität: {entity_id}"
-            )
-
-        if entry.domain != DOMAIN:
-            raise HomeAssistantError(
-                f"Config Entry gehört nicht zu {DOMAIN}: {entity_id}"
-            )
-
-        today = date.today()
-
-        current_values = {
-            **entry.data,
-            **entry.options,
-        }
-
+        passed_date = _parse_passed_date(call.data.get(ATTR_PASSED_DATE))
+        current_values = _merged_entry_values(entry)
         interval = int(current_values.get(CONF_INTERVAL, 2))
 
         new_options = dict(current_values)
-        new_options[CONF_MONTH] = today.month
-        new_options[CONF_YEAR] = today.year + interval
+        new_options[CONF_MONTH] = passed_date.month
+        new_options[CONF_YEAR] = passed_date.year + interval
 
         _LOGGER.info(
-            "TÜV bestanden bestätigt für %s: neue HU %02d/%s",
+            "TÜV bestanden bestätigt für %s: Prüfdatum %s, neue HU %02d/%s",
             entity_id,
+            passed_date.isoformat(),
             new_options[CONF_MONTH],
             new_options[CONF_YEAR],
         )
 
-        hass.config_entries.async_update_entry(
-            entry,
-            options=new_options,
+        await _async_store_updated_options(hass, entry, new_options)
+
+    async def handle_set_due_date(call: ServiceCall):
+        entity_id = call.data[ATTR_ENTITY_ID]
+        entry = _resolve_tuev_entry(hass, entity_id)
+
+        month = int(call.data[CONF_MONTH])
+        year = int(call.data[CONF_YEAR])
+
+        new_options = dict(_merged_entry_values(entry))
+        new_options[CONF_MONTH] = month
+        new_options[CONF_YEAR] = year
+
+        _LOGGER.info(
+            "TÜV-Fälligkeit gesetzt für %s: neue HU %02d/%s",
+            entity_id,
+            month,
+            year,
         )
 
-        await hass.config_entries.async_reload(entry.entry_id)
+        await _async_store_updated_options(hass, entry, new_options)
 
     hass.services.async_register(
         DOMAIN,
@@ -140,6 +188,20 @@ async def async_setup(hass: HomeAssistant, config: dict):
         schema=vol.Schema(
             {
                 vol.Required(ATTR_ENTITY_ID): cv.entity_id,
+                vol.Optional(ATTR_PASSED_DATE): str,
+            }
+        ),
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_DUE_DATE,
+        handle_set_due_date,
+        schema=vol.Schema(
+            {
+                vol.Required(ATTR_ENTITY_ID): cv.entity_id,
+                vol.Required(CONF_MONTH): vol.All(vol.Coerce(int), vol.Range(min=1, max=12)),
+                vol.Required(CONF_YEAR): vol.All(vol.Coerce(int), vol.Range(min=1900, max=2100)),
             }
         ),
     )

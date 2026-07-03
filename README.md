@@ -1,77 +1,96 @@
-# TÜV Reminder – Reminder r014
+# TÜV Reminder – Reminder r015
 
-Reminder r014 polishes the virtual calendar event text while preserving the stable runtime line from Reminder r009/r010/r012 and the calendar options from r013.
+Reminder r015 keeps the stable runtime line from Reminder r009/r012 and the calendar polish from r014, then makes the service/date lifecycle explicit.
 
-Compatible Card baseline:
+Stable combined baseline:
 
 ```text
-Card b355 + Reminder r014
+Card b355 + Reminder r015
 ```
 
-## What r014 changes
+## What r015 changes
 
-- Calendar reminder title is now `TÜV/HU Erinnerung: <Fahrzeug>`.
-- Calendar due title is now `TÜV/HU fällig: <Fahrzeug>`.
-- Calendar event descriptions now use German labels instead of internal enum values.
-- Event descriptions include event type, vehicle, plate, HU, due date, reminder date, offset, calendar mode, status, interval and optional plate metadata.
+- `tuev_reminder.confirm_passed` remains compatible.
+- `confirm_passed` now accepts optional `passed_date` in `YYYY-MM-DD` format.
+- If `passed_date` is omitted, `confirm_passed` still uses today's date.
+- New service: `tuev_reminder.set_due_date` for directly correcting HU month/year.
+- Service code now uses shared entry resolution and update helpers.
 
-## Preserved
+## Services
 
-- One shared virtual calendar entity: `calendar.tuev_reminder`.
-- No writes to `local_calendar`.
-- `calendar_event_mode` and `reminder_offset_days` from r013 remain unchanged.
-- Card b355 bridge remains intact.
-- Reminder r009 plate/format behavior remains intact.
-- Free Kennzeichen input remains allowed.
-- The r011 extra area-code field remains reverted.
-- Area-code typeahead remains a later Manager/Sidebar UI idea.
+### Confirm passed inspection
 
-## Card-facing attributes retained
+```yaml
+service: tuev_reminder.confirm_passed
+data:
+  entity_id: sensor.focus_st_tuv
+  passed_date: "2027-04-23" # optional
+```
+
+The new HU date is calculated from the passed date plus the configured interval.
+
+### Set HU due date directly
+
+```yaml
+service: tuev_reminder.set_due_date
+data:
+  entity_id: sensor.focus_st_tuv
+  month: 7
+  year: 2027
+```
+
+This is intended for corrections and automations where the exact due month/year is already known.
+
+## Compatibility
+
+Card b355 continues to read the existing Reminder attributes. r015 does not require a Card update.
+
+## Not changed
+
+- No Card change.
+- No renderer geometry change.
+- No calendar storage model change.
+- No `local_calendar` write/sync.
+- No area-code autocomplete UI.
+- No sidebar/manager UI.
+
+## Checks
+
+Run:
+
+```bash
+python -m py_compile custom_components/tuev_reminder/*.py
+python -m json.tool custom_components/tuev_reminder/strings.json
+python -m json.tool custom_components/tuev_reminder/manifest.json
+python scripts/check_r015_service_date_lifecycle.py
+```
+
+## Compatibility carry-over from Reminder r009/r014
+
+This release preserves the stable Reminder r009 runtime line for Card b355.
+
+Card/attribute compatibility remains documented for:
 
 ```text
-plate
-plate_base
-plate_display
+plate_suffix_h
+plate_suffix_e
+plate_color_mode
+seasonal
+season_start_month
+season_end_month
+change_plate_enabled
+change_plate_common_text
+change_plate_vehicle_text
+change_plate_vehicle_digit
 plate_kind
 plate_format
-plate_color_mode
 plate_suffix
-plate_suffix_h
-plate_suffix_e
-seasonal
-season_start_month
-season_end_month
-change_plate_enabled
-change_plate_common_text
-change_plate_vehicle_digit
-change_plate_vehicle_text
+plate_display
+plate_base
 calendar_event_mode
 reminder_offset_days
 ```
 
-## Compatibility carry-over notes
+Leerzeichen in Kennzeichen remain preserved. The green plate flow still suppresses H/E suffixes; green plate entries do not expose suffix checkboxes in the current config flow. The old NONE suffix bug remains fixed.
 
-This release remains on the stable Reminder r009 runtime line for plate handling while adding only calendar text polish.
-
-Spacing decision: Leerzeichen in Kennzeichen bleiben erhalten; they are not normalized away because the Card renderer needs the visible block structure.
-
-Green plate note: green plate entries suppress H/E suffixes in the normal Config/Options Flow.
-
-Relevant retained attributes include:
-
-```text
-plate_suffix_h
-plate_suffix_e
-plate_color_mode
-seasonal
-season_start_month
-season_end_month
-change_plate_enabled
-change_plate_common_text
-change_plate_vehicle_text
-change_plate_vehicle_digit
-calendar_event_mode
-reminder_offset_days
-```
-
-Calendar Description Polish: r014 keeps `calendar_event_mode` and `reminder_offset_days` from r013 and improves only the calendar summaries/descriptions.
+Calendar Description Polish remains active from r014, including titles `TÜV/HU Erinnerung` and `TÜV/HU fällig`. No writes to `local_calendar`.

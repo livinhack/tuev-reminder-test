@@ -1,6 +1,6 @@
 confirm_passed:
   name: Confirm passed inspection
-  description: Updates the next inspection due date based on the current month and the configured interval.
+  description: Updates the next inspection due date based on a passed inspection date and the configured interval.
   fields:
     entity_id:
       name: Entity
@@ -9,3 +9,41 @@ confirm_passed:
       selector:
         entity:
           domain: sensor
+    passed_date:
+      name: Passed date
+      description: Optional inspection date in YYYY-MM-DD format. Defaults to today.
+      required: false
+      selector:
+        date:
+
+set_due_date:
+  name: Set inspection due date
+  description: Sets the HU due month and year directly for a TÜV Reminder sensor.
+  fields:
+    entity_id:
+      name: Entity
+      description: TÜV Reminder sensor to update.
+      required: true
+      selector:
+        entity:
+          domain: sensor
+    month:
+      name: HU month
+      description: New HU due month.
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 12
+          step: 1
+          mode: box
+    year:
+      name: HU year
+      description: New HU due year.
+      required: true
+      selector:
+        number:
+          min: 1900
+          max: 2100
+          step: 1
+          mode: box

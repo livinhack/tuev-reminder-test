@@ -85,3 +85,5 @@ STATUS_DUE = "due"
 STATUS_EXPIRED = "expired"
 
 SERVICE_CONFIRM_PASSED = "confirm_passed"
+SERVICE_SET_DUE_DATE = "set_due_date"
+ATTR_PASSED_DATE = "passed_date"
