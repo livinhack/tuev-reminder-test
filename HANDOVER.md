@@ -1,80 +1,75 @@
-# Handover – Reminder r013 Calendar Event Mode + Reminder Offset
+# Handover – Reminder r014 Calendar Description Polish
 
-Current Reminder stand: **r013**.
+Current Reminder stand: **r014**.
 
-r013 builds on the stable tested line:
+Stable combined baseline remains:
 
 ```text
-Card b355 + Reminder r009/r010/r012
+Card b355 + Reminder r009/r010/r012/r013/r014
 ```
 
-It adds the first implemented calendar-v3 feature set. Plate/runtime behavior remains based on Reminder r009, and the Card b355 bridge remains intact.
+r014 is a small calendar-polish step. It does not change the Card, plate renderer, config-flow structure, calendar storage model, or local-calendar behavior.
 
-## Implemented in r013
+## Implemented in r014
 
-- `CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"`.
-- `CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"`.
-- Calendar event modes:
-  - `reminder_only`
-  - `due_only`
-  - `reminder_and_due`
-- Reminder offset range: `0..365`, default `7`.
-- HU Config/Options step now includes calendar settings.
-- Shared virtual calendar emits reminder and/or due events per entry.
-- Stable UIDs:
-  - `{entry_id}-tuev-reminder`
-  - `{entry_id}-tuev-due`
-- Calendar descriptions include vehicle, plate, HU, due date, status, interval, offset and optional plate metadata.
-- Sensor attributes now expose `calendar_event_mode` and `reminder_offset_days`.
-- `reminder_date`, `status`, and `blurred` use the configured offset.
+- Reminder calendar summary: `TÜV/HU Erinnerung: <Fahrzeug>`.
+- Due calendar summary: `TÜV/HU fällig: <Fahrzeug>`.
+- Calendar descriptions now include friendly German labels for:
+  - status
+  - calendar mode
+  - plate kind
+  - plate format
+- Calendar descriptions now show:
+  - Termin type
+  - Fahrzeug
+  - Kennzeichen
+  - HU month/year
+  - Fällig am
+  - Erinnerung am
+  - reminder offset
+  - calendar mode
+  - status
+  - interval
+  - optional green/season/change-plate metadata
 
 ## Preserved
 
-- One shared virtual calendar entity, no per-vehicle duplicate calendar entity.
+- r013 calendar event mode and reminder offset.
+- One shared virtual `calendar.tuev_reminder` entity.
 - No writes to `local_calendar`.
 - Card b355 compatibility.
-- Reminder r009 plate/format behavior.
-- Free Kennzeichen input remains allowed.
-- The r011 extra area-code field remains reverted.
-- Area-code typeahead stays in the later Manager/Sidebar UI roadmap.
-
-## Not changed
-
-- No Card change.
-- No Renderer geometry change.
-- No Sidebar/Manager UI.
-- No active area-code autocomplete.
+- Reminder r009/r012 runtime plate behavior.
+- Area-code selector remains reverted.
 
 ## Suggested HA tests
 
-1. Multiple vehicles still create only one `calendar.tuev_reminder`.
-2. `reminder_only` shows only reminder events.
-3. `due_only` shows only HU due events.
-4. `reminder_and_due` shows both events.
-5. Changing `reminder_offset_days` changes `reminder_date` and calendar reminder event date.
-6. Card b355 still shows plates as before.
+1. Open `calendar.tuev_reminder` and click a reminder event.
+2. Confirm the summary/title is readable.
+3. Confirm the description contains vehicle, plate, HU, due date, reminder date and status.
+4. Confirm `reminder_only`, `due_only` and `reminder_and_due` still behave like r013.
+5. Confirm the old local calendar `TÜV` remains separate and is not written by the integration.
 
-## Card-facing attribute set retained
+## Compatibility carry-over notes
+
+Reminder r009 plate behavior remains the runtime base for this release. Card b355 compatibility is retained.
+
+The r007 `NONE` suffix bug remains fixed. Leerzeichen in Kennzeichen remain preserved.
+
+Relevant retained attributes include:
 
 ```text
-plate
-plate_base
-plate_display
-plate_kind
-plate_format
-plate_color_mode
-plate_suffix
 plate_suffix_h
 plate_suffix_e
+plate_color_mode
 seasonal
 season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
-change_plate_vehicle_digit
 change_plate_vehicle_text
+change_plate_vehicle_digit
 calendar_event_mode
 reminder_offset_days
 ```
 
-Historical r007 note: the previous `NONE` suffix display/parsing bug remains fixed.
+Calendar Description Polish keeps the r013 fields `calendar_event_mode` and `reminder_offset_days` unchanged while improving event titles/descriptions.

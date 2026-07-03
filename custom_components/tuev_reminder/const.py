@@ -66,7 +66,7 @@ PLATE_COLOR_MODES = [
     PLATE_COLOR_GREEN,
 ]
 
-# r013 calendar interface. These are per vehicle entry options used by the
+# r014 calendar interface. These are per vehicle entry options used by the
 # shared virtual CalendarEntity.
 CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"
 CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"

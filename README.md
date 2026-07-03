@@ -1,53 +1,32 @@
-# TÜV Reminder – Reminder r013
+# TÜV Reminder – Reminder r014
 
-Reminder r013 adds the first runtime part of the v3 calendar interface while preserving the stable plate/runtime behavior from Reminder r009/r010/r012.
+Reminder r014 polishes the virtual calendar event text while preserving the stable runtime line from Reminder r009/r010/r012 and the calendar options from r013.
 
 Compatible Card baseline:
 
 ```text
-Card b355 + Reminder r013
+Card b355 + Reminder r014
 ```
 
-Card b355 compatibility remains based on the same attributes documented for Reminder r009/r010/r012. The Card-side renderer mapping is not changed by r013.
+## What r014 changes
 
-## What r013 changes
+- Calendar reminder title is now `TÜV/HU Erinnerung: <Fahrzeug>`.
+- Calendar due title is now `TÜV/HU fällig: <Fahrzeug>`.
+- Calendar event descriptions now use German labels instead of internal enum values.
+- Event descriptions include event type, vehicle, plate, HU, due date, reminder date, offset, calendar mode, status, interval and optional plate metadata.
 
-- Adds `calendar_event_mode`.
-- Adds `reminder_offset_days`.
-- Extends the HU step in the Config/Options Flow with calendar settings.
-- Keeps one shared virtual calendar entity: `calendar.tuev_reminder`.
-- Allows calendar modes:
-  - `reminder_only`
-  - `due_only`
-  - `reminder_and_due`
-- Uses stable event UIDs:
-  - `{entry_id}-tuev-reminder`
-  - `{entry_id}-tuev-due`
-- `reminder_date`, `status`, and `blurred` use the configured reminder offset.
+## Preserved
 
-## Preserved from the stable Reminder r009/r010/r012 line
-
+- One shared virtual calendar entity: `calendar.tuev_reminder`.
+- No writes to `local_calendar`.
+- `calendar_event_mode` and `reminder_offset_days` from r013 remain unchanged.
 - Card b355 bridge remains intact.
-- Runtime plate handling from Reminder r009 remains intact.
-- Leerzeichen in Kennzeichen bleiben erhalten.
-- `plate`, `plate_base`, and `plate_display` remain available.
-- H/E checkboxes remain independent.
-- Green plates still suppress H/E in the flow.
-- Season ranges remain validated as 2–11 months.
-- Change plate + motorcycle remains allowed.
-- Change plate + small two-line remains blocked.
-- Free input remains allowed.
-- No separate `plate_area_code` field is present.
+- Reminder r009 plate/format behavior remains intact.
+- Free Kennzeichen input remains allowed.
+- The r011 extra area-code field remains reverted.
 - Area-code typeahead remains a later Manager/Sidebar UI idea.
 
-## New attributes
-
-```text
-calendar_event_mode
-reminder_offset_days
-```
-
-Existing Card-facing attributes remain available, including:
+## Card-facing attributes retained
 
 ```text
 plate
@@ -56,6 +35,7 @@ plate_display
 plate_kind
 plate_format
 plate_color_mode
+plate_suffix
 plate_suffix_h
 plate_suffix_e
 seasonal
@@ -64,20 +44,34 @@ season_end_month
 change_plate_enabled
 change_plate_common_text
 change_plate_vehicle_digit
+change_plate_vehicle_text
+calendar_event_mode
+reminder_offset_days
 ```
 
-## Not included
+## Compatibility carry-over notes
 
-- No Card change.
-- No Renderer geometry change.
-- No `local_calendar` sync.
-- No Sidebar/Manager UI.
-- No active area-code autocomplete in the normal Config/Options Flow.
+This release remains on the stable Reminder r009 runtime line for plate handling while adding only calendar text polish.
 
-Compatibility note: green plate handling from r009 is preserved; green plates still do not expose H/E checkboxes in the normal flow.
+Spacing decision: Leerzeichen in Kennzeichen bleiben erhalten; they are not normalized away because the Card renderer needs the visible block structure.
 
-Compatibility alias retained:
+Green plate note: green plate entries suppress H/E suffixes in the normal Config/Options Flow.
+
+Relevant retained attributes include:
 
 ```text
+plate_suffix_h
+plate_suffix_e
+plate_color_mode
+seasonal
+season_start_month
+season_end_month
+change_plate_enabled
+change_plate_common_text
 change_plate_vehicle_text
+change_plate_vehicle_digit
+calendar_event_mode
+reminder_offset_days
 ```
+
+Calendar Description Polish: r014 keeps `calendar_event_mode` and `reminder_offset_days` from r013 and improves only the calendar summaries/descriptions.

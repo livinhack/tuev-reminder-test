@@ -31,6 +31,18 @@ from .const import (
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
     PLATE_COLOR_GREEN,
+    STATUS_VALID,
+    STATUS_DUE,
+    STATUS_EXPIRED,
+    PLATE_KIND_STANDARD,
+    PLATE_KIND_SEASONAL,
+    PLATE_KIND_CHANGE,
+    PLATE_KIND_GREEN,
+    PLATE_KIND_GREEN_SEASONAL,
+    PLATE_FORMAT_SINGLE_LINE,
+    PLATE_FORMAT_TWO_LINE,
+    PLATE_FORMAT_SMALL_TWO_LINE,
+    PLATE_FORMAT_MOTORCYCLE,
     CALENDAR_EVENT_MODE_REMINDER_ONLY,
     CALENDAR_EVENT_MODE_DUE_ONLY,
     CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
@@ -49,6 +61,45 @@ from .helpers import (
 
 
 CALENDAR_OWNER_KEY = "calendar_owner_entry_id"
+
+
+STATUS_LABELS = {
+    STATUS_VALID: "gültig",
+    STATUS_DUE: "fällig",
+    STATUS_EXPIRED: "abgelaufen",
+}
+
+PLATE_KIND_LABELS = {
+    PLATE_KIND_STANDARD: "Standard",
+    PLATE_KIND_SEASONAL: "Saisonkennzeichen",
+    PLATE_KIND_CHANGE: "Wechselkennzeichen",
+    PLATE_KIND_GREEN: "Grünes Kennzeichen",
+    PLATE_KIND_GREEN_SEASONAL: "Grünes Kennzeichen + Saison",
+}
+
+PLATE_FORMAT_LABELS = {
+    PLATE_FORMAT_SINGLE_LINE: "Einzeilig",
+    PLATE_FORMAT_TWO_LINE: "Zweizeilig",
+    PLATE_FORMAT_SMALL_TWO_LINE: "Verkleinert zweizeilig",
+    PLATE_FORMAT_MOTORCYCLE: "Motorrad",
+}
+
+CALENDAR_EVENT_MODE_LABELS = {
+    CALENDAR_EVENT_MODE_REMINDER_ONLY: "Nur Erinnerung",
+    CALENDAR_EVENT_MODE_DUE_ONLY: "Nur HU-Fälligkeit",
+    CALENDAR_EVENT_MODE_REMINDER_AND_DUE: "Erinnerung und HU-Fälligkeit",
+}
+
+
+def _format_date(value) -> str:
+    return value.strftime("%d.%m.%Y")
+
+
+def _format_month(value: object) -> str:
+    try:
+        return f"{int(value):02d}"
+    except (TypeError, ValueError):
+        return str(value or "")
 
 
 def _coerce_bool(value: object) -> bool:
@@ -116,15 +167,32 @@ def _plate_from_values(values: dict) -> str:
     return build_plate_with_suffix(plate, suffix)
 
 
-def _description_lines(values: dict, vehicle_name: str, plate: str, month: int, year: int, interval: int, due_date, status: str, offset_days: int):
+def _description_lines(
+    values: dict,
+    event_label: str,
+    vehicle_name: str,
+    plate: str,
+    month: int,
+    year: int,
+    interval: int,
+    due_date,
+    reminder_date,
+    status: str,
+    offset_days: int,
+):
+    status_label = STATUS_LABELS.get(status, status)
+    mode = _calendar_event_mode(values)
     lines = [
+        f"Termin: {event_label}",
         f"Fahrzeug: {vehicle_name}",
         f"Kennzeichen: {plate}",
         f"HU: {month:02d}/{year}",
-        f"Fällig bis: {due_date.isoformat()}",
-        f"Status: {status}",
-        f"Intervall: {interval} Jahr(e)",
+        f"Fällig am: {_format_date(due_date)}",
+        f"Erinnerung am: {_format_date(reminder_date)}",
         f"Erinnerung: {offset_days} Tag(e) vorher",
+        f"Kalendermodus: {CALENDAR_EVENT_MODE_LABELS.get(mode, mode)}",
+        f"Status: {status_label}",
+        f"Intervall: {interval} Jahr(e)",
     ]
 
     if values.get(CONF_PLATE_COLOR_MODE) == PLATE_COLOR_GREEN:
@@ -134,18 +202,29 @@ def _description_lines(values: dict, vehicle_name: str, plate: str, month: int, 
         start = values.get(CONF_SEASON_START_MONTH)
         end = values.get(CONF_SEASON_END_MONTH)
         if start and end:
-            lines.append(f"Saison: {int(start):02d}-{int(end):02d}")
+            lines.append(f"Saison: {_format_month(start)}-{_format_month(end)}")
 
     if _coerce_bool(values.get(CONF_CHANGE_PLATE_ENABLED, False)):
-        lines.append("Wechselkennzeichen: ja")
+        common_text = normalize_plate_text(values.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))
+        vehicle_digit = str(
+            values.get(
+                CONF_CHANGE_PLATE_VEHICLE_DIGIT,
+                values.get(CONF_CHANGE_PLATE_VEHICLE_TEXT, ""),
+            )
+            or ""
+        ).strip()
+        change_detail = "Wechselkennzeichen: ja"
+        if common_text or vehicle_digit:
+            change_detail += f" ({common_text} + {vehicle_digit})"
+        lines.append(change_detail)
 
     plate_kind = values.get(CONF_PLATE_KIND)
     if plate_kind:
-        lines.append(f"Kennzeichentyp: {plate_kind}")
+        lines.append(f"Kennzeichentyp: {PLATE_KIND_LABELS.get(plate_kind, plate_kind)}")
 
     plate_format = values.get(CONF_PLATE_FORMAT)
     if plate_format:
-        lines.append(f"Kennzeichenformat: {plate_format}")
+        lines.append(f"Kennzeichenformat: {PLATE_FORMAT_LABELS.get(plate_format, plate_format)}")
 
     return "\n".join(lines)
 
@@ -230,28 +309,52 @@ class TuevReminderCalendar(CalendarEntity):
         due_date = get_due_date(year, month)
         reminder_date = get_reminder_date(year, month, offset_days)
         status = get_status(year, month, reminder_offset_days=offset_days)
-        description = _description_lines(data, vehicle_name, plate, month, year, interval, due_date, status, offset_days)
-
         events = []
 
         if mode in {CALENDAR_EVENT_MODE_REMINDER_ONLY, CALENDAR_EVENT_MODE_REMINDER_AND_DUE}:
+            event_label = "HU-Erinnerung"
             events.append(
                 CalendarEvent(
                     start=reminder_date,
                     end=reminder_date + timedelta(days=1),
-                    summary=f"HU Erinnerung: {vehicle_name}",
-                    description=description,
+                    summary=f"TÜV/HU Erinnerung: {vehicle_name}",
+                    description=_description_lines(
+                        data,
+                        event_label,
+                        vehicle_name,
+                        plate,
+                        month,
+                        year,
+                        interval,
+                        due_date,
+                        reminder_date,
+                        status,
+                        offset_days,
+                    ),
                     uid=f"{entry.entry_id}-tuev-reminder",
                 )
             )
 
         if mode in {CALENDAR_EVENT_MODE_DUE_ONLY, CALENDAR_EVENT_MODE_REMINDER_AND_DUE}:
+            event_label = "HU-Fälligkeit"
             events.append(
                 CalendarEvent(
                     start=due_date,
                     end=due_date + timedelta(days=1),
-                    summary=f"HU fällig: {vehicle_name}",
-                    description=description,
+                    summary=f"TÜV/HU fällig: {vehicle_name}",
+                    description=_description_lines(
+                        data,
+                        event_label,
+                        vehicle_name,
+                        plate,
+                        month,
+                        year,
+                        interval,
+                        due_date,
+                        reminder_date,
+                        status,
+                        offset_days,
+                    ),
                     uid=f"{entry.entry_id}-tuev-due",
                 )
             )
