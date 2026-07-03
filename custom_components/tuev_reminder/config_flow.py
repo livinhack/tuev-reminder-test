@@ -8,8 +8,6 @@ from .const import (
     DOMAIN,
     CONF_VEHICLE_NAME,
     CONF_PLATE,
-    CONF_PLATE_AREA_CODE,
-    CONF_PLATE_AREA_LABEL,
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
@@ -44,12 +42,13 @@ from .const import (
     PLATE_SUFFIX_E,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
-)
-from .area_codes import (
-    area_code_selector_options,
-    extract_area_code_candidate,
-    get_area_code_label,
-    normalize_area_code,
+    CONF_CALENDAR_EVENT_MODE,
+    CONF_REMINDER_OFFSET_DAYS,
+    CALENDAR_EVENT_MODE_REMINDER_ONLY,
+    CALENDAR_EVENT_MODE_DUE_ONLY,
+    CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
+    CALENDAR_EVENT_MODES,
+    DEFAULT_REMINDER_OFFSET_DAYS,
 )
 from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
 
@@ -106,6 +105,12 @@ MONTH_OPTIONS = [
     for month in range(1, 13)
 ]
 
+CALENDAR_EVENT_MODE_OPTIONS = [
+    {"value": CALENDAR_EVENT_MODE_REMINDER_ONLY, "label": "Nur Erinnerung"},
+    {"value": CALENDAR_EVENT_MODE_DUE_ONLY, "label": "Nur HU-Fälligkeit"},
+    {"value": CALENDAR_EVENT_MODE_REMINDER_AND_DUE, "label": "Erinnerung und HU-Fälligkeit"},
+]
+
 
 def _month_number_selector():
     return selector.NumberSelector(
@@ -134,6 +139,16 @@ def _int_or_default(value: object, default: int) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+def _derive_calendar_event_mode(values: dict) -> str:
+    value = values.get(CONF_CALENDAR_EVENT_MODE, CALENDAR_EVENT_MODE_REMINDER_ONLY)
+    return value if value in CALENDAR_EVENT_MODES else CALENDAR_EVENT_MODE_REMINDER_ONLY
+
+
+def _derive_reminder_offset_days(values: dict) -> int:
+    value = _int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
+    return min(365, max(0, value))
 
 
 def _season_end_month_options(start_month: int):
@@ -273,31 +288,8 @@ def _user_schema(defaults: dict):
     )
 
 
-def _derive_area_code_default(defaults: dict, plate_field: str = CONF_PLATE) -> str:
-    configured = normalize_area_code(defaults.get(CONF_PLATE_AREA_CODE))
-    if configured:
-        return configured
-    return extract_area_code_candidate(defaults.get(plate_field, ""))
-
-
 def _plate_schema(defaults: dict, kind: str):
     schema = {}
-
-    area_default = _derive_area_code_default(
-        defaults,
-        CONF_CHANGE_PLATE_COMMON_TEXT if kind == PLATE_KIND_CHANGE else CONF_PLATE,
-    )
-    schema[
-        vol.Optional(
-            CONF_PLATE_AREA_CODE,
-            default=area_default if get_area_code_label(area_default) else "",
-        )
-    ] = selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=area_code_selector_options(),
-            mode=selector.SelectSelectorMode.DROPDOWN,
-        )
-    )
 
     if kind == PLATE_KIND_CHANGE:
         schema[
@@ -407,6 +399,26 @@ def _due_schema(defaults: dict):
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 )
             ),
+            vol.Required(
+                CONF_CALENDAR_EVENT_MODE,
+                default=_derive_calendar_event_mode(defaults),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=CALENDAR_EVENT_MODE_OPTIONS,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Required(
+                CONF_REMINDER_OFFSET_DAYS,
+                default=_derive_reminder_offset_days(defaults),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=365,
+                    step=1,
+                    mode=selector.NumberSelectorMode.BOX,
+                )
+            ),
         }
     )
 
@@ -428,10 +440,6 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
     normalized[CONF_PLATE_SUFFIX_E] = suffix_e
     normalized[CONF_PLATE_SUFFIX] = _build_suffix_summary(suffix_h, suffix_e)
 
-    selected_area_code = normalize_area_code(user_input.get(CONF_PLATE_AREA_CODE, ""))
-    normalized[CONF_PLATE_AREA_CODE] = selected_area_code
-    normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(selected_area_code)
-
     if kind == PLATE_KIND_CHANGE:
         common_text = normalize_plate_text(user_input.get(CONF_CHANGE_PLATE_COMMON_TEXT, ""))
         vehicle_digit = str(user_input.get(CONF_CHANGE_PLATE_VEHICLE_DIGIT, "")).strip()
@@ -446,19 +454,11 @@ def _validate_and_normalize_plate_data(kind: str, user_input: dict) -> tuple[dic
         # Compatibility alias for r003/Card probes; r004 canonical field is digit.
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = vehicle_digit
         normalized[CONF_PLATE] = build_change_plate_text(common_text, vehicle_digit)
-        if not normalized[CONF_PLATE_AREA_CODE]:
-            derived_area = extract_area_code_candidate(common_text)
-            normalized[CONF_PLATE_AREA_CODE] = derived_area
-            normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(derived_area)
     else:
         plate = normalize_plate_text(user_input.get(CONF_PLATE, ""))
         if not plate:
             errors[CONF_PLATE] = "required"
         normalized[CONF_PLATE] = plate
-        if not normalized[CONF_PLATE_AREA_CODE]:
-            derived_area = extract_area_code_candidate(plate)
-            normalized[CONF_PLATE_AREA_CODE] = derived_area
-            normalized[CONF_PLATE_AREA_LABEL] = get_area_code_label(derived_area)
         normalized[CONF_CHANGE_PLATE_COMMON_TEXT] = ""
         normalized[CONF_CHANGE_PLATE_VEHICLE_DIGIT] = ""
         normalized[CONF_CHANGE_PLATE_VEHICLE_TEXT] = ""
@@ -566,6 +566,8 @@ class TuevReminderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._data.update(user_input)
+            self._data[CONF_CALENDAR_EVENT_MODE] = _derive_calendar_event_mode(self._data)
+            self._data[CONF_REMINDER_OFFSET_DAYS] = _derive_reminder_offset_days(self._data)
             return self.async_create_entry(
                 title=_entry_title(self._data),
                 data=self._data,
@@ -658,6 +660,8 @@ class TuevReminderOptionsFlow(config_entries.OptionsFlow):
 
         if user_input is not None:
             self._data.update(user_input)
+            self._data[CONF_CALENDAR_EVENT_MODE] = _derive_calendar_event_mode(self._data)
+            self._data[CONF_REMINDER_OFFSET_DAYS] = _derive_reminder_offset_days(self._data)
 
             self.hass.config_entries.async_update_entry(
                 config_entry,

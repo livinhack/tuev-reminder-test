@@ -16,9 +16,9 @@ def get_due_date(year: int, month: int) -> date:
     return date(year, month, last_day)
 
 
-def get_reminder_date(year: int, month: int) -> date:
-    """Return the reminder date: one week before the end of the due month."""
-    return get_due_date(year, month) - timedelta(days=7)
+def get_reminder_date(year: int, month: int, offset_days: int = 7) -> date:
+    """Return the reminder date before the end of the due month."""
+    return get_due_date(year, month) - timedelta(days=offset_days)
 
 
 def get_expired_date(year: int, month: int) -> date:
@@ -36,7 +36,12 @@ def get_rotation_for_month(month: int) -> int:
     return (month % 12) * 30
 
 
-def get_status(year: int, month: int, today: date | None = None) -> str:
+def get_status(
+    year: int,
+    month: int,
+    today: date | None = None,
+    reminder_offset_days: int = 7,
+) -> str:
     """Return the current TÜV status."""
     if today is None:
         today = date.today()
@@ -44,15 +49,20 @@ def get_status(year: int, month: int, today: date | None = None) -> str:
     if today >= get_expired_date(year, month):
         return STATUS_EXPIRED
 
-    if today >= get_reminder_date(year, month):
+    if today >= get_reminder_date(year, month, reminder_offset_days):
         return STATUS_DUE
 
     return STATUS_VALID
 
 
-def is_blurred(year: int, month: int, today: date | None = None) -> bool:
+def is_blurred(
+    year: int,
+    month: int,
+    today: date | None = None,
+    reminder_offset_days: int = 7,
+) -> bool:
     """Return whether the badge should be blurred."""
-    return get_status(year, month, today) in {
+    return get_status(year, month, today, reminder_offset_days) in {
         STATUS_DUE,
         STATUS_EXPIRED,
     }

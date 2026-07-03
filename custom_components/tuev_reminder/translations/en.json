@@ -12,9 +12,8 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Enter the license plate data. Spaces are preserved for the card. The optional area-code suggestion is only a helper; free input remains allowed. H/E is offered only for non-green plates. Season start and end are validated together.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
         "data": {
-          "plate_area_code": "Area-code suggestion (optional)",
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",
@@ -26,11 +25,13 @@
       },
       "due": {
         "title": "Inspection due date",
-        "description": "Enter the next inspection due date and interval.",
+        "description": "Set the inspection due data and calendar behavior.",
         "data": {
           "month": "Inspection month",
           "year": "Inspection year",
-          "interval": "Interval"
+          "interval": "Interval",
+          "calendar_event_mode": "Calendar events",
+          "reminder_offset_days": "Reminder days before due date"
         }
       },
       "season_end": {
@@ -47,7 +48,8 @@
       "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
       "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months.",
       "invalid_plate_format": "Invalid license plate format.",
-      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type."
+      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type.",
+      "invalid_reminder_offset_days": "The reminder offset must be between 0 and 365 days."
     }
   },
   "options": {
@@ -63,9 +65,8 @@
       },
       "plate": {
         "title": "License plate",
-        "description": "Update the license plate data. Spaces are preserved for the card. The optional area-code suggestion is only a helper; free input remains allowed. H/E is offered only for non-green plates.",
+        "description": "Enter the license plate data. Spaces are preserved for the card. H/E is offered only for non-green plates. Season start and end are validated together.",
         "data": {
-          "plate_area_code": "Area-code suggestion (optional)",
           "plate": "License plate",
           "season_start_month": "Season start month",
           "change_plate_common_text": "Shared change-plate part",
@@ -77,11 +78,13 @@
       },
       "due": {
         "title": "Inspection due date",
-        "description": "Update the next inspection due date and interval.",
+        "description": "Update the inspection due data and calendar behavior.",
         "data": {
           "month": "Inspection month",
           "year": "Inspection year",
-          "interval": "Interval"
+          "interval": "Interval",
+          "calendar_event_mode": "Calendar events",
+          "reminder_offset_days": "Reminder days before due date"
         }
       },
       "season_end": {
@@ -98,7 +101,8 @@
       "invalid_vehicle_digit": "The vehicle-specific change-plate part must be exactly one digit.",
       "invalid_season_range": "A seasonal license plate must cover at least 2 months and at most 11 months.",
       "invalid_plate_format": "Invalid license plate format.",
-      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type."
+      "invalid_plate_format_for_kind": "This format does not fit the selected license plate type.",
+      "invalid_reminder_offset_days": "The reminder offset must be between 0 and 365 days."
     }
   },
   "entity": {

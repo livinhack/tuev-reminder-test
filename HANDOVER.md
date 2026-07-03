@@ -1,64 +1,80 @@
-# Handover – Reminder r011 Area Code Suggestions
+# Handover – Reminder r013 Calendar Event Mode + Reminder Offset
 
-Current Reminder stand: **r011**.
+Current Reminder stand: **r013**.
 
-r011 builds on the tested combination **Card b355 + Reminder r009/r010**. Runtime vehicle logic from r009 remains intact; r011 adds a local German area-code suggestion database and optional flow field.
+r013 builds on the stable tested line:
 
-## Changed
+```text
+Card b355 + Reminder r009/r010/r012
+```
 
-- Added bundled data file:
-  - `custom_components/tuev_reminder/data/kfz_area_codes_de.json`
-- Added license file for bundled data:
-  - `custom_components/tuev_reminder/data/LICENSE_ODBL-1.0.txt`
-- Added helper module:
-  - `custom_components/tuev_reminder/area_codes.py`
-- Added optional config/options-flow field:
-  - `plate_area_code`
-- Added sensor attributes:
-  - `plate_area_code`
-  - `plate_area_label`
-- Added check:
-  - `scripts/check_r011_area_code_suggestions.py`
+It adds the first implemented calendar-v3 feature set. Plate/runtime behavior remains based on Reminder r009, and the Card b355 bridge remains intact.
 
-## Important behavior
+## Implemented in r013
 
-The area-code list is only a suggestion aid.
+- `CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"`.
+- `CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"`.
+- Calendar event modes:
+  - `reminder_only`
+  - `due_only`
+  - `reminder_and_due`
+- Reminder offset range: `0..365`, default `7`.
+- HU Config/Options step now includes calendar settings.
+- Shared virtual calendar emits reminder and/or due events per entry.
+- Stable UIDs:
+  - `{entry_id}-tuev-reminder`
+  - `{entry_id}-tuev-due`
+- Calendar descriptions include vehicle, plate, HU, due date, status, interval, offset and optional plate metadata.
+- Sensor attributes now expose `calendar_event_mode` and `reminder_offset_days`.
+- `reminder_date`, `status`, and `blurred` use the configured offset.
 
-- Free plate input remains allowed.
-- Unknown codes are not blocked.
-- The selected suggestion does not replace the manually entered plate string.
-- The Card still receives the full visible `plate` attribute.
+## Preserved
+
+- One shared virtual calendar entity, no per-vehicle duplicate calendar entity.
+- No writes to `local_calendar`.
+- Card b355 compatibility.
+- Reminder r009 plate/format behavior.
+- Free Kennzeichen input remains allowed.
+- The r011 extra area-code field remains reverted.
+- Area-code typeahead stays in the later Manager/Sidebar UI roadmap.
 
 ## Not changed
 
-- No Card change; current compatible Card stand remains **Card b355**.
-- No renderer change.
-- No calendar-v3 change.
-- No local_calendar sync.
-- No Manager/Sidebar UI.
+- No Card change.
+- No Renderer geometry change.
+- No Sidebar/Manager UI.
+- No active area-code autocomplete.
 
-## Next likely steps
+## Suggested HA tests
 
-- Test whether the HA selector is comfortable with the 714-entry dropdown.
-- If the stock HA flow UI is not good enough, defer real live autocomplete to a later Manager/Sidebar UI.
-- Continue with either r012 UI cleanup or the next Roadmap item after user feedback.
+1. Multiple vehicles still create only one `calendar.tuev_reminder`.
+2. `reminder_only` shows only reminder events.
+3. `due_only` shows only HU due events.
+4. `reminder_and_due` shows both events.
+5. Changing `reminder_offset_days` changes `reminder_date` and calendar reminder event date.
+6. Card b355 still shows plates as before.
 
-## Compatibility notes carried forward
-
-Reminder r009 remains the tested runtime baseline and Card b355 remains the compatible Card version.
-
-Existing Reminder/Card attributes remain documented and available:
+## Card-facing attribute set retained
 
 ```text
+plate
+plate_base
+plate_display
+plate_kind
+plate_format
+plate_color_mode
+plate_suffix
 plate_suffix_h
 plate_suffix_e
-plate_color_mode
 seasonal
 season_start_month
 season_end_month
 change_plate_enabled
 change_plate_common_text
+change_plate_vehicle_digit
 change_plate_vehicle_text
+calendar_event_mode
+reminder_offset_days
 ```
 
-NONE handling from r007 remains fixed: `plate_suffix: none` is not appended and is not interpreted as E. Green plate suffix suppression remains active.
+Historical r007 note: the previous `NONE` suffix display/parsing bug remains fixed.

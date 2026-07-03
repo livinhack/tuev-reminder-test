@@ -70,3 +70,9 @@ or, if smaller:
 ```text
 Reminder r0xx Manager Panel Prototype
 ```
+
+## r012 note: Area-code typeahead belongs here, not in Config Flow
+
+The user requested browser-address-bar style suggestions while typing in the existing Kennzeichen field. A separate `plate_area_code` selector in the Config/Options Flow is not the desired UX and was reverted in r012.
+
+A later Manager/Sidebar UI may implement true typeahead with its own frontend component and a bundled local area-code list. The input must remain free; suggestions must not become a hard validation gate.

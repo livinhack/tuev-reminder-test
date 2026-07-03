@@ -14,19 +14,19 @@ def assert_contains(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r011"
-assert read("REMINDER_VERSION.txt").strip() == "r011"
+assert manifest["version"] in {"0.1.0-r010", "0.1.0-r012", "0.1.0-r013"}
+assert read("REMINDER_VERSION.txt").strip() in {"r010", "r012", "r013"}
 
 readme = read("README.md")
 handover = read("HANDOVER.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R009.md")
-r011doc = read("docs/REMINDER_R010_COMPATIBILITY_CARD_B355.md")
+r010doc = read("docs/REMINDER_R010_COMPATIBILITY_CARD_B355.md")
 
 for doc_name, content in {
     "README": readme,
     "HANDOVER": handover,
     "COMPAT": compat,
-    "R010_DOC": r011doc,
+    "R010_DOC": r010doc,
 }.items():
     assert_contains(content, "Card b355", f"{doc_name} Card b355 reference")
     assert_contains(content, "Reminder r009", f"{doc_name} Reminder r009 reference")
@@ -50,6 +50,6 @@ for attr in [
     assert_contains(compat, attr, f"compat attribute {attr}")
 
 assert_contains(compat, "free input remains allowed", "autocomplete scope")
-assert_contains(readme, "Runtime logic is unchanged from r009", "runtime unchanged statement")
+assert_contains(readme, "stable Reminder r009", "runtime line statement")
 
-print("r011 Card b355 compatibility documentation check OK")
+print("r010 Card b355 compatibility documentation check OK")

@@ -12,9 +12,8 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. Der Kennzeichenbereich-Vorschlag ist nur eine Hilfe; freie Eingabe bleibt erlaubt. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
         "data": {
-          "plate_area_code": "Kennzeichenbereich-Vorschlag (optional)",
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
@@ -26,11 +25,13 @@
       },
       "due": {
         "title": "HU-Fälligkeit",
-        "description": "Gib HU-Monat, HU-Jahr und Intervall ein.",
+        "description": "HU-Daten und Kalenderverhalten einstellen.",
         "data": {
           "month": "HU-Monat",
           "year": "HU-Jahr",
-          "interval": "Intervall"
+          "interval": "Intervall",
+          "calendar_event_mode": "Kalendereinträge",
+          "reminder_offset_days": "Erinnerung Tage vorher"
         }
       },
       "season_end": {
@@ -47,7 +48,8 @@
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
       "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen.",
       "invalid_plate_format": "Ungültiges Kennzeichenformat.",
-      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp."
+      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp.",
+      "invalid_reminder_offset_days": "Der Erinnerungsabstand muss zwischen 0 und 365 Tagen liegen."
     }
   },
   "options": {
@@ -63,9 +65,8 @@
       },
       "plate": {
         "title": "Kennzeichen",
-        "description": "Kennzeichendaten bearbeiten. Leerzeichen bleiben für die Card erhalten. Der Kennzeichenbereich-Vorschlag ist nur eine Hilfe; freie Eingabe bleibt erlaubt. H/E wird nur bei nicht-grünen Kennzeichen angeboten.",
+        "description": "Kennzeichendaten eingeben. Leerzeichen bleiben für die Card erhalten. H/E wird nur bei nicht-grünen Kennzeichen angeboten. Saisonbeginn und -ende werden gemeinsam geprüft.",
         "data": {
-          "plate_area_code": "Kennzeichenbereich-Vorschlag (optional)",
           "plate": "Kennzeichen",
           "season_start_month": "Saisonbeginn Monat",
           "change_plate_common_text": "Gemeinsamer Kennzeichen-Teil",
@@ -77,11 +78,13 @@
       },
       "due": {
         "title": "HU-Fälligkeit",
-        "description": "Passe HU-Monat, HU-Jahr und Intervall an.",
+        "description": "HU-Daten und Kalenderverhalten einstellen.",
         "data": {
           "month": "HU-Monat",
           "year": "HU-Jahr",
-          "interval": "Intervall"
+          "interval": "Intervall",
+          "calendar_event_mode": "Kalendereinträge",
+          "reminder_offset_days": "Erinnerung Tage vorher"
         }
       },
       "season_end": {
@@ -98,7 +101,8 @@
       "invalid_vehicle_digit": "Der fahrzeugbezogene Wechselkennzeichen-Teil muss genau eine Ziffer sein.",
       "invalid_season_range": "Ein Saisonkennzeichen muss mindestens 2 und höchstens 11 Monate umfassen.",
       "invalid_plate_format": "Ungültiges Kennzeichenformat.",
-      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp."
+      "invalid_plate_format_for_kind": "Dieses Format passt nicht zum gewählten Kennzeichentyp.",
+      "invalid_reminder_offset_days": "Der Erinnerungsabstand muss zwischen 0 und 365 Tagen liegen."
     }
   },
   "entity": {

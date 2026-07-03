@@ -9,8 +9,6 @@ from .const import (
     DOMAIN,
     CONF_VEHICLE_NAME,
     CONF_PLATE,
-    CONF_PLATE_AREA_CODE,
-    CONF_PLATE_AREA_LABEL,
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
@@ -42,9 +40,12 @@ from .const import (
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
     PLATE_COLOR_MODES,
+    CONF_CALENDAR_EVENT_MODE,
+    CONF_REMINDER_OFFSET_DAYS,
+    CALENDAR_EVENT_MODE_REMINDER_ONLY,
+    CALENDAR_EVENT_MODES,
+    DEFAULT_REMINDER_OFFSET_DAYS,
 )
-
-from .area_codes import extract_area_code_candidate, get_area_code_label, normalize_area_code
 
 from .helpers import (
     build_change_plate_text,
@@ -158,20 +159,6 @@ class TuevSensor(SensorEntity):
         return normalize_plate_text(self.data.get(CONF_PLATE, ""))
 
     @property
-    def plate_area_code(self):
-        configured = normalize_area_code(self.data.get(CONF_PLATE_AREA_CODE, ""))
-        if configured:
-            return configured
-        return extract_area_code_candidate(self.plate)
-
-    @property
-    def plate_area_label(self):
-        configured_label = str(self.data.get(CONF_PLATE_AREA_LABEL, "")).strip()
-        if configured_label:
-            return configured_label
-        return get_area_code_label(self.plate_area_code)
-
-    @property
     def plate_suffix_h(self):
         if self.plate_color_mode == PLATE_COLOR_GREEN:
             return False
@@ -209,6 +196,21 @@ class TuevSensor(SensorEntity):
     @property
     def interval(self):
         return int(self.data.get(CONF_INTERVAL, 2))
+
+    @property
+    def calendar_event_mode(self):
+        value = self.data.get(CONF_CALENDAR_EVENT_MODE, CALENDAR_EVENT_MODE_REMINDER_ONLY)
+        if value not in CALENDAR_EVENT_MODES:
+            return CALENDAR_EVENT_MODE_REMINDER_ONLY
+        return value
+
+    @property
+    def reminder_offset_days(self):
+        try:
+            value = int(self.data.get(CONF_REMINDER_OFFSET_DAYS, DEFAULT_REMINDER_OFFSET_DAYS))
+        except (TypeError, ValueError):
+            value = DEFAULT_REMINDER_OFFSET_DAYS
+        return min(365, max(0, value))
 
     @property
     def plate_color_mode(self):
@@ -285,12 +287,12 @@ class TuevSensor(SensorEntity):
 
     @property
     def status(self):
-        return get_status(self.year, self.month)
+        return get_status(self.year, self.month, reminder_offset_days=self.reminder_offset_days)
 
     @property
     def extra_state_attributes(self):
         due_date = get_due_date(self.year, self.month)
-        reminder_date = get_reminder_date(self.year, self.month)
+        reminder_date = get_reminder_date(self.year, self.month, self.reminder_offset_days)
         expired_date = get_expired_date(self.year, self.month)
 
         return {
@@ -302,17 +304,17 @@ class TuevSensor(SensorEntity):
             "plate": self.plate_display,
             "plate_base": self.plate,
             "plate_display": self.plate_display,
-            "plate_area_code": self.plate_area_code,
-            "plate_area_label": self.plate_area_label,
             "month": self.month,
             "year": self.year,
             "interval": self.interval,
+            "calendar_event_mode": self.calendar_event_mode,
+            "reminder_offset_days": self.reminder_offset_days,
             "rotation": get_rotation_for_month(self.month),
             "due_date": due_date.isoformat(),
             "reminder_date": reminder_date.isoformat(),
             "expired_date": expired_date.isoformat(),
             "status": self.status,
-            "blurred": is_blurred(self.year, self.month),
+            "blurred": is_blurred(self.year, self.month, reminder_offset_days=self.reminder_offset_days),
             "plate_kind": self.plate_kind,
             "plate_format": self.plate_format,
             "plate_suffix": self.plate_suffix,

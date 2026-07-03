@@ -2,11 +2,6 @@ DOMAIN = "tuev_reminder"
 
 CONF_VEHICLE_NAME = "vehicle_name"
 CONF_PLATE = "plate"
-
-# Optional area-code suggestion/label. This is never a validity check; users can
-# still enter any plate text manually.
-CONF_PLATE_AREA_CODE = "plate_area_code"
-CONF_PLATE_AREA_LABEL = "plate_area_label"
 CONF_MONTH = "month"
 CONF_YEAR = "year"
 CONF_INTERVAL = "interval"
@@ -70,6 +65,20 @@ PLATE_COLOR_MODES = [
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
 ]
+
+# r013 calendar interface. These are per vehicle entry options used by the
+# shared virtual CalendarEntity.
+CONF_CALENDAR_EVENT_MODE = "calendar_event_mode"
+CONF_REMINDER_OFFSET_DAYS = "reminder_offset_days"
+CALENDAR_EVENT_MODE_REMINDER_ONLY = "reminder_only"
+CALENDAR_EVENT_MODE_DUE_ONLY = "due_only"
+CALENDAR_EVENT_MODE_REMINDER_AND_DUE = "reminder_and_due"
+CALENDAR_EVENT_MODES = [
+    CALENDAR_EVENT_MODE_REMINDER_ONLY,
+    CALENDAR_EVENT_MODE_DUE_ONLY,
+    CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
+]
+DEFAULT_REMINDER_OFFSET_DAYS = 7
 
 STATUS_VALID = "valid"
 STATUS_DUE = "due"

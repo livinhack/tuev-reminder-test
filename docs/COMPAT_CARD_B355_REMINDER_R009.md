@@ -1,9 +1,9 @@
-# Compatibility – Card b355 + Reminder r009/r011
+# Compatibility – Card b355 + Reminder r009/r010
 
 This note documents the first tested compatibility checkpoint between the two separate projects:
 
 - **TÜV Reminder Card:** `b355` (`Reminder r008 Attribute Mapping`)
-- **TÜV Reminder Integration:** `r009` tested in HA, `r011` documentation checkpoint with no runtime logic changes compared to r009
+- **TÜV Reminder Integration:** `r009` tested in HA, `r010` documentation checkpoint with no runtime logic changes compared to r009
 
 ## Status
 
@@ -19,9 +19,9 @@ The confirmed scope includes:
 - Old H/E suffix state no longer reappears after unchecking/removing.
 - Type/format validation preserves form values after an error.
 
-## Reminder r011
+## Reminder r010
 
-`r011` is intentionally a documentation/compatibility checkpoint. It does not change the runtime logic from r009.
+`r010` is intentionally a documentation/compatibility checkpoint. It does not change the runtime logic from r009.
 
 Purpose:
 

@@ -22,7 +22,7 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r011"', "manifest r011 version")
+assert_contains(manifest, '"version": "0.1.0-r013"', "manifest r013 version")
 
 for needle in [
     'PLATE_FORMAT_SINGLE_LINE = "single_line"',
@@ -54,8 +54,8 @@ for text, label in [(strings, "strings"), (de, "German translations"), (en, "Eng
     assert_contains(text, '"invalid_plate_format"', label)
     assert_contains(text, '"invalid_plate_format_for_kind"', label)
 
-assert_contains(readme, "Reminder r009", "README r011")
-assert_contains(handover, "Reminder r009", "handover r011")
+assert_contains(readme, "Reminder r009", "README r012")
+assert_contains(handover, "Reminder r009", "handover r012")
 assert_contains(handover, "Card b355", "Card compatibility")
 
 print("r008/r009 plate format validation compatibility check OK")
