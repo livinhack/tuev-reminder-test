@@ -1,5 +1,13 @@
 # Changelog
 
+## r033 - Switch-Manager-style Sidebar Polish
+
+- Keeps the Reminder Sidebar page Reminder-only and read-only.
+- Reworks the r032 card-heavy page into a denser full-width manager list closer to the Switch Manager reference.
+- Adds compact top bar, toolbar search/filter/sort, summary strip and row-end Kennzeichen preview.
+- Keeps the row menu disabled for the future create/update path.
+- Does not import or bundle Card code and does not duplicate Card actions.
+
 ## r032 - Sidebar Vehicle List
 
 - Keeps the Reminder/Card repository separation unchanged.

@@ -1,11 +1,11 @@
-# TÜV Reminder r032
+# TÜV Reminder r033
 
-**Reminder r032** extends the Reminder-owned Home Assistant Sidebar panel into a read-only vehicle list with search, status filtering and sorting. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031 Sidebar registration remain preserved.
+**Reminder r033** polishes the Reminder-owned Sidebar vehicle list toward a Switch-Manager-style full-width manager view. The page remains read-only and Reminder-only; Card code and Card actions are not imported or duplicated. The r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency and r031/r032 Sidebar work remain preserved.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r032
+Card b355+ / b356 RC + Reminder r033
 ```
 
 ## What the integration does
@@ -120,7 +120,7 @@ data:
 The current development ZIP keeps the test-series version format:
 
 ```text
-0.1.0-r032
+0.1.0-r033
 ```
 
 r028 added `scripts/build_public_release_zip.py`; r029 keeps it for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r029`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md`.
@@ -207,3 +207,7 @@ Both service handlers now await `_resolve_tuev_entry(...)` before reading config
 r032 keeps the Sidebar panel Reminder-only and improves the first manager page from a shell into a read-only vehicle overview. The page now shows status metrics, a searchable/filterable/sortable vehicle table, HU date, reminder date, expired date, plate kind, plate format and sensor entity id.
 
 It still intentionally contains no Card code, no plate renderer, no Dashboard configuration and no duplicated actions such as `confirm_passed` or `set_due_date`.
+
+## r033 Switch-Manager-style Sidebar Polish
+
+r033 keeps the Sidebar panel inside the Reminder integration and improves the read-only vehicle list toward the Switch Manager reference: compact top bar, toolbar search, dense table rows, row-end Kennzeichen preview and disabled row menu placeholder. The preview is a lightweight Reminder UI fallback only; the Card repository remains separate.

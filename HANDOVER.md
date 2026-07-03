@@ -1,3 +1,31 @@
+# Handover – Reminder r033 Switch-Manager-style Sidebar Polish
+
+Current Reminder version: **r033**.
+
+## What changed in r033
+
+- Updated `REMINDER_VERSION.txt` to `r033`.
+- Updated `custom_components/tuev_reminder/manifest.json` to `0.1.0-r033`.
+- Preserved r028 Manager API foundation, r029 service-await fix, r030 sensor/readmodel consistency, r031 Sidebar registration and r032 read-only list.
+- Reworked the Sidebar panel layout toward the Switch Manager reference: compact header, toolbar search/filter/sort, full-width dense manager table and row-end Kennzeichen preview.
+- Kept all create/update/delete and action commands out of scope.
+- Kept the Card repository separate; no Card renderer internals were copied into Reminder.
+
+## HA smoke test focus for r033
+
+1. Sidebar entry `TÜV Reminder` still appears.
+2. `/tuev-reminder` loads without frontend console errors.
+3. Visual layout is now closer to a full-page HA manager table instead of large cards.
+4. Search, status filter and sort still work.
+5. Each row shows a compact Kennzeichen preview near the row end.
+6. Disabled three-dot row menu is visible as future edit-route placeholder.
+
+## Next intended step
+
+Continue with the create-form path: detail/form skeleton first, then backend create API. Do not add `HU bestanden` or duplicate Card actions in the Sidebar.
+
+---
+
 # Handover – Reminder r032 Sidebar Vehicle List
 
 Current Reminder version: **r032**.

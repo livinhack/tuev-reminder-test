@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r032 Sidebar read-only vehicle list."""
+"""Validate r033 Switch-Manager-style Sidebar visual polish."""
 from __future__ import annotations
 
 import json
@@ -13,14 +13,14 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r032 sidebar vehicle list check failed: {message}")
+    raise SystemExit(f"r033 sidebar visual polish check failed: {message}")
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
 if manifest.get("version") != "0.1.0-r033":
     fail("manifest version must be 0.1.0-r033")
 if read("REMINDER_VERSION.txt").strip() != "r033":
-    fail("REMINDER_VERSION.txt must be r032")
+    fail("REMINDER_VERSION.txt must be r033")
 
 panel_py = read("custom_components/tuev_reminder/panel.py")
 panel_js = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
@@ -33,19 +33,16 @@ for marker in [
         fail(f"panel.py missing marker: {marker}")
 
 for marker in [
-    "_filter",
-    "_statusFilter",
-    "_sort",
-    "_visibleVehicles()",
+    "topbar",
+    "toolbar",
+    "summary-strip",
     "manager-table",
-    "status-filter",
-    "HU-Datum",
-    "Status",
-    "Name",
-    "Treffer",
-    "fällig/abgelaufen",
-    "keine Card-Funktionen",
+    "col-preview",
+    "preview-cell",
+    "plate-preview",
+    "plate-eu",
     "row-menu",
+    "keine Card-Funktionen",
     "type: \"tuev_reminder/manager/vehicles/list\"",
 ]:
     if marker not in panel_js:
@@ -54,17 +51,18 @@ for marker in [
 for forbidden in [
     "confirm_passed",
     "set_due_date",
-    "tuev-card",
     "custom:tuev-card",
+    "import(\"/local",
+    "module_url: \"/local",
 ]:
     if forbidden in panel_js:
         fail(f"panel JS must not duplicate Card/action behavior: {forbidden}")
 
 for relative in [
-    "docs/REMINDER_R032_SIDEBAR_VEHICLE_LIST.md",
-    "docs/COMPAT_CARD_B355_REMINDER_R032.md",
+    "docs/REMINDER_R033_SWITCH_MANAGER_STYLE_POLISH.md",
+    "docs/COMPAT_CARD_B355_REMINDER_R033.md",
 ]:
     if not (ROOT / relative).exists():
         fail(f"missing documentation file: {relative}")
 
-print("r032 sidebar vehicle list check OK")
+print("r033 sidebar visual polish check OK")
