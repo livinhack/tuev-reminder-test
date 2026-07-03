@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 import py_compile
+import runpy
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -36,10 +37,14 @@ def remove_generated_artifacts() -> None:
 
 
 def check_python_syntax() -> None:
-    for file in sorted((ROOT / "custom_components/tuev_reminder").glob("*.py")):
-        py_compile.compile(str(file), doraise=True)
-    # py_compile writes __pycache__; remove it before package hygiene checks run.
-    remove_generated_artifacts()
+    old_dont_write = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    try:
+        for file in sorted((ROOT / "custom_components/tuev_reminder").glob("*.py")):
+            py_compile.compile(str(file), doraise=True)
+    finally:
+        sys.dont_write_bytecode = old_dont_write
+        remove_generated_artifacts()
 
 
 def check_json() -> None:
@@ -50,9 +55,18 @@ def check_json() -> None:
 
 
 def run_script_checks() -> None:
-    for script in sorted((ROOT / "scripts").glob("check_r*.py")):
-        print(f"RUN {script.relative_to(ROOT)}")
-        subprocess.run([sys.executable, str(script)], cwd=ROOT, check=True)
+    old_cwd = Path.cwd()
+    os.chdir(ROOT)
+    try:
+        for script in sorted((ROOT / "scripts").glob("check_r*.py")):
+            print(f"RUN {script.relative_to(ROOT)}", flush=True)
+            try:
+                runpy.run_path(str(script), run_name="__main__")
+            except SystemExit as exc:
+                if exc.code not in (0, None):
+                    raise
+    finally:
+        os.chdir(old_cwd)
 
 
 def main() -> int:
@@ -61,7 +75,7 @@ def main() -> int:
     check_json()
     run_script_checks()
     remove_generated_artifacts()
-    print("All TÜV Reminder checks passed without leaving generated cache artifacts.")
+    print("All TÜV Reminder checks passed without leaving generated cache artifacts.", flush=True)
     return 0
 
 

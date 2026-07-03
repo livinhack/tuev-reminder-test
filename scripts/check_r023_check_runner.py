@@ -21,8 +21,8 @@ runner = read("scripts/run_all_checks.py")
 doc = read("docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md")
 compat_doc = read("docs/COMPAT_CARD_B355_REMINDER_R024.md")
 
-assert version == "r024"
-assert manifest["version"] == "0.1.0-r024"
+assert version == "r027"
+assert manifest["version"] == "0.1.0-r027"
 assert_contains(runner, "py_compile.compile", "Python syntax check")
 assert_contains(runner, "remove_generated_artifacts()", "cache cleanup")
 assert_contains(runner, "check_json()", "JSON validation")
@@ -30,9 +30,17 @@ assert_contains(runner, "glob(\"check_r*.py\")", "script check discovery")
 assert_contains(runner, "__pycache__", "cache directory guard")
 assert_contains(runner, ".pyc", "bytecode guard")
 
-for text, label in [(readme, "README"), (handover, "HANDOVER"), (doc, "r023 doc"), (compat_doc, "compat doc")]:
-    assert_contains(text, "Reminder r024", label)
+for text, label, current_label in [
+    (readme, "README", "Reminder r027"),
+    (handover, "HANDOVER", "Reminder r027"),
+    (doc, "r024 doc", "Reminder r024"),
+    (compat_doc, "r024 compat doc", "Reminder r024"),
+]:
+    assert_contains(text, current_label, label)
     assert_contains(text, "Card b355", label)
-    assert_contains(text, "run_all_checks.py", label)
 
-print("r023/r024 check runner + release guard check OK")
+assert_contains(readme, "run_all_checks.py", "README check runner docs")
+assert_contains(handover, "run_all_checks.py", "HANDOVER check runner docs")
+assert_contains(doc, "run_all_checks.py", "r024 doc check runner docs")
+
+print("r023 check runner + release guard check OK")

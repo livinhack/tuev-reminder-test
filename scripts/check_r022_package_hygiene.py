@@ -29,21 +29,21 @@ init = read("custom_components/tuev_reminder/__init__.py")
 calendar = read("custom_components/tuev_reminder/calendar.py")
 services = read("custom_components/tuev_reminder/services.yaml")
 
-assert version in {"r022", "r023", "r024"}
+assert version in {"r022", "r023", "r024", "r027"}
 assert manifest["version"] == f"0.1.0-{version}"
 assert manifest["domain"] == "tuev_reminder"
 assert manifest["config_flow"] is True
 assert hacs["name"] == "TÜV Reminder"
 assert "homeassistant" in hacs
 
-for text, label in [
-    (readme, "README"),
-    (handover, "HANDOVER"),
-    (package_doc, "package hygiene doc"),
-    (compat_doc, "compat doc"),
+for text, label, expected_version in [
+    (readme, "README", f"Reminder {version}"),
+    (handover, "HANDOVER", f"Reminder {version}"),
+    (package_doc, "package hygiene doc", "Reminder r022"),
+    (compat_doc, "compat doc", "Reminder r022"),
 ]:
     assert_contains(text, "Card b355", label)
-    assert_contains(text, f"Reminder {version}", label)
+    assert_contains(text, expected_version, label)
 
 for text, label in [(readme, "README"), (handover, "HANDOVER"), (compat_doc, "compat doc")]:
     assert_contains(text, "calendar.tuev_reminder", label)

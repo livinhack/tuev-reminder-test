@@ -1,25 +1,26 @@
-# Handover – Reminder r024 Release Candidate Notes + Changelog
+# Handover – Reminder r027 Public Release Asset Builder
 
-Current Reminder version: **r024**.
+Current Reminder version: **r026**.
 
 Current compatible stack:
 
 ```text
-Card b355 + Reminder r024
+Card b355 + Reminder r027
 ```
 
-r024 is a release-candidate documentation/checkpoint stand. Runtime behavior is intentionally unchanged from the stabilized r020/r021/r022/r023 line.
+r026 is a release tag/package decision checkpoint. Runtime behavior is intentionally unchanged from the stabilized r020–r025 line.
 
-## What changed in r024
+## What changed in r026
 
-- Updated `REMINDER_VERSION.txt` to `r024`.
-- Updated `manifest.json` to `0.1.0-r024`.
-- Added `CHANGELOG.md`.
-- Added `docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md`.
-- Added `docs/COMPAT_CARD_B355_REMINDER_R024.md`.
-- Added `scripts/check_r024_release_candidate_notes.py`.
-- Updated README/HANDOVER for the current release-candidate stack.
-- Kept the r023 check runner and release guard.
+- Updated `REMINDER_VERSION.txt` to `r026`.
+- Updated `manifest.json` to `0.1.0-r027`.
+- Added `docs/REMINDER_R027_PUBLIC_RELEASE_ASSET_BUILDER.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R027.md`.
+- Added `scripts/build_public_release_zip.py`.
+- Added `scripts/check_r027_release_asset_builder.py`.
+- Added `scripts/check_r026_release_tag_plan.py`.
+- Added a builder that creates a public `v0.1.0` release-candidate ZIP while keeping this working tree on `0.1.0-r027`.
+- Kept the r023 check runner and r022 package-hygiene guard.
 
 ## Runtime preserved
 
@@ -57,9 +58,20 @@ The runner performs Python syntax checks, JSON validation and all `check_r*.py` 
 
 ## Next recommended step
 
-Install/test r024 in HA with Card b355 as a release-candidate stack. If it passes, the next useful task is either public release preparation or Manager/Sidebar UI planning.
+Install/test r026 in HA with Card b355. If it passes, the next useful step is either:
 
-## Preserved Card b355 attributes
+```text
+1. create the actual public release tag/asset
+2. or pause Reminder work and return to Card/HACS release packaging
+```
+
+## Historical compatibility baselines
+
+Reminder r009 remains the tested Card-bridge runtime line for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due runtime baseline. Reminder r023 remains the check-runner/release-guard baseline. Reminder r025 remains the public-release documentation baseline preserved by r026.
+
+NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt. Green plate / grünes Kennzeichen suppresses H/E. Leerzeichen im Kennzeichen bleiben erhalten.
+
+## Preserved Card b355 bridge attributes
 
 ```text
 plate_suffix_h
@@ -74,10 +86,6 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-## Historical compatibility baselines
+Reminder r009 remains the tested Card-bridge runtime baseline for Card b355. Leerzeichen im Kennzeichen bleiben erhalten.
 
-Reminder r009 remains the tested Card-bridge runtime line for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due stabilized runtime baseline. Reminder r023 remains the check-runner/release-guard baseline.
-
-NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt. Green plate / grünes Kennzeichen suppresses H/E. Leerzeichen im Kennzeichen bleiben erhalten.
-
-Historical release baseline note: Reminder r020 / Calendar Always Due remains the runtime baseline preserved by r024, including calendar.tuev_reminder, reminder_offset_days and Card b355 compatibility.
+Historical runtime baseline: Reminder r020 is the Calendar Always Due stabilization line preserved by Reminder r027.

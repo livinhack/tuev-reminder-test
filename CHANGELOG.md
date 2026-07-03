@@ -1,3 +1,26 @@
+# Changelog
+
+## r027 – Public Release Asset Builder
+
+- Adds `scripts/build_public_release_zip.py` to create a public `v0.1.0` release-candidate ZIP from the internal r-series checkout.
+- Keeps the development manifest on `0.1.0-r027`; the generated public ZIP patches the manifest to `0.1.0`.
+- Adds release-asset guard checks and Card b355 compatibility notes for r027.
+- Runtime unchanged from the stabilized v3 line.
+
+## r026 – Release Tag + Package Plan
+
+- Added release tag/package planning documentation.
+- Documented the intended public release conversion from `0.1.0-r026` to `v0.1.0` / manifest `0.1.0` after final HA smoke testing.
+- Added Card b355 compatibility note for Reminder r026.
+- Runtime unchanged from the stabilized v3 line.
+
+## r025 – Public Release Preparation Docs
+
+- Reworks README around installation/update, Card compatibility, services and troubleshooting.
+- Adds public release installation guide.
+- Adds compatibility document for Card b355 + Reminder r025.
+- Runtime unchanged from the stabilized v3 line.
+
 # Changelog – TÜV Reminder
 
 ## r024 – Release Candidate Notes + Changelog

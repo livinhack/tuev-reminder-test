@@ -1,12 +1,11 @@
-# TÜV Reminder r024
+# TÜV Reminder r027
 
-**Reminder r024** is the current release-candidate documentation checkpoint for the stabilized v3 line.
-Runtime behavior is intentionally unchanged from r020/r021/r022/r023.
+**Reminder r027** is the release tag and package plan checkpoint for the stabilized v3 line. Runtime behavior is intentionally unchanged from r020–r025.
 
 Compatible stack:
 
 ```text
-Card b355 + Reminder r024
+Card b355 + Reminder r027
 ```
 
 ## What the integration does
@@ -23,6 +22,14 @@ Each vehicle can store:
 - season months where applicable
 - HU month/year and inspection interval
 - reminder offset in days
+
+## Installation / update
+
+Install the custom integration as `custom_components/tuev_reminder/` in Home Assistant, then restart Home Assistant and add vehicles through the integration UI.
+
+When updating from an older test ZIP, replace the complete `custom_components/tuev_reminder/` folder with the new one from this package and restart Home Assistant.
+
+The Card is a separate project. Use **Card b355 or newer** for the new Reminder v3 attributes.
 
 ## Calendar
 
@@ -108,64 +115,43 @@ data:
   year: 2027
 ```
 
-## Checks
+## Release asset builder
 
-Run the complete local check suite from the repository root:
+The current development ZIP keeps the test-series version format:
+
+```text
+0.1.0-r027
+```
+
+r027 adds `scripts/build_public_release_zip.py` for creating a public `v0.1.0` release-candidate ZIP from the internal r-series checkout. The development ZIP keeps `0.1.0-r027`; the generated public ZIP patches the manifest to `0.1.0`. See `docs/REMINDER_R027_PUBLIC_RELEASE_ASSET_BUILDER.md`.
+
+## Local validation
+
+From the repository root, run:
 
 ```bash
 python scripts/run_all_checks.py
 ```
 
-The runner compiles Python files, validates JSON files, runs all `check_r*.py` checks and removes generated cache artifacts so the release ZIP stays clean.
+The runner performs Python syntax checks, JSON validation and all `check_r*.py` checks, then removes generated cache artifacts.
 
-## Release-candidate notes
+## Troubleshooting
 
-r024 adds release notes and a changelog/checkpoint summary. It does not change runtime behavior.
+### Old red calendar entries are still visible
 
-Before using this as a public release candidate, test with:
+Those are likely from an older local calendar such as `TÜV`. The Reminder integration does not write to `local_calendar`; it only exposes `calendar.tuev_reminder`.
 
-```text
-Card b355 + Reminder r024
-```
+### Card does not show green/season/change plates
 
-Focus on:
+Use Card b355 or newer. Older Card versions only read the legacy plate attributes.
 
-- vehicle creation/editing
-- green, seasonal, H/E and change plates
-- `calendar.tuev_reminder`
-- `confirm_passed`
-- `set_due_date`
+### Area-code autocomplete
 
-## Not included
+There is no browser-style live autocomplete in the normal HA Config Flow. The idea is reserved for a future Sidebar/Manager UI. No Sidebar/Manager UI yet.
 
-- No Card code.
-- No renderer geometry changes.
-- No `local_calendar` sync.
-- No browser-style area-code autocomplete in the normal HA config flow.
-- No Sidebar/Manager UI yet.
+## Historical compatibility baseline
 
-## Current stable baseline
+Reminder r009 remains the tested Card-bridge runtime baseline for Card b355. Leerzeichen im Kennzeichen bleiben erhalten.
+The stable Reminder r009 runtime line remains preserved for Card b355 compatibility.
 
-The current runtime is the stabilized v3 line after r020. r024 is a release-candidate notes/changelog checkpoint on top of that runtime.
-
-Stable Card compatibility:
-
-```text
-Card b355 + Reminder r024
-```
-
-Key guarantees preserved:
-
-- `NONE`/`none` legacy values are not appended to plates.
-- Green plate / grünes Kennzeichen suppresses H/E.
-- Leerzeichen im Kennzeichen bleiben erhalten.
-- The detached calendar architecture remains active.
-- Calendar always emits reminder + due events.
-
-## Historical compatibility baselines
-
-Reminder r009 remains the tested Card-bridge runtime line for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due stabilized runtime baseline. Reminder r023 remains the check-runner/release-guard baseline.
-
-The stable Reminder r009 Card-bridge runtime line is preserved for Card b355 compatibility.
-
-Historical release baseline note: TÜV Reminder r020 / Reminder r020 remains the Calendar Always Due runtime baseline preserved by r024. It includes calendar.tuev_reminder and reminder_offset_days and remains compatible with Card b355.
+Historical runtime baseline: TÜV Reminder r020 / Reminder r020 is the Calendar Always Due stabilization line preserved by Reminder r027.
