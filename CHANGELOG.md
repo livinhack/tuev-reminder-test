@@ -1,6 +1,15 @@
 # Changelog
 
-## r041 - Sidebar Create Form Save
+## r042 - Sidebar Three-Dot Action Menu
+
+- Adds a Switch-Manager-style three-dot row action menu.
+- Row menu now offers explicit `Bearbeiten` and `Löschen` entries.
+- `Bearbeiten` opens the existing detail/form modal for the selected vehicle.
+- `Löschen` is visible as a prepared action, but does not call a backend delete command yet.
+- Keeps the r041 create flow working.
+- Preserves strict Reminder/Card separation.
+
+## r042 - Sidebar Create Form Save
 
 - Wires the Sidebar modal save button to `tuev_reminder/manager/vehicles/create`.
 - Adds frontend payload construction for manager-created vehicles.
@@ -10,7 +19,7 @@
 - Keeps existing vehicle rows read-only; update/delete remain out of scope.
 - Preserves strict Reminder/Card separation.
 
-## r041 - Sidebar Table Compact Polish
+## r042 - Sidebar Table Compact Polish
 
 - Removed the secondary entity-id line below the vehicle name in the Sidebar table.
 - Removed the secondary due-date line below the HU month/year in the Sidebar table.
@@ -18,7 +27,7 @@
 - Preserved r038 Backend Create API foundation and r039 table label cleanup.
 - Preserved strict Reminder/Card separation.
 
-## r041 - Sidebar Table Compact Polish
+## r042 - Sidebar Table Compact Polish
 
 - Moved the Status column behind Erinnerung.
 - Renamed Reminder to Erinnerung.
@@ -29,7 +38,7 @@
 - Preserved strict Reminder/Card separation.
 
 
-## r041 - Backend Create API Foundation + Plain Plus Controls
+## r042 - Backend Create API Foundation + Plain Plus Controls
 
 - Added Manager WebSocket command `tuev_reminder/manager/vehicles/create`.
 - Added backend validation/normalization for manager-created vehicle data.

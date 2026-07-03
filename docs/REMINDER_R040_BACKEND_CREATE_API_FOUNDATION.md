@@ -1,6 +1,6 @@
-# Reminder r041 – Backend Create API Foundation
+# Reminder r042 – Backend Create API Foundation
 
-r041 adds the first write-side Manager backend path for the Reminder-owned Sidebar UI.
+r042 adds the first write-side Manager backend path for the Reminder-owned Sidebar UI.
 
 ## Scope
 
@@ -13,8 +13,8 @@ r041 adds the first write-side Manager backend path for the Reminder-owned Sideb
 
 ## Separation
 
-The Card remains a separate dashboard project. r041 does not import Card code, does not duplicate Card actions and does not add Lovelace/Dashboard management.
+The Card remains a separate dashboard project. r042 does not import Card code, does not duplicate Card actions and does not add Lovelace/Dashboard management.
 
 ## Next step
 
-r041 should wire the modal form's save button to `tuev_reminder/manager/vehicles/create`, handle validation errors in the modal and refresh the list after successful creation.
+r042 should wire the modal form's save button to `tuev_reminder/manager/vehicles/create`, handle validation errors in the modal and refresh the list after successful creation.

@@ -1,6 +1,6 @@
-# Compatibility – Card b355+ / b356 RC with Reminder r041
+# Compatibility – Card b355+ / b356 RC with Reminder r042
 
-Reminder r041 preserves the Card-facing bridge contract from the previous r040 state.
+Reminder r042 preserves the Card-facing bridge contract from the previous r040 state.
 
 The change is limited to the Reminder-owned Sidebar create form save path. Sensor attributes, services, calendar behavior, Card renderer behavior and Dashboard Card configuration remain unchanged.
 

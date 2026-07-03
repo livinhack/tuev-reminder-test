@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r042 Sidebar create form save wiring."""
+"""Validate r042 Sidebar three-dot action menu shell."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r042 create form save check failed: {message}")
+    raise SystemExit(f"r042 three-dot action menu check failed: {message}")
 
 
 def main() -> None:
@@ -27,34 +27,28 @@ def main() -> None:
         fail("REMINDER_VERSION.txt must be r042")
 
     for marker in [
-        "_formPayload()",
-        "async _saveCreateForm()",
-        'type: "tuev_reminder/manager/vehicles/create"',
-        "vehicle: this._formPayload()",
-        'id="save-create"',
-        "Speichert …",
-        "Speicherbereit",
-        "result?.vehicles",
-        "this._vehicles = result.vehicles",
+        "this._openMenuIndex",
+        "_openRowMenu(index)",
+        "_handleRowAction(action, vehicle)",
+        "row-action-menu",
+        'data-row-action="edit"',
+        'data-row-action="delete"',
+        ">Bearbeiten<",
+        ">Löschen<",
+        "Löschen ist als Menüpunkt vorbereitet",
+        "Drei-Punkte-Menü vorbereitet",
     ]:
         if marker not in panel:
             fail(f"panel JS missing {marker!r}")
 
-    for stale in [
-        "UI-Speichern folgt später",
-        "Dieser Stand hält den Speichern-Button noch deaktiviert",
-    ]:
-        if stale in panel:
-            fail(f"panel JS still contains stale disabled-save marker {stale!r}")
-
-    if '"mode": "vehicle_list_create_form_save"' not in panel_py:
-        fail("panel.py mode should describe the save-wired UI")
+    if '"mode": "vehicle_list_create_form_action_menu"' not in panel_py:
+        fail("panel.py mode should describe the three-dot action menu UI")
 
     for forbidden in ["tuev-card", "confirm_passed", "set_due_date", "vehicles/update", "vehicles/delete"]:
         if forbidden in panel:
             fail(f"panel JS must not include {forbidden!r}")
 
-    print("r042 create form save check OK")
+    print("r042 three-dot action menu check OK")
 
 
 if __name__ == "__main__":

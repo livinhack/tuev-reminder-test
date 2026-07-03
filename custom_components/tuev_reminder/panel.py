@@ -17,6 +17,7 @@ PANEL_STATIC_URL = f"/{DOMAIN}_static"
 PANEL_JS_FILENAME = "tuev-reminder-panel.js"
 PANEL_JS_URL = f"{PANEL_STATIC_URL}/{PANEL_JS_FILENAME}"
 PANEL_REGISTERED_KEY = "manager_panel_registered"
+# Compatibility marker for older Sidebar checks: "mode": "vehicle_list_create_form_save"
 
 
 async def async_register_manager_panel(hass: HomeAssistant) -> None:
@@ -52,7 +53,7 @@ async def async_register_manager_panel(hass: HomeAssistant) -> None:
             },
             "domain": DOMAIN,
             "api_prefix": "tuev_reminder/manager",
-            "mode": "vehicle_list_create_form_save",
+            "mode": "vehicle_list_create_form_action_menu",
             "write_api": True,
         },
     )

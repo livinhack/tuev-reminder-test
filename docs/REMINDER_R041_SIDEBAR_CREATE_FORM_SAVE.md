@@ -1,6 +1,6 @@
-# Reminder r041 – Sidebar Create Form Save
+# Reminder r042 – Sidebar Create Form Save
 
-r041 wires the Reminder-owned Sidebar create modal to the backend Manager write command introduced in r038.
+r042 wires the Reminder-owned Sidebar create modal to the backend Manager write command introduced in r038.
 
 ## Scope
 
@@ -14,7 +14,7 @@ r041 wires the Reminder-owned Sidebar create modal to the backend Manager write 
 
 ## Separation
 
-The Card remains a separate Dashboard/Lovelace project. r041 does not import Card code, does not add Card renderer coupling, and does not duplicate Card actions such as HU passed or manual due-date changes.
+The Card remains a separate Dashboard/Lovelace project. r042 does not import Card code, does not add Card renderer coupling, and does not duplicate Card actions such as HU passed or manual due-date changes.
 
 ## HA smoke test
 

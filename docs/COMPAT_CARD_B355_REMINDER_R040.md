@@ -1,6 +1,6 @@
-# Compatibility – Card b355+ / b356 RC with Reminder r041
+# Compatibility – Card b355+ / b356 RC with Reminder r042
 
-Reminder r041 preserves the same entity and Card-bridge attributes as r039. The Sidebar table has only visual compact-list changes plus the previously prepared backend create API.
+Reminder r042 preserves the same entity and Card-bridge attributes as r039. The Sidebar table has only visual compact-list changes plus the previously prepared backend create API.
 
 - Card repository remains separate.
 - No Card renderer is bundled or imported by Reminder.

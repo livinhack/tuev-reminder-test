@@ -1,6 +1,6 @@
-# Reminder r041 – Sidebar Table Compact Polish
+# Reminder r042 – Sidebar Table Compact Polish
 
-r041 keeps the r038 Backend Create API foundation and r039 table column cleanup, then removes the remaining secondary table lines requested from the Sidebar vehicle list.
+r042 keeps the r038 Backend Create API foundation and r039 table column cleanup, then removes the remaining secondary table lines requested from the Sidebar vehicle list.
 
 ## Changes
 
@@ -17,4 +17,4 @@ This is still Reminder-only Sidebar work. It does not import Card files, does no
 
 ## Next intended step
 
-r041 should connect the modal form save/create button to `tuev_reminder/manager/vehicles/create` and refresh the read-only vehicle list after successful creation.
+r042 should connect the modal form save/create button to `tuev_reminder/manager/vehicles/create` and refresh the read-only vehicle list after successful creation.

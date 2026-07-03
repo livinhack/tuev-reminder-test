@@ -1,8 +1,50 @@
-# Handover – Reminder r041 Sidebar Create Form Save
+# Handover – Reminder r042 Sidebar Three-Dot Action Menu
 
-Current Reminder version: **r041** / manifest `0.1.0-r041`.
+Current Reminder version: **r042** / manifest `0.1.0-r042`.
 
-## What changed in r041
+## What changed in r042
+
+- Added a Switch-Manager-style row action menu at the end of each Sidebar vehicle row.
+- The three-dot menu exposes:
+  - `Bearbeiten`
+  - `Löschen`
+- `Bearbeiten` opens the existing detail/form modal for the selected vehicle.
+- `Löschen` is intentionally only a prepared UI action for now and shows a notice; no backend delete command is called.
+- Existing row click still opens the detail modal as a quick path.
+- r041 Sidebar create/save flow remains intact and still uses `tuev_reminder/manager/vehicles/create`.
+- Reminder/Card repository separation remains unchanged.
+
+## Still deliberately not included
+
+- No Card repository files in Reminder.
+- No Card renderer import or Card-internal coupling.
+- No Dashboard/Lovelace Card management.
+- No `HU bestanden` / `set_due_date` action duplication.
+- No `vehicles/update` backend command yet.
+- No `vehicles/delete` backend command yet.
+
+## HA smoke test focus
+
+1. Install/update Reminder r042 and restart/reload HA as required.
+2. Open Sidebar → TÜV Reminder.
+3. Verify the list still loads and the `+` controls still open the create modal.
+4. Create one vehicle to confirm the r041 create path still works.
+5. Click the three-dot menu at the end of an existing row.
+6. Verify `Bearbeiten` and `Löschen` are shown.
+7. Click `Bearbeiten` and verify the existing detail/form modal opens.
+8. Click `Löschen` and verify no destructive action runs yet.
+
+## Next recommended step
+
+r043 should introduce a Reminder-owned `vehicles/update` backend command or a deeper design check for safely updating existing ConfigEntries. Delete should come only after a confirmation dialog and a dedicated backend command exist.
+
+---
+
+# Handover – Reminder r042 Sidebar Create Form Save
+
+Current Reminder version: **r042** / manifest `0.1.0-r042`.
+
+## What changed in r042
 
 - Wired the Sidebar modal save button to `tuev_reminder/manager/vehicles/create`.
 - Added frontend payload construction for new vehicles.
@@ -24,7 +66,7 @@ Current Reminder version: **r041** / manifest `0.1.0-r041`.
 
 ## HA smoke test focus
 
-1. Install/update Reminder r041 and restart/reload HA as required.
+1. Install/update Reminder r042 and restart/reload HA as required.
 2. Open Sidebar → TÜV Reminder.
 3. Click a plain `+` above or below the list.
 4. Type into several fields and verify focus remains stable.
@@ -84,7 +126,7 @@ Current Reminder version: **r040**.
 3. Confirm add controls are plain `+` above and below the list.
 4. Confirm the modal still opens and text fields keep focus.
 5. Confirm existing entities and Card display are unchanged.
-6. UI creation is not expected yet; backend command is prepared for r041 UI wiring.
+6. UI creation is not expected yet; backend command is prepared for r042 UI wiring.
 
 ---
 

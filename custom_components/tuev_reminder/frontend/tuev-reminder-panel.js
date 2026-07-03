@@ -13,12 +13,14 @@ class TuevReminderPanel extends HTMLElement {
     this._filter = "";
     this._statusFilter = "all";
     this._sort = "due";
+    this._openMenuIndex = null;
     this._view = "list";
     this._selectedVehicle = null;
     this._form = this._defaultForm();
     this._saving = false;
     this._formError = null;
     this._formInfo = null;
+    this._openMenuIndex = null;
   }
 
   set hass(hass) {
@@ -259,7 +261,32 @@ class TuevReminderPanel extends HTMLElement {
     return errors;
   }
 
+  _openRowMenu(index) {
+    this._openMenuIndex = this._openMenuIndex === index ? null : index;
+    this._render();
+  }
+
+  _closeRowMenu() {
+    if (this._openMenuIndex !== null) {
+      this._openMenuIndex = null;
+      this._render();
+    }
+  }
+
+  _handleRowAction(action, vehicle) {
+    this._openMenuIndex = null;
+    if (action === "edit") {
+      this._openDetailForm(vehicle);
+      return;
+    }
+    if (action === "delete") {
+      this._openDetailForm(vehicle);
+      this._formInfo = "Löschen ist als Menüpunkt vorbereitet. Die Delete-API folgt in einem späteren Backend-Schritt.";
+    }
+  }
+
   _openCreateForm() {
+    this._openMenuIndex = null;
     this._form = this._defaultForm();
     this._selectedVehicle = null;
     this._formError = null;
@@ -269,6 +296,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openDetailForm(vehicle) {
+    this._openMenuIndex = null;
     this._selectedVehicle = vehicle;
     this._formError = null;
     this._formInfo = null;
@@ -482,7 +510,15 @@ class TuevReminderPanel extends HTMLElement {
                 </td>
                 <td><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
-                <td class="menu-cell"><button class="row-menu" data-menu-index="${index}" title="Detail-/Formularansicht öffnen" aria-label="Zeilenmenü">⋮</button></td>
+                <td class="menu-cell">
+                  <button class="row-menu" data-menu-index="${index}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuIndex === index ? "true" : "false"}">⋮</button>
+                  ${this._openMenuIndex === index ? `
+                    <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
+                      <button type="button" data-row-action="edit" data-action-index="${index}" role="menuitem">Bearbeiten</button>
+                      <button type="button" data-row-action="delete" data-action-index="${index}" role="menuitem">Löschen</button>
+                    </div>
+                  ` : ""}
+                </td>
               </tr>
             `).join("")}
           </tbody>
@@ -761,6 +797,32 @@ class TuevReminderPanel extends HTMLElement {
         .col-name { width: 38%; }
         .col-preview { width: 240px; text-align: right; }
         .col-menu { width: 40px; }
+        .menu-cell { position: relative; text-align: right; }
+        .row-action-menu {
+          position: absolute;
+          right: 10px;
+          top: 40px;
+          z-index: 20;
+          min-width: 148px;
+          padding: 6px 0;
+          border: 1px solid var(--divider-color);
+          border-radius: 8px;
+          background: var(--card-background-color);
+          box-shadow: 0 8px 24px rgba(0,0,0,.26);
+        }
+        .row-action-menu button {
+          display: block;
+          width: 100%;
+          border: 0;
+          border-radius: 0;
+          background: transparent;
+          color: var(--primary-text-color);
+          padding: 10px 14px;
+          text-align: left;
+          font-size: 14px;
+          cursor: pointer;
+        }
+        .row-action-menu button:hover { background: var(--secondary-background-color); }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
         .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         .main-value { font-weight: 500; line-height: 1.25; }
@@ -948,7 +1010,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-API aktiv · Formular speichert neue Entitäten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-API aktiv · Formular speichert neue Entitäten · Drei-Punkte-Menü vorbereitet · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
@@ -997,20 +1059,34 @@ class TuevReminderPanel extends HTMLElement {
       });
     }
 
-    this.shadowRoot.querySelectorAll("tr[data-row-index], button[data-menu-index]").forEach((element) => {
-      element.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const index = Number(element.dataset.rowIndex ?? element.dataset.menuIndex);
+    this.shadowRoot.querySelectorAll("tr[data-row-index]").forEach((row) => {
+      row.addEventListener("click", () => {
+        const index = Number(row.dataset.rowIndex);
         const vehicle = this._visibleVehicles()[index];
         if (vehicle) this._openDetailForm(vehicle);
       });
-      element.addEventListener("keydown", (event) => {
+      row.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          const index = Number(element.dataset.rowIndex ?? element.dataset.menuIndex);
+          const index = Number(row.dataset.rowIndex);
           const vehicle = this._visibleVehicles()[index];
           if (vehicle) this._openDetailForm(vehicle);
         }
+      });
+    });
+
+    this.shadowRoot.querySelectorAll("button[data-menu-index]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        this._openRowMenu(Number(button.dataset.menuIndex));
+      });
+    });
+
+    this.shadowRoot.querySelectorAll("button[data-row-action]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const vehicle = this._visibleVehicles()[Number(button.dataset.actionIndex)];
+        if (vehicle) this._handleRowAction(button.dataset.rowAction, vehicle);
       });
     });
 

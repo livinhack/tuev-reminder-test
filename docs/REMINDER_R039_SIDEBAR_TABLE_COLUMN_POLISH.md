@@ -1,6 +1,6 @@
-# Reminder r041 – Sidebar Table Compact Polish
+# Reminder r042 – Sidebar Table Compact Polish
 
-r041 applies the latest Sidebar list layout feedback on top of r038.
+r042 applies the latest Sidebar list layout feedback on top of r038.
 
 ## Changes
 
