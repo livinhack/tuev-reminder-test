@@ -1,56 +1,65 @@
-# Handover – Reminder r020 V3 Stabilized Checkpoint
+# Handover – Reminder r024 Release Candidate Notes + Changelog
 
-Current Reminder stand: **r020**.
+Current Reminder version: **r024**.
 
-r020 is a stabilization/checkpoint ZIP after the calendar simplification from r019. Runtime behavior is intentionally the same as the r019 line, with version/docs updated for the current v3 baseline.
+Current compatible stack:
 
-## Current compatible stack
+```text
+Card b355 + Reminder r024
+```
 
-- Card: **b355**
-- Reminder: **r020**
+r024 is a release-candidate documentation/checkpoint stand. Runtime behavior is intentionally unchanged from the stabilized r020/r021/r022/r023 line.
 
-## Runtime baseline
+## What changed in r024
 
-- Vehicles remain individual Home Assistant devices/config entries with their TÜV sensor.
-- `calendar.tuev_reminder` is detached from vehicle devices and belongs to the TÜV Reminder manager/integration context.
-- The Reminder does not write to `local_calendar`.
-- Calendar events are generated dynamically from vehicle config entries.
-- The calendar always emits both event types per vehicle:
-  - TÜV/HU Erinnerung
-  - TÜV/HU fällig
-- The only user-facing calendar timing option is `reminder_offset_days`.
-- Old `calendar_event_mode` data is ignored/kept only as compatibility residue.
+- Updated `REMINDER_VERSION.txt` to `r024`.
+- Updated `manifest.json` to `0.1.0-r024`.
+- Added `CHANGELOG.md`.
+- Added `docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R024.md`.
+- Added `scripts/check_r024_release_candidate_notes.py`.
+- Updated README/HANDOVER for the current release-candidate stack.
+- Kept the r023 check runner and release guard.
 
-## Preserved from previous stands
+## Runtime preserved
 
-- r009/r012 plate logic: H/E checkboxes, green plate suppression of H/E, season handling, Wechselkennzeichen, Motorrad format, form-state fix.
-- r015 services: `confirm_passed` with optional `passed_date`, and `set_due_date`.
-- r017 detached calendar entity.
-- r019 always-due + offset-only calendar behavior.
-- Card b355 attribute bridge.
+- One vehicle = one config entry/device + one TÜV/HU sensor.
+- Shared virtual calendar: `calendar.tuev_reminder`.
+- Calendar detached from vehicle devices.
+- No writes to `local_calendar`.
+- Calendar always emits:
+  - `TÜV/HU Erinnerung`
+  - `TÜV/HU fällig`
+- `reminder_offset_days` remains the only user-facing calendar timing option.
+- Card b355 bridge attributes remain preserved.
+- Services remain preserved:
+  - `tuev_reminder.confirm_passed`
+  - `tuev_reminder.set_due_date`
 
-## Not changed in r020
+## Not changed
 
-- No Card changes.
-- No renderer geometry changes.
+- No Card change.
+- No renderer geometry change.
 - No new calendar mode selector.
-- No `local_calendar` writes.
-- No Area-Code autocomplete UI.
+- No area-code autocomplete UI.
 - No Sidebar/Manager UI.
+- No `local_calendar` sync.
+
+## Checks
+
+Run from repository root:
+
+```bash
+python scripts/run_all_checks.py
+```
+
+The runner performs Python syntax checks, JSON validation and all `check_r*.py` checks. It also removes generated cache artifacts before and after the suite so the package-hygiene guard can run reliably.
 
 ## Next recommended step
 
-Install/test Reminder r020 with Card b355. If it passes, the next work item should be release/HACS cleanup rather than feature expansion.
+Install/test r024 in HA with Card b355 as a release-candidate stack. If it passes, the next useful task is either public release preparation or Manager/Sidebar UI planning.
 
-## Compatibility history / preserved decisions
-
-This checkpoint preserves the Calendar Always Due behavior from r019.
-
-Stable Reminder r009 runtime line remains documented for Card b355 compatibility. Reminder r009 introduced the tested Card bridge for new plate attributes. Reminder r017 detached the calendar entity from vehicle devices.
-
-Reminder r017 is the calendar-detached architecture baseline preserved by r020.
-
-Important attribute names preserved for Card b355 and sensor compatibility:
+## Preserved Card b355 attributes
 
 ```text
 plate_suffix_h
@@ -65,4 +74,10 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-Leerzeichen im Kennzeichen bleiben erhalten. green plate / grünes Kennzeichen unterdrückt H/E. NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt.
+## Historical compatibility baselines
+
+Reminder r009 remains the tested Card-bridge runtime line for Card b355. Reminder r017 remains the detached-calendar architecture baseline. Reminder r020 remains the Calendar Always Due stabilized runtime baseline. Reminder r023 remains the check-runner/release-guard baseline.
+
+NONE-/none-Altlasten werden nicht ans Kennzeichen angehängt. Green plate / grünes Kennzeichen suppresses H/E. Leerzeichen im Kennzeichen bleiben erhalten.
+
+Historical release baseline note: Reminder r020 / Calendar Always Due remains the runtime baseline preserved by r024, including calendar.tuev_reminder, reminder_offset_days and Card b355 compatibility.

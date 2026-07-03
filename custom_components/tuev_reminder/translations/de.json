@@ -25,7 +25,7 @@
       },
       "due": {
         "title": "HU-Fälligkeit",
-        "description": "HU-Daten und Kalenderverhalten einstellen.",
+        "description": "HU-Daten und Erinnerungszeitpunkt einstellen.",
         "data": {
           "month": "HU-Monat",
           "year": "HU-Jahr",
@@ -77,7 +77,7 @@
       },
       "due": {
         "title": "HU-Fälligkeit",
-        "description": "HU-Daten und Kalenderverhalten einstellen.",
+        "description": "HU-Daten und Erinnerungszeitpunkt bearbeiten.",
         "data": {
           "month": "HU-Monat",
           "year": "HU-Jahr",

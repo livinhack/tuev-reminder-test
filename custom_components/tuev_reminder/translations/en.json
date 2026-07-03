@@ -25,7 +25,7 @@
       },
       "due": {
         "title": "Inspection due date",
-        "description": "Set the inspection due data and calendar behavior.",
+        "description": "Set the inspection due date and reminder timing.",
         "data": {
           "month": "Inspection month",
           "year": "Inspection year",
@@ -77,7 +77,7 @@
       },
       "due": {
         "title": "Inspection due date",
-        "description": "Update the inspection due data and calendar behavior.",
+        "description": "Update the inspection due date and reminder timing.",
         "data": {
           "month": "Inspection month",
           "year": "Inspection year",
