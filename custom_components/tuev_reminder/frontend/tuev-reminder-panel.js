@@ -15,6 +15,7 @@ class TuevReminderPanel extends HTMLElement {
     this._sortKey = "hu";
     this._sortDirection = "asc";
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._view = "list";
     this._selectedVehicle = null;
     this._form = this._defaultForm();
@@ -25,6 +26,7 @@ class TuevReminderPanel extends HTMLElement {
     this._flashMessage = null;
     this._flashTimer = null;
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._formSnapshot = null;
     this._actionSheetVehicle = null;
     this._actionSheetOpenedAt = 0;
@@ -202,6 +204,79 @@ class TuevReminderPanel extends HTMLElement {
     return `<th class="${this._escape(extraClass)}"><button class="sort-header${active}" type="button" data-sort-key="${this._escape(key)}" aria-label="Nach ${this._escape(label)} sortieren">${this._escape(label)}<span>${this._escape(this._sortIndicator(key))}</span></button></th>`;
   }
 
+  _cssEscape(value) {
+    if (window.CSS?.escape) return CSS.escape(String(value));
+    return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  }
+
+  _captureListUiState() {
+    const root = this.shadowRoot;
+    if (!root) return {};
+
+    const active = root.activeElement;
+    const focus = active
+      ? {
+          id: active.id || "",
+          field: active.dataset?.field || "",
+          sortKey: active.dataset?.sortKey || "",
+          menuEntryId: active.dataset?.menuEntryId || "",
+          createTrigger: active.dataset?.createTrigger || "",
+          selectionStart: null,
+          selectionEnd: null,
+        }
+      : null;
+
+    if (focus && typeof active.selectionStart === "number") {
+      focus.selectionStart = active.selectionStart;
+      focus.selectionEnd = active.selectionEnd;
+    }
+
+    const shell = root.querySelector(".list-shell");
+    return {
+      focus,
+      listScrollLeft: shell ? shell.scrollLeft : null,
+      listScrollTop: shell ? shell.scrollTop : null,
+    };
+  }
+
+  _restoreListUiState(state = {}) {
+    const root = this.shadowRoot;
+    if (!root) return;
+
+    const shell = root.querySelector(".list-shell");
+    if (shell) {
+      if (typeof state.listScrollLeft === "number") shell.scrollLeft = state.listScrollLeft;
+      if (typeof state.listScrollTop === "number") shell.scrollTop = state.listScrollTop;
+    }
+
+    const focus = state.focus;
+    if (!focus) return;
+
+    let target = null;
+    if (focus.id) target = root.querySelector(`#${this._cssEscape(focus.id)}`);
+    if (!target && focus.field) target = root.querySelector(`[data-field="${this._cssEscape(focus.field)}"]`);
+    if (!target && focus.sortKey) target = root.querySelector(`[data-sort-key="${this._cssEscape(focus.sortKey)}"]`);
+    if (!target && focus.menuEntryId) target = root.querySelector(`[data-menu-entry-id="${this._cssEscape(focus.menuEntryId)}"]`);
+    if (!target && focus.createTrigger) target = root.querySelector(`[data-create-trigger="${this._cssEscape(focus.createTrigger)}"]`);
+
+    if (!target || typeof target.focus !== "function") return;
+
+    target.focus({ preventScroll: true });
+    if (typeof focus.selectionStart === "number" && typeof target.setSelectionRange === "function") {
+      try {
+        target.setSelectionRange(focus.selectionStart, focus.selectionEnd ?? focus.selectionStart);
+      } catch (_err) {
+        // Some input types do not support selection ranges. Focus restore is enough.
+      }
+    }
+  }
+
+  _renderPreservingListUiState() {
+    const state = this._captureListUiState();
+    this._render();
+    this._restoreListUiState(state);
+  }
+
   _visibleVehicles() {
     const filter = this._filter.trim().toLowerCase();
     const vehicles = this._vehicles.filter((vehicle) => {
@@ -287,8 +362,10 @@ class TuevReminderPanel extends HTMLElement {
     const year = Number(this._form.year);
     const offset = Number(this._form.reminder_offset_days);
     if (!Number.isInteger(month) || month < 1 || month > 12) errors.push("HU-Monat muss zwischen 1 und 12 liegen.");
-    if (!Number.isInteger(year) || year < 2000 || year > 2100) errors.push("HU-Jahr muss zwischen 2000 und 2100 liegen.");
-    if (!Number.isInteger(offset) || offset < 0 || offset > 365) errors.push("Reminder-Vorlauf muss zwischen 0 und 365 Tagen liegen.");
+    if (!Number.isInteger(year) || year < 1900 || year > 2100) errors.push("HU-Jahr muss zwischen 1900 und 2100 liegen.");
+    const interval = Number(this._form.interval);
+    if (!Number.isInteger(interval) || ![1, 2].includes(interval)) errors.push("Prüfintervall muss 1 oder 2 Jahre betragen.");
+    if (!Number.isInteger(offset) || offset < 0 || offset > 365) errors.push("Erinnerungs-Vorlauf muss zwischen 0 und 365 Tagen liegen.");
     if (["seasonal", "green_seasonal"].includes(this._form.plate_kind)) {
       const start = Number(this._form.season_start_month);
       const end = Number(this._form.season_end_month);
@@ -303,25 +380,33 @@ class TuevReminderPanel extends HTMLElement {
     return this._narrow || window.matchMedia?.("(max-width: 1100px)")?.matches === true;
   }
 
+  _vehicleByEntryId(entryId) {
+    if (!entryId) return null;
+    return this._vehicles.find((vehicle) => String(vehicle.entry_id || "") === String(entryId)) || null;
+  }
+
   _openRowMenu(index) {
     const vehicle = this._visibleVehicles()[index];
     if (!vehicle) return;
     if (this._mobileActionMode()) {
       this._openMenuIndex = null;
+      this._openMenuEntryId = null;
       this._actionSheetVehicle = vehicle;
       this._actionSheetOpenedAt = Date.now();
       this._actionSheetCloseGuardUntil = this._actionSheetOpenedAt + 650;
     } else {
       this._actionSheetVehicle = null;
-      this._openMenuIndex = this._openMenuIndex === index ? null : index;
+      this._openMenuIndex = null;
+      this._openMenuEntryId = this._openMenuEntryId === vehicle.entry_id ? null : vehicle.entry_id;
     }
-    this._render();
+    this._renderPreservingListUiState();
   }
 
   _closeRowMenu() {
-    if (this._openMenuIndex !== null) {
+    if (this._openMenuIndex !== null || this._openMenuEntryId !== null) {
       this._openMenuIndex = null;
-      this._render();
+      this._openMenuEntryId = null;
+      this._renderPreservingListUiState();
     }
   }
 
@@ -333,12 +418,13 @@ class TuevReminderPanel extends HTMLElement {
       this._actionSheetVehicle = null;
       this._actionSheetOpenedAt = 0;
       this._actionSheetCloseGuardUntil = 0;
-      this._render();
+      this._renderPreservingListUiState();
     }
   }
 
   _handleRowAction(action, vehicle) {
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
     this._actionSheetOpenedAt = 0;
     this._actionSheetCloseGuardUntil = 0;
@@ -379,6 +465,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openDeleteConfirm(vehicle) {
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
     this._selectedVehicle = vehicle;
     this._formError = null;
@@ -389,6 +476,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openCreateForm() {
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
     this._form = this._defaultForm();
     this._selectedVehicle = null;
@@ -401,6 +489,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openDetailForm(vehicle) {
     this._openMenuIndex = null;
+    this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
     this._selectedVehicle = vehicle;
     this._formError = null;
@@ -485,6 +574,7 @@ class TuevReminderPanel extends HTMLElement {
     this._formError = null;
     this._formSnapshot = null;
     this._actionSheetVehicle = null;
+    this._openMenuEntryId = null;
   }
 
   async _saveCreateForm() {
@@ -711,11 +801,11 @@ class TuevReminderPanel extends HTMLElement {
                 <td class="status-cell"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
                 <td class="menu-cell">
-                  <button type="button" class="row-menu" data-menu-index="${index}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuIndex === index ? "true" : "false"}"><span aria-hidden="true">⋮</span></button>
-                  ${this._openMenuIndex === index ? `
+                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}"><span aria-hidden="true">⋮</span></button>
+                  ${this._openMenuEntryId === vehicle.entry_id ? `
                     <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
-                      <button type="button" data-row-action="edit" data-action-index="${index}" role="menuitem">Bearbeiten</button>
-                      <button type="button" data-row-action="delete" data-action-index="${index}" role="menuitem">Löschen</button>
+                      <button type="button" data-row-action="edit" data-action-index="${index}" data-action-entry-id="${this._escape(vehicle.entry_id || "")}" role="menuitem">Bearbeiten</button>
+                      <button type="button" data-row-action="delete" data-action-index="${index}" data-action-entry-id="${this._escape(vehicle.entry_id || "")}" role="menuitem">Löschen</button>
                     </div>
                   ` : ""}
                 </td>
@@ -736,6 +826,13 @@ class TuevReminderPanel extends HTMLElement {
       const value = String(index + 1);
       return `<option value="${value}" ${String(selected) === value ? "selected" : ""}>${value.padStart(2, "0")}</option>`;
     }).join("");
+  }
+
+  _renderIntervalOptions(selected) {
+    return [
+      { value: "1", label: "1 Jahr" },
+      { value: "2", label: "2 Jahre" },
+    ].map((option) => `<option value="${option.value}" ${String(selected) === option.value ? "selected" : ""}>${option.label}</option>`).join("");
   }
 
   _renderDeleteConfirm() {
@@ -823,11 +920,11 @@ class TuevReminderPanel extends HTMLElement {
             <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(this._form.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
             <div class="field-pair">
               <label>HU-Monat<select data-field="month">${this._renderMonthOptions(this._form.month)}</select></label>
-              <label>HU-Jahr<input data-field="year" inputmode="numeric" value="${this._escape(this._form.year)}"></label>
+              <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(this._form.year)}"></label>
             </div>
             <div class="field-pair">
-              <label>Intervall<input data-field="interval" inputmode="numeric" value="${this._escape(this._form.interval)}"></label>
-              <label>Reminder-Vorlauf Tage<input data-field="reminder_offset_days" inputmode="numeric" value="${this._escape(this._form.reminder_offset_days)}"></label>
+              <label>Intervall<select data-field="interval">${this._renderIntervalOptions(this._form.interval)}</select></label>
+              <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(this._form.reminder_offset_days)}"></label>
             </div>
 
             <h3>Kennzeichen</h3>
@@ -837,7 +934,7 @@ class TuevReminderPanel extends HTMLElement {
             ${change ? `
               <div class="field-pair">
                 <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(this._form.change_plate_common_text)}" placeholder="z. B. B AB"></label>
-                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" value="${this._escape(this._form.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(this._form.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
               </div>
             ` : `
               <label>Kennzeichen<input data-field="plate" value="${this._escape(this._form.plate)}" placeholder="z. B. B AB 123"></label>
@@ -1414,7 +1511,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · Responsive Tabelle · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -1446,7 +1543,9 @@ class TuevReminderPanel extends HTMLElement {
     if (filterInput) {
       filterInput.addEventListener("input", (event) => {
         this._filter = event.target.value;
-        this._render();
+        this._openMenuIndex = null;
+        this._openMenuEntryId = null;
+        this._renderPreservingListUiState();
       });
     }
 
@@ -1454,7 +1553,9 @@ class TuevReminderPanel extends HTMLElement {
     if (statusFilter) {
       statusFilter.addEventListener("change", (event) => {
         this._statusFilter = event.target.value;
-        this._render();
+        this._openMenuIndex = null;
+        this._openMenuEntryId = null;
+        this._renderPreservingListUiState();
       });
     }
 
@@ -1468,14 +1569,15 @@ class TuevReminderPanel extends HTMLElement {
           this._sortDirection = "asc";
         }
         this._openMenuIndex = null;
-        this._render();
+        this._openMenuEntryId = null;
+        this._renderPreservingListUiState();
       });
     });
 
     const page = this.shadowRoot.querySelector(".page");
     if (page) {
       page.addEventListener("click", (event) => {
-        if (this._openMenuIndex === null) return;
+        if (this._openMenuIndex === null && this._openMenuEntryId === null) return;
         const path = event.composedPath ? event.composedPath() : [];
         const insideMenuCell = path.some((node) => node?.classList?.contains?.("menu-cell"));
         if (!insideMenuCell) this._closeRowMenu();
@@ -1499,7 +1601,7 @@ class TuevReminderPanel extends HTMLElement {
     this.shadowRoot.querySelectorAll("button[data-row-action]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
-        const vehicle = this._visibleVehicles()[Number(button.dataset.actionIndex)];
+        const vehicle = this._vehicleByEntryId(button.dataset.actionEntryId) || this._visibleVehicles()[Number(button.dataset.actionIndex)];
         if (vehicle) this._handleRowAction(button.dataset.rowAction, vehicle);
       });
     });

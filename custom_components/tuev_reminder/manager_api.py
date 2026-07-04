@@ -27,6 +27,39 @@ WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"
 WS_TYPE_VEHICLE_DELETE = "tuev_reminder/manager/vehicles/delete"
 
 
+_FIELD_ERROR_MESSAGES = {
+    (CONF_VEHICLE_NAME, "required"): "Fahrzeugname fehlt.",
+    ("plate", "required"): "Kennzeichen fehlt.",
+    ("plate_kind", "invalid_plate_kind"): "Kennzeichenart ist ungültig.",
+    ("plate_format", "invalid_plate_format"): "Kennzeichenformat ist ungültig.",
+    ("plate_format", "invalid_plate_format_for_kind"): "Kennzeichenformat passt nicht zur Kennzeichenart.",
+    ("change_plate_common_text", "required"): "Gemeinsamer Wechselkennzeichen-Text fehlt.",
+    ("change_plate_vehicle_digit", "invalid_vehicle_digit"): "Fahrzeugziffer für Wechselkennzeichen muss genau eine Ziffer sein.",
+    ("season_start_month", "invalid_month"): "Saison-Startmonat muss zwischen 1 und 12 liegen.",
+    ("season_end_month", "invalid_month"): "Saison-Endmonat muss zwischen 1 und 12 liegen.",
+    ("season_end_month", "invalid_season_range"): "Saisonzeitraum muss mindestens 2 und höchstens 11 Monate umfassen.",
+    ("month", "invalid_month"): "HU-Monat muss zwischen 1 und 12 liegen.",
+    ("year", "invalid_year"): "HU-Jahr muss zwischen 1900 und 2100 liegen.",
+    ("interval", "invalid_interval"): "Prüfintervall muss 1 oder 2 Jahre betragen.",
+}
+
+
+def _validation_error_message(field_errors: dict, duplicate_errors: list[str]) -> str:
+    """Return a stable, user-facing validation error message for the Sidebar UI."""
+    messages: list[str] = []
+    for field, code in sorted((field_errors or {}).items()):
+        messages.append(
+            _FIELD_ERROR_MESSAGES.get(
+                (field, code),
+                f"Ungültiger Wert für {field}: {code}.",
+            )
+        )
+    messages.extend(duplicate_errors or [])
+    if not messages:
+        messages.append("Ungültige Fahrzeugdaten.")
+    return " ".join(messages)
+
+
 def _duplicate_vehicle_errors(
     hass: HomeAssistant,
     normalized: dict,
@@ -107,10 +140,14 @@ async def websocket_manager_vehicle_get(hass: HomeAssistant, connection, msg) ->
 @websocket_api.async_response
 async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg) -> None:
     """Create a TÜV Reminder vehicle ConfigEntry from manager form data."""
-    errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
-    errors.extend(_duplicate_vehicle_errors(hass, normalized))
-    if errors:
-        connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
+    field_errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    duplicate_errors = _duplicate_vehicle_errors(hass, normalized)
+    if field_errors or duplicate_errors:
+        connection.send_error(
+            msg["id"],
+            "validation_failed",
+            _validation_error_message(field_errors, duplicate_errors),
+        )
         return
 
     existing_entry_ids = {entry.entry_id for entry in hass.config_entries.async_entries(DOMAIN)}
@@ -168,10 +205,14 @@ async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg)
         connection.send_error(msg["id"], "not_found", "TÜV Reminder vehicle not found")
         return
 
-    errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
-    errors.extend(_duplicate_vehicle_errors(hass, normalized, current_entry_id=entry.entry_id))
-    if errors:
-        connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
+    field_errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    duplicate_errors = _duplicate_vehicle_errors(hass, normalized, current_entry_id=entry.entry_id)
+    if field_errors or duplicate_errors:
+        connection.send_error(
+            msg["id"],
+            "validation_failed",
+            _validation_error_message(field_errors, duplicate_errors),
+        )
         return
 
     hass.config_entries.async_update_entry(

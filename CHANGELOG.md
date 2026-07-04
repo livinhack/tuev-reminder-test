@@ -1,5 +1,89 @@
 # Changelog
 
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
+## r058 – Sidebar List State Preservation
+
+- Bumped Reminder version to `0.1.0-r058`.
+- Adds list UI state capture/restore around Sidebar list re-renders.
+- Keeps the search field focused while typing and preserves caret position where supported.
+- Preserves table scroll state across search/filter/sort/menu re-renders.
+- Keeps row actions tied to stable `entry_id` from r056.
+- Keeps r055 mobile action-sheet tap-race fix and r057 backend validation runtime fix unchanged.
+- Keeps Reminder/Card separation unchanged.
+
+---
+
+# Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
+## r057 – Manager Validation Runtime Fix
+
+- Bumped Reminder version to `0.1.0-r057`.
+- Fixes the Sidebar Manager create/update validation path so field-error dictionaries are no longer treated like lists.
+- Removes invalid `.extend(...)` usage on backend validation dictionaries.
+- Keeps duplicate-name and duplicate-plate checks for create/update.
+- Adds `_validation_error_message(...)` for stable German validation messages in the Sidebar modal.
+- Keeps r055 mobile action-sheet fix and r056 row-action identity hardening unchanged.
+- Keeps Reminder/Card separation unchanged.
+
+---
+
+# Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
+## r056 – Sidebar Row Action Identity Hardening
+
+- Bumped Reminder version to `0.1.0-r056`.
+- Keeps the r055 mobile action-sheet tap-race fix unchanged.
+- Hardens desktop row action state by tracking the opened action menu by `entry_id` instead of relying only on the currently visible sorted row index.
+- Adds stable `data-action-entry-id` markers to row action buttons.
+- Resolves row actions by `entry_id` before falling back to the visible-row index.
+- Closes any open inline row menu when search/filter/sort changes.
+- Keeps full rows non-clickable; only the three-dot button opens actions.
+- Keeps create/update/delete, duplicate guard, dirty guard, responsive table, mobile action sheet, and brand asset paths unchanged.
+- Keeps Reminder/Card separation unchanged.
+
+---
+
+# Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
 ## r055 – Mobile Action Sheet Tap Race Fix
 
 - Fixes the smartphone three-dot action sheet flashing briefly and closing immediately.
@@ -13,6 +97,16 @@
 - Keeps Reminder/Card separation unchanged.
 
 # Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
 
 ## r054 – Brand Assets Path / Proxy Readiness
 
@@ -37,6 +131,16 @@
 
 # Changelog
 
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
 ## r054 – Sidebar Mobile Action Sheet
 
 - Replaces the inline row action dropdown with a centered action sheet on smartphone/narrow layouts.
@@ -51,6 +155,16 @@
 
 # Changelog
 
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
 ## r054 – Sidebar Mobile Action Hit Target Fix
 
 - Enlarged the three-dot row action hit target, especially on mobile/narrow screens.
@@ -60,6 +174,16 @@
 - Added pointer-up handling to make touch activation more reliable on mobile browsers/WebViews.
 
 # Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
 
 ## r054 – Sidebar Dirty Guard
 
@@ -102,6 +226,16 @@
 
 # Changelog
 
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
 ## r045 - Backend Update API Foundation
 
 - Added Reminder Manager WebSocket command `tuev_reminder/manager/vehicles/update`.
@@ -113,6 +247,16 @@
 - Card/Reminder separation remains unchanged.
 
 # Changelog
+
+## r059 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r059`.
+- Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
+- Added local interval validation to match the backend Manager API.
+- Aligned local HU year validation with backend range `1900–2100`.
+- Added numeric constraints to HU year and Erinnerung offset fields.
+- Added one-digit constraint to Wechselkennzeichen vehicle digit input.
+- Preserved Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
 
 ## r043 - Sidebar Modal Actions Bottom
 

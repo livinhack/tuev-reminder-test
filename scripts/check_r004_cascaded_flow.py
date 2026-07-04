@@ -76,7 +76,7 @@ for text, label in [(strings, "strings"), (translations_de, "German translations
     ]:
         assert_contains(text, key, label)
 
-assert_contains(manifest, '"version": "0.1.0-r055"', "manifest version")
+assert_contains(manifest, '"version": "0.1.0-r059"', "manifest version")
 assert_contains(readme, "Reminder r009", "README r012 documentation")
 assert_contains(handover, "Reminder r009", "handover r012 documentation")
 assert_contains(readme, "Leerzeichen", "README spacing decision")

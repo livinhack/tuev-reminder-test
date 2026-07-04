@@ -1,3 +1,51 @@
+# TÜV Reminder – r059
+
+Current working build: **Reminder r059**. r059 tightens the Sidebar create/edit form so local validation and input controls match the backend Manager API rules more closely.
+
+The confirmed create/update/delete flows, duplicate guard, dirty guard, mobile action sheet, HA integration brand icon path, and backend validation runtime fix remain unchanged. The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r059 highlights
+
+- Intervall is now a select with `1 Jahr` / `2 Jahre`, matching the backend rule.
+- Local form validation now blocks invalid inspection intervals before the WebSocket call.
+- HU year validation is aligned to the backend range `1900–2100`.
+- HU year and Erinnerung offset have numeric min/max/step input attributes.
+- Wechselkennzeichen vehicle digit input is constrained to one digit.
+- r041 create, r045 update, r047 delete, r055 mobile action sheet, r058 list state preservation and brand assets remain intact.
+- Reminder and Card stay separate repositories/projects.
+
+## r058 highlights
+
+- Search field keeps focus while typing.
+- Caret position is restored where the browser supports it.
+- List/table scroll state is preserved around list re-renders.
+- Existing row-action identity hardening via `entry_id` remains in place.
+
+---
+
+# TÜV Reminder – r057
+
+Current working build: **Reminder r057**. r057 fixes the Sidebar Manager backend validation runtime path for create/update commands. It keeps the confirmed smartphone three-dot action sheet, responsive table, CRUD flows, dirty guard, duplicate protection intent, and Home Assistant integration brand icon path unchanged.
+
+## r057 highlights
+
+- `vehicles/create` and `vehicles/update` no longer call `.extend(...)` on backend validation dictionaries.
+- Field validation errors and duplicate errors are handled separately.
+- Sidebar modal receives cleaner German validation messages from the backend.
+- The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+---
+
+# TÜV Reminder – r056
+
+Current working build: **Reminder r056**. r056 keeps the confirmed r055 mobile action-sheet fix and Home Assistant brand-icon path, then hardens row actions in the Sidebar table.
+
+The desktop inline three-dot menu now tracks the selected vehicle by stable `entry_id`, and row action buttons carry `data-action-entry-id`. This avoids accidental action/index drift when the list is sorted, filtered, or re-rendered. Search, status filter and header sorting close an open inline menu instead of leaving a stale action menu on screen.
+
+The Reminder integration and the Lovelace/Dashboard Card remain separate projects. The Sidebar only manages Reminder ConfigEntries/Entities; it does not import Card files, duplicate Card actions, or manage Dashboard cards.
+
+---
+
 # TÜV Reminder – r055
 
 Current working build: **Reminder r055**. r055 fixes the remaining smartphone row-action issue where tapping the three dots could show the centered action overlay only for a moment before it closed again.

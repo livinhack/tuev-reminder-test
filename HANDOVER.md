@@ -1,3 +1,174 @@
+# Handover – Reminder r059 Sidebar Form Validation Parity
+
+## Base
+
+Built on r058 (`tuev-reminder-r058-sidebar-list-state-preservation.zip`).
+
+## Why this step
+
+After Create/Update/Delete, mobile action handling and list state preservation were stabilized, the next useful hardening point is the Sidebar form itself. The backend Manager API is the source of truth, but the frontend still allowed some avoidably invalid values to be submitted.
+
+## Implemented
+
+- Changed `Intervall` from free input to a select with `1 Jahr` and `2 Jahre`.
+- Added local interval validation: only 1 or 2 years are accepted.
+- Aligned local HU year validation to backend range `1900–2100`.
+- Added numeric min/max/step constraints to HU year and Erinnerungs-Vorlauf fields.
+- Renamed the form label from `Reminder-Vorlauf Tage` to `Erinnerungs-Vorlauf Tage`.
+- Added one-digit input constraints for Wechselkennzeichen vehicle digit.
+- Added `scripts/check_r059_sidebar_form_validation_parity.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Create and edit a normal vehicle with interval 1 and 2 years.
+2. The interval field should no longer accept arbitrary values like 3.
+3. Invalid HU year / Erinnerungs-Vorlauf should be blocked locally.
+4. Wechselkennzeichen digit should remain a single digit.
+5. Create/Update/Delete and smartphone action sheet should still work.
+
+---
+
+# Handover – Reminder r058 Sidebar List State Preservation
+
+## Base
+
+Built on r057 (`tuev-reminder-r057-manager-validation-runtime-fix.zip`).
+
+## Why this step
+
+After the mobile action sheet, CRUD, duplicate guard, and backend validation fixes, the next stability issue is list re-render behavior. Filter/status/sort/menu interactions rebuild the panel and can reset focus, caret position, or table scroll. That is especially annoying when typing into search or when a table has any scroll state.
+
+## Implemented
+
+- Added `_captureListUiState()`.
+- Added `_restoreListUiState(state)`.
+- Added `_renderPreservingListUiState()`.
+- Search input, status filter, sortable headers, row menu open/close, and action-sheet close now use the preserving render path where applicable.
+- Added selector escaping fallback so restore does not depend exclusively on `CSS.escape`.
+- Added `scripts/check_r058_sidebar_list_state_preservation.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 validation runtime fix.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Type several characters in the search field; focus/caret should stay in the search field.
+2. Sort via headers after scrolling table horizontally on desktop; scroll should not jump unexpectedly.
+3. Open/close desktop row menu; list scroll should remain stable.
+4. Smartphone action sheet should still stay visible and operate normally.
+
+---
+
+# Handover – Reminder r057 Manager Validation Runtime Fix
+
+## Base
+
+Built on r056 (`tuev-reminder-r056-sidebar-row-action-identity.zip`).
+
+## Why this step
+
+While reviewing the current CRUD path, a backend runtime bug was found: `validate_and_normalize_vehicle_payload(...)` returns a dictionary of field errors, but the create/update WebSocket commands tried to call `.extend(...)` on that dictionary when adding duplicate guard errors. That can break create/update error handling instead of returning a clean validation message.
+
+## Implemented
+
+- `vehicles/create` now uses separate `field_errors` and `duplicate_errors`.
+- `vehicles/update` now uses separate `field_errors` and `duplicate_errors`.
+- Invalid `errors.extend(...)` calls on dictionaries removed.
+- Added `_validation_error_message(...)` in `manager_api.py`.
+- Added German user-facing messages for common backend validation codes.
+- Added `scripts/check_r057_manager_validation_runtime_fix.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard semantics.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Create valid vehicle: still succeeds.
+2. Duplicate vehicle name: friendly error shown in modal.
+3. Duplicate plate: friendly error shown in modal.
+4. Edit own unchanged name/plate: not blocked.
+5. Edit to another vehicle's name/plate: blocked.
+
+---
+
+# Handover – Reminder r056 Sidebar Row Action Identity Hardening
+
+## Base
+
+Built on r055 (`tuev-reminder-r055-mobile-action-sheet-tap-race-fix.zip`).
+
+## Why this step
+
+r055 is confirmed in HA for the smartphone three-dot action sheet and HA Integration icon display. r056 does not change those paths. It hardens the desktop/table row action identity before more UI work: inline row actions should operate on the selected ConfigEntry even if the visible list is sorted/filtered/re-rendered.
+
+## Implemented
+
+- Added `_openMenuEntryId` state for desktop inline row menus.
+- Added `_vehicleByEntryId(entryId)` helper.
+- Desktop inline menus now open/close by stable `entry_id` instead of row index.
+- Row action buttons include `data-action-entry-id`.
+- Action handlers resolve the target vehicle by `entry_id` first and only then fall back to visible-row index for compatibility.
+- Search, status filter and sort now close any open inline row menu.
+- Existing `this._openMenuIndex`/`data-menu-index` compatibility markers remain for older local checks, but row-action identity no longer depends on them.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Desktop: open three-dot menu, sort by a header, menu should close.
+2. Desktop: open three-dot menu, change search/filter, menu should close.
+3. Desktop: open three-dot menu, click Bearbeiten/Löschen, the correct vehicle should be targeted.
+4. Smartphone: three-dot action sheet still stays visible and opens Bearbeiten/Löschen correctly.
+5. Create/update/delete flows still work.
+
+---
+
 # Handover – Reminder r055 Mobile Action Sheet Tap Race Fix
 
 ## Base
