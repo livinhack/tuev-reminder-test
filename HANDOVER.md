@@ -1,3 +1,46 @@
+# Handover – Reminder r055 Mobile Action Sheet Tap Race Fix
+
+## Base
+
+Built on r054 (`tuev-reminder-r054-brand-assets-path-proxy.zip`).
+
+## Problem
+
+On smartphone, tapping the row three-dot button could make the centered **Bearbeiten / Löschen / Schließen** action sheet flash briefly and disappear immediately.
+
+Likely cause: the previous mobile handling opened the sheet on `pointerup`; the synthetic follow-up `click`/outside event could then hit the newly rendered backdrop and close it in the same tap sequence.
+
+## Implemented
+
+- Removed the mobile `pointerup` open path for row action buttons.
+- Row actions now open through a single click/keyboard path.
+- Added `_actionSheetOpenedAt` / `_actionSheetCloseGuardUntil` state.
+- Added a guarded `_closeActionSheet({ force = false })` helper.
+- Backdrop `pointerup`/`click` events during the short opening guard are ignored.
+- Explicit close actions force-close the sheet.
+- Action-sheet z-index raised to stay above HA panel/table layers.
+- Desktop outside-click close from r053 is preserved.
+
+## HA test focus
+
+1. Smartphone portrait: tap three dots; action sheet stays visible.
+2. Smartphone landscape: tap three dots; action sheet stays visible and table does not snap horizontally.
+3. Tap `Bearbeiten`; edit modal opens.
+4. Tap `Löschen`; delete confirmation opens.
+5. Tap `Schließen`; action sheet closes.
+6. Desktop: inline three-dot menu opens and closes when clicking elsewhere.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- No Card files or Card actions imported into Reminder.
+
 # Handover – Reminder r054 Brand Assets Path / Proxy Readiness
 
 ## Base

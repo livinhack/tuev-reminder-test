@@ -15,17 +15,17 @@ def require(text: str, needle: str, label: str) -> None:
         fail(f"missing {label}: {needle!r}")
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r054":
-    fail("manifest version must be 0.1.0-r054")
-if VERSION.read_text(encoding="utf-8").strip() != "r054":
+if manifest.get("version") != "0.1.0-r055":
+    fail("manifest version must be 0.1.0-r055")
+if VERSION.read_text(encoding="utf-8").strip() != "r055":
     fail("REMINDER_VERSION.txt must be r053")
 
 panel = PANEL.read_text(encoding="utf-8")
 require(panel, 'window.matchMedia?.("(max-width: 1100px)")', "mobile action mode aligned with compact CSS breakpoint")
 require(panel, "@media (max-width: 1100px)", "compact CSS breakpoint for phone landscape")
-require(panel, "z-index: 10050;", "high action-sheet z-index")
+require(panel, "z-index: 2147483000;", "very high action-sheet z-index")
 require(panel, 'tabindex="-1"', "focusable action sheet backdrop")
-require(panel, "actionSheetBackdrop.focus({ preventScroll: true });", "action sheet focus on open")
+require(panel, "window.setTimeout(() => actionSheetBackdrop.focus({ preventScroll: true }), 0);", "deferred action sheet focus on open")
 require(panel, 'const page = this.shadowRoot.querySelector(".page");', "outside-click listener root")
 require(panel, 'if (!insideMenuCell) this._closeRowMenu();', "desktop outside click closes row menu")
 require(panel, "tbody tr { cursor: default; }", "rows remain non-clickable")

@@ -3,8 +3,8 @@ ROOT = Path(__file__).resolve().parents[1]
 js = (ROOT / "custom_components/tuev_reminder/frontend/tuev-reminder-panel.js").read_text(encoding="utf-8")
 manifest = (ROOT / "custom_components/tuev_reminder/manifest.json").read_text(encoding="utf-8")
 version = (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip()
-assert '"version": "0.1.0-r054"' in manifest
-assert version == "r054"
+assert '"version": "0.1.0-r055"' in manifest
+assert version == "r055"
 for needle in [
     'type="button" class="row-menu"',
     'min-width: 46px;',
@@ -12,7 +12,7 @@ for needle in [
     'touch-action: manipulation;',
     '.menu-cell {',
     'overflow: visible;',
-    'button.addEventListener("pointerup"',
+    'button.addEventListener("click", openMenu);',
     'event.preventDefault();',
     'row-action-menu button',
     'min-height: 44px;',

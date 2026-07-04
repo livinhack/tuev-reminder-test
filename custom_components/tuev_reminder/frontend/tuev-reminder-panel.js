@@ -27,6 +27,8 @@ class TuevReminderPanel extends HTMLElement {
     this._openMenuIndex = null;
     this._formSnapshot = null;
     this._actionSheetVehicle = null;
+    this._actionSheetOpenedAt = 0;
+    this._actionSheetCloseGuardUntil = 0;
   }
 
   set hass(hass) {
@@ -307,6 +309,8 @@ class TuevReminderPanel extends HTMLElement {
     if (this._mobileActionMode()) {
       this._openMenuIndex = null;
       this._actionSheetVehicle = vehicle;
+      this._actionSheetOpenedAt = Date.now();
+      this._actionSheetCloseGuardUntil = this._actionSheetOpenedAt + 650;
     } else {
       this._actionSheetVehicle = null;
       this._openMenuIndex = this._openMenuIndex === index ? null : index;
@@ -321,9 +325,14 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
-  _closeActionSheet() {
+  _closeActionSheet({ force = false } = {}) {
+    if (!force && Date.now() < this._actionSheetCloseGuardUntil) {
+      return;
+    }
     if (this._actionSheetVehicle) {
       this._actionSheetVehicle = null;
+      this._actionSheetOpenedAt = 0;
+      this._actionSheetCloseGuardUntil = 0;
       this._render();
     }
   }
@@ -331,6 +340,8 @@ class TuevReminderPanel extends HTMLElement {
   _handleRowAction(action, vehicle) {
     this._openMenuIndex = null;
     this._actionSheetVehicle = null;
+    this._actionSheetOpenedAt = 0;
+    this._actionSheetCloseGuardUntil = 0;
     if (action === "edit") {
       this._openDetailForm(vehicle);
       return;
@@ -762,7 +773,7 @@ class TuevReminderPanel extends HTMLElement {
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
     const plate = vehicle.plate_display || vehicle.plate || "—";
     return `
-      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true" tabindex="-1">
+      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true" tabindex="-1" data-action-sheet-backdrop="true">
         <div class="action-sheet">
           <div class="action-sheet-head">
             <strong>${this._escape(name)}</strong>
@@ -1090,13 +1101,16 @@ class TuevReminderPanel extends HTMLElement {
         .action-sheet-backdrop {
           position: fixed;
           inset: 0;
-          z-index: 10050;
+          z-index: 2147483000;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 24px;
           box-sizing: border-box;
-          background: rgba(0,0,0,.45);
+          background: rgba(0,0,0,.55);
+          pointer-events: auto;
+          touch-action: none;
+          overscroll-behavior: contain;
         }
         .action-sheet {
           width: min(360px, 100%);
@@ -1105,6 +1119,8 @@ class TuevReminderPanel extends HTMLElement {
           background: var(--card-background-color);
           box-shadow: 0 16px 48px rgba(0,0,0,.34);
           overflow: hidden;
+          pointer-events: auto;
+          transform: translateZ(0);
         }
         .action-sheet-head {
           display: grid;
@@ -1467,24 +1483,16 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     this.shadowRoot.querySelectorAll("button[data-menu-index]").forEach((button) => {
-      let handledPointer = false;
       const openMenu = (event) => {
         event.preventDefault();
         event.stopPropagation();
         this._openRowMenu(Number(button.dataset.menuIndex));
       };
-      button.addEventListener("pointerup", (event) => {
-        handledPointer = true;
-        openMenu(event);
-        window.setTimeout(() => { handledPointer = false; }, 350);
-      });
-      button.addEventListener("click", (event) => {
-        if (handledPointer) {
-          event.preventDefault();
-          event.stopPropagation();
-          return;
+      button.addEventListener("click", openMenu);
+      button.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          openMenu(event);
         }
-        openMenu(event);
       });
     });
 
@@ -1512,7 +1520,7 @@ class TuevReminderPanel extends HTMLElement {
     if (cancelDeleteButton) cancelDeleteButton.addEventListener("click", () => this._closeForm());
 
     const cancelActionSheetButton = this.shadowRoot.querySelector("#cancel-action-sheet");
-    if (cancelActionSheetButton) cancelActionSheetButton.addEventListener("click", () => this._closeActionSheet());
+    if (cancelActionSheetButton) cancelActionSheetButton.addEventListener("click", () => this._closeActionSheet({ force: true }));
 
     this.shadowRoot.querySelectorAll("button[data-action-sheet-action]").forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -1547,12 +1555,19 @@ class TuevReminderPanel extends HTMLElement {
 
     const actionSheetBackdrop = this.shadowRoot.querySelector(".action-sheet-backdrop");
     if (actionSheetBackdrop) {
-      actionSheetBackdrop.focus({ preventScroll: true });
-      actionSheetBackdrop.addEventListener("click", (event) => {
-        if (event.target === actionSheetBackdrop) this._closeActionSheet();
-      });
+      window.setTimeout(() => actionSheetBackdrop.focus({ preventScroll: true }), 0);
+      const maybeCloseActionSheet = (event) => {
+        if (Date.now() < this._actionSheetCloseGuardUntil) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        if (event.target === actionSheetBackdrop) this._closeActionSheet({ force: true });
+      };
+      actionSheetBackdrop.addEventListener("pointerup", maybeCloseActionSheet);
+      actionSheetBackdrop.addEventListener("click", maybeCloseActionSheet);
       actionSheetBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") this._closeActionSheet();
+        if (event.key === "Escape") this._closeActionSheet({ force: true });
       });
     }
 

@@ -16,9 +16,9 @@ def main() -> None:
     panel = PANEL.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    if manifest.get("version") != "0.1.0-r054":
-        fail("manifest version must be 0.1.0-r054")
-    if VERSION.read_text(encoding="utf-8").strip() != "r054":
+    if manifest.get("version") != "0.1.0-r055":
+        fail("manifest version must be 0.1.0-r055")
+    if VERSION.read_text(encoding="utf-8").strip() != "r055":
         fail("REMINDER_VERSION.txt must be r053")
 
     for marker in [

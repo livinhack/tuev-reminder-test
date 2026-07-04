@@ -20,8 +20,8 @@ def main() -> int:
     js = JS.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    assert VERSION.read_text(encoding="utf-8").strip() == "r054"
-    assert manifest["version"] == "0.1.0-r054"
+    assert VERSION.read_text(encoding="utf-8").strip() == "r055"
+    assert manifest["version"] == "0.1.0-r055"
 
     require(js, 'this._view = "list"')
     require(js, "_renderCreateForm()")

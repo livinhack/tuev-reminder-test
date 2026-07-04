@@ -1,5 +1,19 @@
 # Changelog
 
+## r055 – Mobile Action Sheet Tap Race Fix
+
+- Fixes the smartphone three-dot action sheet flashing briefly and closing immediately.
+- Removes the previous touch `pointerup` open path that could race with the follow-up synthetic click.
+- Opens row actions through a single click/keyboard path.
+- Adds a short close guard after opening the mobile action sheet so the opening tap cannot also close the overlay.
+- Keeps explicit close actions (`Schließen`, backdrop after guard, Escape) working.
+- Raises the mobile action sheet above Home Assistant panel/table layers.
+- Keeps desktop outside-click menu close from r053.
+- Keeps create/update/delete, duplicate guard, dirty guard, responsive table, and brand asset paths unchanged.
+- Keeps Reminder/Card separation unchanged.
+
+# Changelog
+
 ## r054 – Brand Assets Path / Proxy Readiness
 
 - Bumped Reminder version to `0.1.0-r054`.

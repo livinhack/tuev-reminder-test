@@ -1,3 +1,17 @@
+# TÜV Reminder – r055
+
+Current working build: **Reminder r055**. r055 fixes the remaining smartphone row-action issue where tapping the three dots could show the centered action overlay only for a moment before it closed again.
+
+The fix keeps the responsive Sidebar table from r050/r053, but hardens the mobile action-sheet event path:
+
+- row actions open through one stable click/keyboard path;
+- the old touch `pointerup` race path is removed;
+- the centered mobile action sheet has a short close guard after opening;
+- explicit `Bearbeiten`, `Löschen`, `Schließen`, backdrop-close after the guard, and Escape still work;
+- desktop inline three-dot menus still close on outside click.
+
+No entity schema, Manager API payloads, services, Card bridge attributes, or brand asset paths changed in r055. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+
 # TÜV Reminder – r054
 
 Current working build: **Reminder r054**. r054 fixes packaging for Home Assistant 2026.3+ local brand images and keeps all Sidebar CRUD behavior from r053 unchanged. The Lovelace/Dashboard Card remains a separate project; compatibility with **Card b355** and the existing `calendar.tuev_reminder` / `reminder_offset_days` behavior is unchanged.
