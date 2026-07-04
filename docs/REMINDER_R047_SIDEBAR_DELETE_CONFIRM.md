@@ -1,8 +1,8 @@
-# Reminder r047 – Sidebar Delete Confirm
+# Reminder r048 – Sidebar Delete Confirm
 
 ## Ziel
 
-r047 schließt die über das Drei-Punkte-Menü vorbereitete Löschstrecke funktional an.
+r048 schließt die über das Drei-Punkte-Menü vorbereitete Löschstrecke funktional an.
 Die Sidebar bleibt eine Reminder-eigene Verwaltungsseite; die Card bleibt ein getrenntes Dashboard-Projekt.
 
 ## Änderungen

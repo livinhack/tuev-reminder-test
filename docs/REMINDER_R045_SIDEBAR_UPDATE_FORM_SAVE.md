@@ -1,8 +1,8 @@
-# Reminder r047 – Sidebar Update Form Save
+# Reminder r048 – Sidebar Update Form Save
 
 ## Ziel
 
-r047 verbindet die bestehende Sidebar-Bearbeitungsansicht mit der in r044 eingeführten Backend-API `tuev_reminder/manager/vehicles/update`.
+r048 verbindet die bestehende Sidebar-Bearbeitungsansicht mit der in r044 eingeführten Backend-API `tuev_reminder/manager/vehicles/update`.
 
 ## Änderungen
 

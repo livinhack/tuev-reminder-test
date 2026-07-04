@@ -1,3 +1,20 @@
+# Handover – Reminder r048 Sidebar CRUD Hardening
+
+## Stand
+
+Current Reminder version: **r048** / manifest `0.1.0-r048`.
+
+r048 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+
+## Änderungen in r048
+
+- Duplicate-Schutz für `vehicles/create` und `vehicles/update`:
+  - gleicher Fahrzeugname wird geblockt
+  - gleiches normalisiertes/display Kennzeichen wird geblockt
+  - Update ignoriert die eigene `entry_id`
+- Erfolgsmeldungen nach Anlegen, Speichern und Löschen.
+- Reminder/Card-Trennung bleibt unverändert.
+
 # Handover – Reminder r045 Sidebar Update Form Save
 
 ## Stand
@@ -475,9 +492,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r047 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r048 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r047
+## Implemented in r048
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -494,11 +511,11 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r047
+Reminder r048
 
-# r047 Handover Addendum – Sidebar Delete Confirm
+# r048 Handover Addendum – Sidebar Delete Confirm
 
-## Implemented in r047
+## Implemented in r048
 
 - `vehicles/delete` WebSocket API added.
 - Three-dot menu → Löschen now opens a centered confirmation dialog.
@@ -512,4 +529,4 @@ Reminder r047
 - r046 row actions and sortable headers remain active.
 - No Card repository files are imported into Reminder.
 
-Reminder r047
+Reminder r048

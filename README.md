@@ -1,6 +1,17 @@
-# TÜV Reminder – r047
+# TÜV Reminder – r048
 
-Current working build: Reminder r047. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
+Current working build: **Reminder r048**. r048 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+
+## r048 Sidebar CRUD Hardening
+
+- Backend duplicate checks for vehicle name and normalized/display kennzeichen during create/update.
+- Update excludes the edited ConfigEntry from duplicate comparison.
+- Sidebar shows short success feedback after create, update and delete.
+- Three-dot-only row actions, sortable headers and delete confirmation remain intact.
+
+# TÜV Reminder – r048
+
+Current working build: Reminder r048. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
 
 # TÜV Reminder r045
 
@@ -303,9 +314,9 @@ r037 keeps the r036 modal form and focus behavior, but changes the create entry 
 
 r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
 
-## r047 – Sidebar Row Actions + Sortable Headers
+## r048 – Sidebar Row Actions + Sortable Headers
 
-r047 keeps the Sidebar create/update flow and improves table interaction:
+r048 keeps the Sidebar create/update flow and improves table interaction:
 
 - rows themselves are no longer clickable;
 - only the three-dot menu opens per-vehicle actions;
@@ -314,4 +325,4 @@ r047 keeps the Sidebar create/update flow and improves table interaction:
 - the Card remains a separate Dashboard/Lovelace project.
 
 
-Reminder r047
+Reminder r048

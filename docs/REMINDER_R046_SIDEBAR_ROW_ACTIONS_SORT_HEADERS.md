@@ -1,6 +1,6 @@
-# Reminder r047 – Sidebar Row Actions + Sortable Headers
+# Reminder r048 – Sidebar Row Actions + Sortable Headers
 
-r047 polishes the Sidebar vehicle table behavior after r045 enabled create/update from the modal.
+r048 polishes the Sidebar vehicle table behavior after r045 enabled create/update from the modal.
 
 ## Changes
 

@@ -8,9 +8,12 @@ from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
+from .const import CONF_VEHICLE_NAME
 from .manager import (
     entry_title_from_vehicle_values,
     manager_metadata,
+    merged_entry_values,
+    plate_parts_from_values,
     validate_and_normalize_vehicle_payload,
     vehicle_record_by_entry_id,
     vehicle_records,
@@ -22,6 +25,39 @@ WS_TYPE_VEHICLE_GET = "tuev_reminder/manager/vehicles/get"
 WS_TYPE_VEHICLE_CREATE = "tuev_reminder/manager/vehicles/create"
 WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"
 WS_TYPE_VEHICLE_DELETE = "tuev_reminder/manager/vehicles/delete"
+
+
+def _duplicate_vehicle_errors(
+    hass: HomeAssistant,
+    normalized: dict,
+    *,
+    current_entry_id: str | None = None,
+) -> list[str]:
+    """Return duplicate errors for manager create/update payloads.
+
+    The Sidebar Manager writes normal ConfigEntries. Duplicate checks therefore
+    happen in the backend as the source of truth, not only in the panel.
+    """
+    errors: list[str] = []
+    wanted_name = str(normalized.get(CONF_VEHICLE_NAME, "") or "").strip().casefold()
+    wanted_plate = str(
+        plate_parts_from_values(normalized).get("plate_display", "") or ""
+    ).strip().casefold()
+
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if current_entry_id and entry.entry_id == current_entry_id:
+            continue
+        values = merged_entry_values(entry)
+        existing_name = str(values.get(CONF_VEHICLE_NAME, entry.title) or "").strip().casefold()
+        existing_plate = str(
+            plate_parts_from_values(values).get("plate_display", "") or ""
+        ).strip().casefold()
+        if wanted_name and existing_name == wanted_name:
+            errors.append("Ein Fahrzeug mit diesem Namen existiert bereits.")
+        if wanted_plate and existing_plate == wanted_plate:
+            errors.append("Ein Fahrzeug mit diesem Kennzeichen existiert bereits.")
+
+    return errors
 
 
 @websocket_api.websocket_command(
@@ -72,6 +108,7 @@ async def websocket_manager_vehicle_get(hass: HomeAssistant, connection, msg) ->
 async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg) -> None:
     """Create a TÜV Reminder vehicle ConfigEntry from manager form data."""
     errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    errors.extend(_duplicate_vehicle_errors(hass, normalized))
     if errors:
         connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
         return
@@ -132,6 +169,7 @@ async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg)
         return
 
     errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
+    errors.extend(_duplicate_vehicle_errors(hass, normalized, current_entry_id=entry.entry_id))
     if errors:
         connection.send_error(msg["id"], "validation_failed", f"TÜV Reminder vehicle data is invalid: {errors}")
         return

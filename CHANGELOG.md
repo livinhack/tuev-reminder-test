@@ -1,6 +1,19 @@
 # Changelog – TÜV Reminder
 
-## r047 – Sidebar Delete Confirm
+## r048 – Sidebar CRUD Hardening
+
+- Adds backend duplicate protection for Sidebar create/update.
+  - Blocks duplicate vehicle names.
+  - Blocks duplicate normalized/display kennzeichen values.
+  - Excludes the currently edited ConfigEntry during update checks.
+- Adds Sidebar success feedback after create, update and delete.
+- Keeps the r047 delete confirmation flow intact.
+- Keeps sortable table headers and three-dot-only row actions intact.
+- Keeps Reminder/Card separation unchanged.
+
+# Changelog – TÜV Reminder
+
+## r048 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -244,7 +257,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r047 – Sidebar Row Actions + Sortable Headers
+## Reminder r048 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.

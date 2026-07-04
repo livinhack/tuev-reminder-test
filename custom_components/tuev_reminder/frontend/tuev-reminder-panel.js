@@ -22,6 +22,8 @@ class TuevReminderPanel extends HTMLElement {
     this._deleting = false;
     this._formError = null;
     this._formInfo = null;
+    this._flashMessage = null;
+    this._flashTimer = null;
     this._openMenuIndex = null;
   }
 
@@ -390,6 +392,16 @@ class TuevReminderPanel extends HTMLElement {
     return payload;
   }
 
+  _setFlash(message, tone = "success") {
+    this._flashMessage = { message, tone };
+    if (this._flashTimer) window.clearTimeout(this._flashTimer);
+    this._flashTimer = window.setTimeout(() => {
+      this._flashMessage = null;
+      this._flashTimer = null;
+      this._render();
+    }, 4500);
+  }
+
   _applySaveResult(result) {
     if (Array.isArray(result?.vehicles)) {
       this._vehicles = result.vehicles;
@@ -431,6 +443,7 @@ class TuevReminderPanel extends HTMLElement {
       });
       this._applySaveResult(result);
       if (!this._loaded) await this._refresh();
+      this._setFlash("Fahrzeug wurde angelegt.");
       this._finishSuccessfulSave();
     } catch (err) {
       this._formError = err?.message || String(err);
@@ -457,6 +470,7 @@ class TuevReminderPanel extends HTMLElement {
       });
       this._applySaveResult(result);
       if (!this._loaded) await this._refresh();
+      this._setFlash("Fahrzeug wurde gelöscht.");
       this._finishSuccessfulSave();
     } catch (err) {
       this._formError = err?.message || String(err);
@@ -491,6 +505,7 @@ class TuevReminderPanel extends HTMLElement {
       });
       this._applySaveResult(result);
       if (!this._loaded) await this._refresh();
+      this._setFlash("Änderungen wurden gespeichert.");
       this._finishSuccessfulSave();
     } catch (err) {
       this._formError = err?.message || String(err);
@@ -1177,8 +1192,10 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Formular speichert Entitäten · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
+
+        ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
           <button class="action icon-action" data-create-trigger="top" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>

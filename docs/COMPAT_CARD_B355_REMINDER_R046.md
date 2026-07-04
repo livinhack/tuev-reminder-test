@@ -1,6 +1,6 @@
-# Compatibility – Card b355+ with Reminder r047
+# Compatibility – Card b355+ with Reminder r048
 
-Reminder r047 remains compatible with the existing Card bridge attributes.
+Reminder r048 remains compatible with the existing Card bridge attributes.
 
 The Sidebar changes are limited to Reminder-owned manager UI behavior:
 
