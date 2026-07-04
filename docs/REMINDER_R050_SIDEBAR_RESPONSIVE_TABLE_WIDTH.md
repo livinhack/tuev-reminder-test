@@ -1,6 +1,6 @@
-# Reminder r050 – Sidebar Responsive Table Width
+# Reminder r051 – Sidebar Responsive Table Width
 
-r050 fixes the Sidebar vehicle list on narrow/mobile screens.
+r051 fixes the Sidebar vehicle list on narrow/mobile screens.
 
 ## Changes
 

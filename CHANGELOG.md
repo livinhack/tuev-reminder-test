@@ -1,6 +1,16 @@
 # Changelog
 
-## r050 – Sidebar Dirty Guard
+## r051 – Sidebar Mobile Action Hit Target Fix
+
+- Enlarged the three-dot row action hit target, especially on mobile/narrow screens.
+- Kept full rows non-clickable; only the three-dot control opens actions.
+- Widened the mobile menu column enough for reliable finger taps.
+- Kept action menu overflow visible and increased mobile menu item height.
+- Added pointer-up handling to make touch activation more reliable on mobile browsers/WebViews.
+
+# Changelog
+
+## r051 – Sidebar Dirty Guard
 
 - Create/edit modal now stores a normalized snapshot when opened.
 - Closing a changed create/edit modal asks before discarding unsaved changes.
@@ -11,7 +21,7 @@
 
 # Changelog – TÜV Reminder
 
-## r050 – Sidebar CRUD Hardening
+## r051 – Sidebar CRUD Hardening
 
 - Adds backend duplicate protection for Sidebar create/update.
   - Blocks duplicate vehicle names.
@@ -24,7 +34,7 @@
 
 # Changelog – TÜV Reminder
 
-## r050 – Sidebar Delete Confirm
+## r051 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -268,7 +278,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r050 – Sidebar Row Actions + Sortable Headers
+## Reminder r051 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.
@@ -277,7 +287,7 @@
 - Preserved create/update API behavior from r041/r045.
 - Preserved Reminder/Card repository separation.
 
-## r050 – Sidebar Responsive Table Width
+## r051 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

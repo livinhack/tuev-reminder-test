@@ -21,8 +21,8 @@ runner = read("scripts/run_all_checks.py")
 doc = read("docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md")
 compat_doc = read("docs/COMPAT_CARD_B355_REMINDER_R024.md")
 
-assert version == "r050"
-assert manifest["version"] == "0.1.0-r050"
+assert version == "r051"
+assert manifest["version"] == "0.1.0-r051"
 assert_contains(runner, "py_compile.compile", "Python syntax check")
 assert_contains(runner, "remove_generated_artifacts()", "cache cleanup")
 assert_contains(runner, "check_json()", "JSON validation")

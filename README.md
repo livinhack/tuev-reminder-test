@@ -1,8 +1,20 @@
-# TÜV Reminder – r050
+# TÜV Reminder – r051
 
-Current working build: **Reminder r050**. r050 hardens the Sidebar create/edit modal with a dirty-state guard and disables no-op edit saves. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r051**. r051 keeps the responsive Sidebar table from r050 and improves the mobile touch target for the per-row three-dot action menu. Full rows remain non-clickable; only the three-dot control opens row actions. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
 
-## r050 Sidebar Dirty Guard
+## r051 Sidebar Mobile Action Hit Target Fix
+
+- Larger three-dot touch target on narrow screens.
+- Menu column widened enough for reliable finger taps.
+- Action menu overflow kept visible.
+- Mobile menu items receive touch-friendly height.
+- Create/update/delete flows from earlier Sidebar builds remain unchanged.
+
+# TÜV Reminder – r051
+
+Current working build: **Reminder r051**. r051 hardens the Sidebar create/edit modal with a dirty-state guard and disables no-op edit saves. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+
+## r051 Sidebar Dirty Guard
 
 - Warns before closing a changed create/edit modal.
 - Keeps edit-mode save disabled until fields actually changed.
@@ -10,20 +22,20 @@ Current working build: **Reminder r050**. r050 hardens the Sidebar create/edit m
 - Preserves create/update/delete and duplicate protection from r048.
 - Keeps Reminder and Card repositories separated.
 
-# TÜV Reminder – r050
+# TÜV Reminder – r051
 
-Current working build: **Reminder r050**. r050 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r051**. r051 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
 
-## r050 Sidebar CRUD Hardening
+## r051 Sidebar CRUD Hardening
 
 - Backend duplicate checks for vehicle name and normalized/display kennzeichen during create/update.
 - Update excludes the edited ConfigEntry from duplicate comparison.
 - Sidebar shows short success feedback after create, update and delete.
 - Three-dot-only row actions, sortable headers and delete confirmation remain intact.
 
-# TÜV Reminder – r050
+# TÜV Reminder – r051
 
-Current working build: Reminder r050. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
+Current working build: Reminder r051. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
 
 # TÜV Reminder r045
 
@@ -326,9 +338,9 @@ r037 keeps the r036 modal form and focus behavior, but changes the create entry 
 
 r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
 
-## r050 – Sidebar Row Actions + Sortable Headers
+## r051 – Sidebar Row Actions + Sortable Headers
 
-r050 keeps the Sidebar create/update flow and improves table interaction:
+r051 keeps the Sidebar create/update flow and improves table interaction:
 
 - rows themselves are no longer clickable;
 - only the three-dot menu opens per-vehicle actions;
@@ -337,9 +349,9 @@ r050 keeps the Sidebar create/update flow and improves table interaction:
 - the Card remains a separate Dashboard/Lovelace project.
 
 
-Reminder r050
+Reminder r051
 
-## r050 – Sidebar Responsive Table Width
+## r051 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

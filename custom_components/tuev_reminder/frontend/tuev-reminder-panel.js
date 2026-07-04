@@ -675,7 +675,7 @@ class TuevReminderPanel extends HTMLElement {
                 <td class="status-cell"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
                 <td class="menu-cell">
-                  <button class="row-menu" data-menu-index="${index}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuIndex === index ? "true" : "false"}">⋮</button>
+                  <button type="button" class="row-menu" data-menu-index="${index}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuIndex === index ? "true" : "false"}"><span aria-hidden="true">⋮</span></button>
                   ${this._openMenuIndex === index ? `
                     <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
                       <button type="button" data-row-action="edit" data-action-index="${index}" role="menuitem">Bearbeiten</button>
@@ -1014,8 +1014,8 @@ class TuevReminderPanel extends HTMLElement {
         tbody tr:hover { background: var(--secondary-background-color); }
         .col-name { width: 38%; }
         .col-preview { width: 240px; text-align: right; }
-        .col-menu { width: 40px; }
-        .menu-cell { position: relative; text-align: right; }
+        .col-menu { width: 48px; }
+        .menu-cell { position: relative; text-align: right; overflow: visible; }
         .row-action-menu {
           position: absolute;
           right: 10px;
@@ -1128,15 +1128,34 @@ class TuevReminderPanel extends HTMLElement {
           transform: rotate(180deg);
         }
         .row-menu {
-          width: 32px;
-          height: 32px;
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+          min-height: 40px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           border: 0;
           border-radius: 50%;
           background: transparent;
           color: var(--secondary-text-color);
-          font-size: 22px;
+          font-size: 24px;
           line-height: 1;
           cursor: pointer;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+          position: relative;
+          z-index: 4;
+        }
+        .row-menu:hover,
+        .row-menu:focus-visible {
+          background: var(--secondary-background-color);
+          color: var(--primary-text-color);
+          outline: none;
+        }
+        .row-menu span {
+          pointer-events: none;
+          transform: translateY(-1px);
         }
         .state { padding: 24px 16px; }
         .error { color: var(--error-color); }
@@ -1213,11 +1232,15 @@ class TuevReminderPanel extends HTMLElement {
             padding: 8px 6px;
             overflow: hidden;
           }
+          .menu-cell {
+            padding: 2px 2px 2px 4px;
+            overflow: visible;
+          }
           .col-name { width: auto; }
           .col-hu { width: 62px; }
           .col-reminder { width: 92px; }
-          .col-status { width: 74px; }
-          .col-menu { width: 34px; }
+          .col-status { width: 70px; }
+          .col-menu { width: 52px; }
           .col-preview, .preview-cell { display: none; }
           .sort-header { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .vehicle-title, .main-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1230,14 +1253,28 @@ class TuevReminderPanel extends HTMLElement {
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-          .row-menu { width: 30px; height: 30px; }
-          .row-action-menu { right: 0; top: 34px; }
+          .row-menu {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            min-height: 46px;
+            font-size: 26px;
+          }
+          .row-action-menu {
+            right: 2px;
+            top: 48px;
+            min-width: 168px;
+          }
+          .row-action-menu button {
+            min-height: 44px;
+            font-size: 15px;
+          }
         }
         @media (max-width: 460px) {
           .col-reminder, .reminder-cell { display: none; }
-          .col-hu { width: 58px; }
-          .col-status { width: 72px; }
-          .col-menu { width: 32px; }
+          .col-hu { width: 56px; }
+          .col-status { width: 66px; }
+          .col-menu { width: 50px; }
           h1 { font-size: 18px; }
           .version { display: none; }
         }
@@ -1330,9 +1367,24 @@ class TuevReminderPanel extends HTMLElement {
     });
 
     this.shadowRoot.querySelectorAll("button[data-menu-index]").forEach((button) => {
-      button.addEventListener("click", (event) => {
+      let handledPointer = false;
+      const openMenu = (event) => {
+        event.preventDefault();
         event.stopPropagation();
         this._openRowMenu(Number(button.dataset.menuIndex));
+      };
+      button.addEventListener("pointerup", (event) => {
+        handledPointer = true;
+        openMenu(event);
+        window.setTimeout(() => { handledPointer = false; }, 350);
+      });
+      button.addEventListener("click", (event) => {
+        if (handledPointer) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        openMenu(event);
       });
     });
 

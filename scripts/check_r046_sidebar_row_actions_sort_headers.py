@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r050 Sidebar row actions and sortable table headers."""
+"""Validate r051 Sidebar row actions and sortable table headers."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r050 sidebar row action/sort header check failed: {message}")
+    raise SystemExit(f"r051 sidebar row action/sort header check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r050":
-        fail("manifest version must be 0.1.0-r050")
-    if read("REMINDER_VERSION.txt").strip() != "r050":
-        fail("REMINDER_VERSION.txt must be r050")
+    if manifest.get("version") != "0.1.0-r051":
+        fail("manifest version must be 0.1.0-r051")
+    if read("REMINDER_VERSION.txt").strip() != "r051":
+        fail("REMINDER_VERSION.txt must be r051")
 
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 
@@ -61,11 +61,11 @@ def main() -> None:
 
     docs = read("docs/REMINDER_R046_SIDEBAR_ROW_ACTIONS_SORT_HEADERS.md")
     if "Nur die Drei-Punkte-Schaltfläche" not in docs:
-        fail("r050 docs must describe row click removal")
+        fail("r051 docs must describe row click removal")
     if "Spaltenüberschriften" not in docs:
-        fail("r050 docs must describe sortable headers")
+        fail("r051 docs must describe sortable headers")
 
-    print("r050 sidebar row action/sort header check OK")
+    print("r051 sidebar row action/sort header check OK")
 
 
 if __name__ == "__main__":

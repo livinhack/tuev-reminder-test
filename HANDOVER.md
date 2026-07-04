@@ -1,12 +1,37 @@
-# Handover – Reminder r050 Sidebar Dirty Guard
+# Handover – Reminder r051 Sidebar Mobile Action Hit Target Fix
+
+## Status
+
+Built on r050. r051 addresses mobile usability where the responsive table fit the viewport but the three-dot row action button was not reliably tappable with a finger.
+
+## Implemented
+
+- Enlarged row action button hit target.
+- Adjusted mobile menu column width.
+- Kept row itself non-clickable.
+- Kept overflow visible for the menu cell/action menu.
+- Added pointer-up handling for mobile/WebView touch activation.
+
+## Still separate from Card
+
+No Card code, renderer import, Lovelace management, or HU/action duplication was added.
+
+## Test focus
+
+- Smartphone: three-dot action opens reliably with finger tap.
+- Smartphone: no horizontal table dragging required.
+- Desktop: sortable headers and action menu still work.
+- Create/update/delete still work.
+
+# Handover – Reminder r051 Sidebar Dirty Guard
 
 ## Stand
 
-Current Reminder version: **r050** / manifest `0.1.0-r050`.
+Current Reminder version: **r051** / manifest `0.1.0-r051`.
 
-r050 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
+r051 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
 
-## Änderungen in r050
+## Änderungen in r051
 
 - Create/Edit-Modal merkt sich beim Öffnen einen normalisierten Formular-Snapshot.
 - Schließen per Button, Overlay oder Escape fragt bei ungespeicherten Änderungen nach.
@@ -33,15 +58,15 @@ r050 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches 
 - keine Lovelace-/Dashboard-Verwaltung
 - keine `HU bestanden`-/`set_due_date`-Dopplung
 
-# Handover – Reminder r050 Sidebar CRUD Hardening
+# Handover – Reminder r051 Sidebar CRUD Hardening
 
 ## Stand
 
-Current Reminder version: **r050** / manifest `0.1.0-r050`.
+Current Reminder version: **r051** / manifest `0.1.0-r051`.
 
-r050 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+r051 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
 
-## Änderungen in r050
+## Änderungen in r051
 
 - Duplicate-Schutz für `vehicles/create` und `vehicles/update`:
   - gleicher Fahrzeugname wird geblockt
@@ -527,9 +552,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r050 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r051 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r050
+## Implemented in r051
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -546,11 +571,11 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r050
+Reminder r051
 
-# r050 Handover Addendum – Sidebar Delete Confirm
+# r051 Handover Addendum – Sidebar Delete Confirm
 
-## Implemented in r050
+## Implemented in r051
 
 - `vehicles/delete` WebSocket API added.
 - Three-dot menu → Löschen now opens a centered confirmation dialog.
@@ -564,9 +589,9 @@ Reminder r050
 - r046 row actions and sortable headers remain active.
 - No Card repository files are imported into Reminder.
 
-Reminder r050
+Reminder r051
 
-## r050 – Sidebar Responsive Table Width
+## r051 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.
