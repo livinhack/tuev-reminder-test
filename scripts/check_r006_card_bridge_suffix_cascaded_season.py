@@ -6,7 +6,7 @@ sensor = (ROOT / "custom_components/tuev_reminder/sensor.py").read_text(encoding
 helpers = (ROOT / "custom_components/tuev_reminder/helpers.py").read_text(encoding="utf-8")
 manifest = (ROOT / "custom_components/tuev_reminder/manifest.json").read_text(encoding="utf-8")
 
-assert '"version": "0.1.0-r051"' in manifest
+assert '"version": "0.1.0-r052"' in manifest
 assert '"plate": self.plate_display' in sensor
 assert '"plate_base": self.plate' in sensor
 assert '"plate_display": self.plate_display' in sensor

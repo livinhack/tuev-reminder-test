@@ -1,8 +1,26 @@
-# TÜV Reminder – r051
+# TÜV Reminder – r052
 
-Current working build: **Reminder r051**. r051 keeps the responsive Sidebar table from r050 and improves the mobile touch target for the per-row three-dot action menu. Full rows remain non-clickable; only the three-dot control opens row actions. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r052**.
 
-## r051 Sidebar Mobile Action Hit Target Fix
+r052 fixes the remaining mobile usability issue in the Sidebar manager. On smartphone/narrow layouts, tapping the row three-dot button now opens a centered action sheet with **Bearbeiten** and **Löschen** instead of relying on an inline dropdown that can be clipped by table overflow.
+
+The Reminder integration and the Lovelace/Dashboard Card remain separate projects. The Card is not bundled, imported, or used by this Sidebar manager.
+
+## r052 highlights
+
+- Centered mobile action sheet for row actions.
+- Desktop inline three-dot dropdown preserved.
+- Compact table rules also apply in smartphone landscape.
+- Rows remain non-clickable; only three dots open row actions.
+- Existing create/update/delete flows remain intact.
+
+---
+
+# TÜV Reminder – r052
+
+Current working build: **Reminder r052**. r052 keeps the responsive Sidebar table from r050 and improves the mobile touch target for the per-row three-dot action menu. Full rows remain non-clickable; only the three-dot control opens row actions. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+
+## r052 Sidebar Mobile Action Hit Target Fix
 
 - Larger three-dot touch target on narrow screens.
 - Menu column widened enough for reliable finger taps.
@@ -10,11 +28,11 @@ Current working build: **Reminder r051**. r051 keeps the responsive Sidebar tabl
 - Mobile menu items receive touch-friendly height.
 - Create/update/delete flows from earlier Sidebar builds remain unchanged.
 
-# TÜV Reminder – r051
+# TÜV Reminder – r052
 
-Current working build: **Reminder r051**. r051 hardens the Sidebar create/edit modal with a dirty-state guard and disables no-op edit saves. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r052**. r052 hardens the Sidebar create/edit modal with a dirty-state guard and disables no-op edit saves. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
 
-## r051 Sidebar Dirty Guard
+## r052 Sidebar Dirty Guard
 
 - Warns before closing a changed create/edit modal.
 - Keeps edit-mode save disabled until fields actually changed.
@@ -22,20 +40,20 @@ Current working build: **Reminder r051**. r051 hardens the Sidebar create/edit m
 - Preserves create/update/delete and duplicate protection from r048.
 - Keeps Reminder and Card repositories separated.
 
-# TÜV Reminder – r051
+# TÜV Reminder – r052
 
-Current working build: **Reminder r051**. r051 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r052**. r052 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
 
-## r051 Sidebar CRUD Hardening
+## r052 Sidebar CRUD Hardening
 
 - Backend duplicate checks for vehicle name and normalized/display kennzeichen during create/update.
 - Update excludes the edited ConfigEntry from duplicate comparison.
 - Sidebar shows short success feedback after create, update and delete.
 - Three-dot-only row actions, sortable headers and delete confirmation remain intact.
 
-# TÜV Reminder – r051
+# TÜV Reminder – r052
 
-Current working build: Reminder r051. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
+Current working build: Reminder r052. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
 
 # TÜV Reminder r045
 
@@ -338,9 +356,9 @@ r037 keeps the r036 modal form and focus behavior, but changes the create entry 
 
 r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
 
-## r051 – Sidebar Row Actions + Sortable Headers
+## r052 – Sidebar Row Actions + Sortable Headers
 
-r051 keeps the Sidebar create/update flow and improves table interaction:
+r052 keeps the Sidebar create/update flow and improves table interaction:
 
 - rows themselves are no longer clickable;
 - only the three-dot menu opens per-vehicle actions;
@@ -349,9 +367,9 @@ r051 keeps the Sidebar create/update flow and improves table interaction:
 - the Card remains a separate Dashboard/Lovelace project.
 
 
-Reminder r051
+Reminder r052
 
-## r051 – Sidebar Responsive Table Width
+## r052 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

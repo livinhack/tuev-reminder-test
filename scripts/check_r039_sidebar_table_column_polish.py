@@ -1,4 +1,4 @@
-"""Validate r051 Sidebar table column polish."""
+"""Validate r052 Sidebar table column polish."""
 from pathlib import Path
 import json
 
@@ -9,17 +9,17 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r051 sidebar table compact polish check failed: {message}")
+    raise SystemExit(f"r052 sidebar table compact polish check failed: {message}")
 
 
 def main() -> None:
     panel = PANEL.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    if manifest.get("version") != "0.1.0-r051":
-        fail("manifest version must be 0.1.0-r051")
-    if VERSION.read_text(encoding="utf-8").strip() != "r051":
-        fail("REMINDER_VERSION.txt must be r051")
+    if manifest.get("version") != "0.1.0-r052":
+        fail("manifest version must be 0.1.0-r052")
+    if VERSION.read_text(encoding="utf-8").strip() != "r052":
+        fail("REMINDER_VERSION.txt must be r052")
 
     for marker in [
         "HU",
@@ -43,7 +43,7 @@ def main() -> None:
     if '<td><div class="tag-row">${this._vehicleMeta(vehicle)}</div></td>' in panel:
         fail("vehicle meta type cell must be removed from main table")
 
-    print("r051 sidebar table compact polish check OK")
+    print("r052 sidebar table compact polish check OK")
 
 
 if __name__ == "__main__":

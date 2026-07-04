@@ -26,6 +26,7 @@ class TuevReminderPanel extends HTMLElement {
     this._flashTimer = null;
     this._openMenuIndex = null;
     this._formSnapshot = null;
+    this._actionSheetVehicle = null;
   }
 
   set hass(hass) {
@@ -296,8 +297,20 @@ class TuevReminderPanel extends HTMLElement {
     return errors;
   }
 
+  _mobileActionMode() {
+    return this._narrow || window.matchMedia?.("(max-width: 720px)")?.matches === true;
+  }
+
   _openRowMenu(index) {
-    this._openMenuIndex = this._openMenuIndex === index ? null : index;
+    const vehicle = this._visibleVehicles()[index];
+    if (!vehicle) return;
+    if (this._mobileActionMode()) {
+      this._openMenuIndex = null;
+      this._actionSheetVehicle = vehicle;
+    } else {
+      this._actionSheetVehicle = null;
+      this._openMenuIndex = this._openMenuIndex === index ? null : index;
+    }
     this._render();
   }
 
@@ -308,8 +321,16 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
+  _closeActionSheet() {
+    if (this._actionSheetVehicle) {
+      this._actionSheetVehicle = null;
+      this._render();
+    }
+  }
+
   _handleRowAction(action, vehicle) {
     this._openMenuIndex = null;
+    this._actionSheetVehicle = null;
     if (action === "edit") {
       this._openDetailForm(vehicle);
       return;
@@ -347,6 +368,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openDeleteConfirm(vehicle) {
     this._openMenuIndex = null;
+    this._actionSheetVehicle = null;
     this._selectedVehicle = vehicle;
     this._formError = null;
     this._formInfo = null;
@@ -356,6 +378,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openCreateForm() {
     this._openMenuIndex = null;
+    this._actionSheetVehicle = null;
     this._form = this._defaultForm();
     this._selectedVehicle = null;
     this._formError = null;
@@ -367,6 +390,7 @@ class TuevReminderPanel extends HTMLElement {
 
   _openDetailForm(vehicle) {
     this._openMenuIndex = null;
+    this._actionSheetVehicle = null;
     this._selectedVehicle = vehicle;
     this._formError = null;
     this._formInfo = null;
@@ -449,6 +473,7 @@ class TuevReminderPanel extends HTMLElement {
     this._formInfo = null;
     this._formError = null;
     this._formSnapshot = null;
+    this._actionSheetVehicle = null;
   }
 
   async _saveCreateForm() {
@@ -731,6 +756,26 @@ class TuevReminderPanel extends HTMLElement {
     `;
   }
 
+
+  _renderActionSheet() {
+    const vehicle = this._actionSheetVehicle || {};
+    const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
+    const plate = vehicle.plate_display || vehicle.plate || "—";
+    return `
+      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true">
+        <div class="action-sheet">
+          <div class="action-sheet-head">
+            <strong>${this._escape(name)}</strong>
+            <span>${this._escape(plate)}</span>
+          </div>
+          <button type="button" class="sheet-action" data-action-sheet-action="edit">Bearbeiten</button>
+          <button type="button" class="sheet-action danger-text" data-action-sheet-action="delete">Löschen</button>
+          <button type="button" class="sheet-cancel" id="cancel-action-sheet">Schließen</button>
+        </div>
+      </section>
+    `;
+  }
+
   _renderCreateForm() {
     const isDetail = this._view === "detail";
     const errors = this._formValidation();
@@ -843,6 +888,7 @@ class TuevReminderPanel extends HTMLElement {
     const visibleCount = this._visibleVehicles().length;
     const listMode = true;
     const formOpen = this._view !== "list";
+    const actionSheetOpen = this._view === "list" && Boolean(this._actionSheetVehicle);
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -1041,6 +1087,51 @@ class TuevReminderPanel extends HTMLElement {
           cursor: pointer;
         }
         .row-action-menu button:hover { background: var(--secondary-background-color); }
+        .action-sheet-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 80;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          box-sizing: border-box;
+          background: rgba(0,0,0,.45);
+        }
+        .action-sheet {
+          width: min(360px, 100%);
+          border: 1px solid var(--divider-color);
+          border-radius: 16px;
+          background: var(--card-background-color);
+          box-shadow: 0 16px 48px rgba(0,0,0,.34);
+          overflow: hidden;
+        }
+        .action-sheet-head {
+          display: grid;
+          gap: 4px;
+          padding: 16px 18px 12px;
+          border-bottom: 1px solid var(--divider-color);
+        }
+        .action-sheet-head span { color: var(--secondary-text-color); font-size: 13px; }
+        .sheet-action,
+        .sheet-cancel {
+          display: block;
+          width: 100%;
+          min-height: 52px;
+          border: 0;
+          border-bottom: 1px solid var(--divider-color);
+          border-radius: 0;
+          background: transparent;
+          color: var(--primary-text-color);
+          font-size: 16px;
+          text-align: left;
+          padding: 0 18px;
+          cursor: pointer;
+        }
+        .sheet-action:hover,
+        .sheet-cancel:hover { background: var(--secondary-background-color); }
+        .sheet-cancel { text-align: center; border-bottom: 0; color: var(--secondary-text-color); }
+        .danger-text { color: var(--error-color); }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
         .mobile-plate-text { display: none; margin-top: 2px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
@@ -1218,7 +1309,7 @@ class TuevReminderPanel extends HTMLElement {
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
-        @media (max-width: 720px) {
+        @media (max-width: 900px) {
           .toolbar { padding: 8px 10px; }
           .summary-strip { padding: 8px 10px; }
           .list-add-row { padding: 8px 10px; }
@@ -1261,9 +1352,7 @@ class TuevReminderPanel extends HTMLElement {
             font-size: 26px;
           }
           .row-action-menu {
-            right: 2px;
-            top: 48px;
-            min-width: 168px;
+            display: none;
           }
           .row-action-menu button {
             min-height: 44px;
@@ -1326,6 +1415,7 @@ class TuevReminderPanel extends HTMLElement {
           <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
         ${formOpen ? (this._view === "delete" ? this._renderDeleteConfirm() : this._renderCreateForm()) : ""}
+        ${actionSheetOpen ? this._renderActionSheet() : ""}
       </main>
     `;
 
@@ -1411,6 +1501,18 @@ class TuevReminderPanel extends HTMLElement {
     const cancelDeleteButton = this.shadowRoot.querySelector("#cancel-delete");
     if (cancelDeleteButton) cancelDeleteButton.addEventListener("click", () => this._closeForm());
 
+    const cancelActionSheetButton = this.shadowRoot.querySelector("#cancel-action-sheet");
+    if (cancelActionSheetButton) cancelActionSheetButton.addEventListener("click", () => this._closeActionSheet());
+
+    this.shadowRoot.querySelectorAll("button[data-action-sheet-action]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const vehicle = this._actionSheetVehicle;
+        if (vehicle) this._handleRowAction(button.dataset.actionSheetAction, vehicle);
+      });
+    });
+
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       if (field.tagName === "SELECT") {
         field.addEventListener("change", (event) => {
@@ -1432,6 +1534,16 @@ class TuevReminderPanel extends HTMLElement {
         this._setFormValue(event.target.dataset.field, event.target.value, { render: false });
       });
     });
+
+    const actionSheetBackdrop = this.shadowRoot.querySelector(".action-sheet-backdrop");
+    if (actionSheetBackdrop) {
+      actionSheetBackdrop.addEventListener("click", (event) => {
+        if (event.target === actionSheetBackdrop) this._closeActionSheet();
+      });
+      actionSheetBackdrop.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") this._closeActionSheet();
+      });
+    }
 
     const modalBackdrop = this.shadowRoot.querySelector(".modal-backdrop");
     if (modalBackdrop) {

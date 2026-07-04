@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r051 Sidebar three-dot action menu shell."""
+"""Validate r052 Sidebar three-dot action menu shell."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r051 three-dot action menu check failed: {message}")
+    raise SystemExit(f"r052 three-dot action menu check failed: {message}")
 
 
 def main() -> None:
@@ -21,10 +21,10 @@ def main() -> None:
     panel_py = PANEL_PY.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    if manifest.get("version") != "0.1.0-r051":
-        fail("manifest version must be 0.1.0-r051")
-    if VERSION.read_text(encoding="utf-8").strip() != "r051":
-        fail("REMINDER_VERSION.txt must be r051")
+    if manifest.get("version") != "0.1.0-r052":
+        fail("manifest version must be 0.1.0-r052")
+    if VERSION.read_text(encoding="utf-8").strip() != "r052":
+        fail("REMINDER_VERSION.txt must be r052")
 
     for marker in [
         "this._openMenuIndex",
@@ -48,7 +48,7 @@ def main() -> None:
         if forbidden in panel:
             fail(f"panel JS must not include {forbidden!r}")
 
-    print("r051 three-dot action menu check OK")
+    print("r052 three-dot action menu check OK")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,20 @@
 # Changelog
 
-## r051 – Sidebar Mobile Action Hit Target Fix
+## r052 – Sidebar Mobile Action Sheet
+
+- Replaces the inline row action dropdown with a centered action sheet on smartphone/narrow layouts.
+- Action sheet contains `Bearbeiten`, `Löschen`, and `Schließen`.
+- Keeps desktop/tablet inline three-dot dropdown behavior.
+- Extends compact responsive table rules to 900px so smartphone landscape also avoids the wide, horizontally snapping table.
+- Keeps full vehicle rows non-clickable; only the three-dot control opens actions.
+- Keeps create/update/delete APIs and flows from r041/r045/r047 intact.
+- Keeps Reminder/Card separation unchanged.
+
+---
+
+# Changelog
+
+## r052 – Sidebar Mobile Action Hit Target Fix
 
 - Enlarged the three-dot row action hit target, especially on mobile/narrow screens.
 - Kept full rows non-clickable; only the three-dot control opens actions.
@@ -10,7 +24,7 @@
 
 # Changelog
 
-## r051 – Sidebar Dirty Guard
+## r052 – Sidebar Dirty Guard
 
 - Create/edit modal now stores a normalized snapshot when opened.
 - Closing a changed create/edit modal asks before discarding unsaved changes.
@@ -21,7 +35,7 @@
 
 # Changelog – TÜV Reminder
 
-## r051 – Sidebar CRUD Hardening
+## r052 – Sidebar CRUD Hardening
 
 - Adds backend duplicate protection for Sidebar create/update.
   - Blocks duplicate vehicle names.
@@ -34,7 +48,7 @@
 
 # Changelog – TÜV Reminder
 
-## r051 – Sidebar Delete Confirm
+## r052 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -278,7 +292,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r051 – Sidebar Row Actions + Sortable Headers
+## Reminder r052 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.
@@ -287,7 +301,7 @@
 - Preserved create/update API behavior from r041/r045.
 - Preserved Reminder/Card repository separation.
 
-## r051 – Sidebar Responsive Table Width
+## r052 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

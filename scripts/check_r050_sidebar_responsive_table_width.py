@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r051 Sidebar responsive table width fix."""
+"""Validate r052 Sidebar responsive table width fix."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r051 sidebar responsive table width check failed: {message}")
+    raise SystemExit(f"r052 sidebar responsive table width check failed: {message}")
 
 
 def require(text: str, needle: str, label: str) -> None:
@@ -22,13 +22,13 @@ def require(text: str, needle: str, label: str) -> None:
 
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r051":
-        fail("manifest version must be 0.1.0-r051")
-    if VERSION.read_text(encoding="utf-8").strip() != "r051":
-        fail("REMINDER_VERSION.txt must be r051")
+    if manifest.get("version") != "0.1.0-r052":
+        fail("manifest version must be 0.1.0-r052")
+    if VERSION.read_text(encoding="utf-8").strip() != "r052":
+        fail("REMINDER_VERSION.txt must be r052")
 
     panel = PANEL.read_text(encoding="utf-8")
-    require(panel, "@media (max-width: 720px)", "narrow table media query")
+    require(panel, "@media (max-width: 900px)", "narrow and landscape table media query")
     require(panel, ".manager-table {", "manager table css")
     require(panel, "min-width: 0;", "mobile min-width reset")
     require(panel, "table-layout: fixed;", "fixed mobile table layout")
@@ -48,7 +48,7 @@ def main() -> int:
         if needle in panel:
             fail(f"Reminder Sidebar panel must not contain Card/action coupling {needle!r}")
 
-    print("r051 sidebar responsive table width check OK")
+    print("r052 sidebar responsive table width check OK")
     return 0
 
 
