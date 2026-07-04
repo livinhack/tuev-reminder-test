@@ -1,10 +1,102 @@
-# Handover – Reminder r052 Sidebar Mobile Action Sheet
+# Handover – Reminder r054 Brand Assets Path / Proxy Readiness
+
+## Base
+
+Built on r053 (`tuev-reminder-r053-mobile-action-overlay-menu-close.zip`).
+
+## Main change
+
+r054 fixes the brand asset packaging for Home Assistant 2026.3+ local brand images:
+
+```text
+custom_components/tuev_reminder/brand/icon.png
+custom_components/tuev_reminder/brand/logo.png
+```
+
+The existing root-level assets are intentionally kept too:
+
+```text
+brand/icon.png
+brand/logo.png
+```
+
+Reason: HA Core local brand serving expects integration-local assets; some repository/HACS renderers may still use the root-level assets.
+
+## Runtime behavior
+
+No functional Sidebar/CRUD/API behavior was changed in r054. r041 create, r045 update, r047 delete, r048 duplicate guard, r049 dirty guard, r050 responsive table, r052 mobile action sheet, and r053 desktop menu close remain unchanged.
+
+## New validation
+
+```text
+scripts/check_r054_brand_assets_path.py
+```
+
+Checks:
+
+- manifest domain is `tuev_reminder`
+- manifest version is `0.1.0-r054`
+- `REMINDER_VERSION.txt` is `r054`
+- integration-local `brand/icon.png` and `brand/logo.png` exist
+- root-level `brand/icon.png` and `brand/logo.png` still exist
+
+## Next suggested step
+
+Install/test r054 in HA and check:
+
+```text
+/api/brands/integration/tuev_reminder/icon.png
+/api/brands/integration/tuev_reminder/logo.png
+```
+
+If HA integration details show the icon but HACS still does not, the remaining issue is likely HACS-side cache/rendering behavior rather than package structure.
+
+---
+
+# Handover – Reminder r054 Mobile Action Overlay + Desktop Outside Close
 
 ## Stand
 
-Current Reminder version: **r052** / manifest `0.1.0-r052`.
+Current Reminder version: **r054** / manifest `0.1.0-r054`.
 
-r052 is a mobile usability follow-up to r050/r052. Portrait width was acceptable, but the inline row action menu could be hidden/clipped. Landscape could still behave like the old too-wide table and snap back after horizontal dragging.
+r054 fixes two follow-up issues from r052/r051: the mobile action overlay was not reliably visible, and desktop inline three-dot menus did not close when clicking elsewhere. It also extends the compact responsive breakpoint to cover smartphone landscape.
+
+## Implemented
+
+- Mobile action mode now uses `max-width: 1100px`, matching the compact table CSS.
+- Compact responsive table CSS also uses `max-width: 1100px`, so smartphone landscape avoids the too-wide desktop table.
+- Mobile action sheet backdrop now has a higher fixed z-index and receives focus after render.
+- Desktop inline row action menu closes when clicking outside the menu cell.
+- Full table rows remain non-clickable; only the three-dot button opens row actions.
+- Create/update/delete, duplicate guard and dirty guard remain unchanged.
+
+## HA test focus
+
+1. Smartphone portrait: tap three dots; centered Bearbeiten/Löschen/Schließen overlay must be visible.
+2. Smartphone landscape: no horizontal table snap-back; three dots must open the centered overlay.
+3. Desktop: open a row three-dot menu, then click elsewhere; menu must close.
+4. Create, edit, delete still work.
+
+## Brand icons note
+
+The ZIP contains `brand/icon.png` and `brand/logo.png`, but Home Assistant does not generally load arbitrary local brand icons from a custom integration ZIP for the Sidebar/panel icon. The Sidebar panel uses an MDI icon from `panel_custom`. Official integration brand artwork is normally served through the Home Assistant Brands pipeline/CDN for known domains.
+
+## Not changed
+
+- No Card files in Reminder.
+- No Card renderer import.
+- No Lovelace/dashboard management.
+- No `HU bestanden` / `set_due_date` action duplication.
+
+---
+
+# Handover – Reminder r054 Sidebar Mobile Action Sheet
+
+## Stand
+
+Current Reminder version: **r054** / manifest `0.1.0-r054`.
+
+r054 is a mobile usability follow-up to r050/r054. Portrait width was acceptable, but the inline row action menu could be hidden/clipped. Landscape could still behave like the old too-wide table and snap back after horizontal dragging.
 
 ## Implemented
 
@@ -36,11 +128,11 @@ r052 is a mobile usability follow-up to r050/r052. Portrait width was acceptable
 
 ---
 
-# Handover – Reminder r052 Sidebar Mobile Action Hit Target Fix
+# Handover – Reminder r054 Sidebar Mobile Action Hit Target Fix
 
 ## Status
 
-Built on r050. r052 addresses mobile usability where the responsive table fit the viewport but the three-dot row action button was not reliably tappable with a finger.
+Built on r050. r054 addresses mobile usability where the responsive table fit the viewport but the three-dot row action button was not reliably tappable with a finger.
 
 ## Implemented
 
@@ -61,15 +153,15 @@ No Card code, renderer import, Lovelace management, or HU/action duplication was
 - Desktop: sortable headers and action menu still work.
 - Create/update/delete still work.
 
-# Handover – Reminder r052 Sidebar Dirty Guard
+# Handover – Reminder r054 Sidebar Dirty Guard
 
 ## Stand
 
-Current Reminder version: **r052** / manifest `0.1.0-r052`.
+Current Reminder version: **r054** / manifest `0.1.0-r054`.
 
-r052 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
+r054 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
 
-## Änderungen in r052
+## Änderungen in r054
 
 - Create/Edit-Modal merkt sich beim Öffnen einen normalisierten Formular-Snapshot.
 - Schließen per Button, Overlay oder Escape fragt bei ungespeicherten Änderungen nach.
@@ -96,15 +188,15 @@ r052 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches 
 - keine Lovelace-/Dashboard-Verwaltung
 - keine `HU bestanden`-/`set_due_date`-Dopplung
 
-# Handover – Reminder r052 Sidebar CRUD Hardening
+# Handover – Reminder r054 Sidebar CRUD Hardening
 
 ## Stand
 
-Current Reminder version: **r052** / manifest `0.1.0-r052`.
+Current Reminder version: **r054** / manifest `0.1.0-r054`.
 
-r052 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+r054 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
 
-## Änderungen in r052
+## Änderungen in r054
 
 - Duplicate-Schutz für `vehicles/create` und `vehicles/update`:
   - gleicher Fahrzeugname wird geblockt
@@ -590,9 +682,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r052 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r054 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r052
+## Implemented in r054
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -609,11 +701,11 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r052
+Reminder r054
 
-# r052 Handover Addendum – Sidebar Delete Confirm
+# r054 Handover Addendum – Sidebar Delete Confirm
 
-## Implemented in r052
+## Implemented in r054
 
 - `vehicles/delete` WebSocket API added.
 - Three-dot menu → Löschen now opens a centered confirmation dialog.
@@ -627,9 +719,9 @@ Reminder r052
 - r046 row actions and sortable headers remain active.
 - No Card repository files are imported into Reminder.
 
-Reminder r052
+Reminder r054
 
-## r052 – Sidebar Responsive Table Width
+## r054 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

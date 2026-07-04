@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r052 Sidebar CRUD hardening and feedback."""
+"""Validate r053 Sidebar CRUD hardening and feedback."""
 from __future__ import annotations
 
 import json
@@ -11,13 +11,13 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r052 sidebar CRUD hardening check failed: {message}")
+    raise SystemExit(f"r053 sidebar CRUD hardening check failed: {message}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r052":
-    fail("manifest version must be 0.1.0-r052")
-if read("REMINDER_VERSION.txt").strip() != "r052":
-    fail("REMINDER_VERSION.txt must be r052")
+if manifest.get("version") != "0.1.0-r054":
+    fail("manifest version must be 0.1.0-r054")
+if read("REMINDER_VERSION.txt").strip() != "r054":
+    fail("REMINDER_VERSION.txt must be r053")
 
 api = read("custom_components/tuev_reminder/manager_api.py")
 panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
@@ -40,4 +40,4 @@ require(panel, "Fahrzeug wurde gelöscht.", "delete success feedback")
 require(panel, "class=\"flash", "flash render")
 require(panel, "Duplicate-Schutz", "summary hardening marker")
 
-print("r052 sidebar CRUD hardening check OK")
+print("r053 sidebar CRUD hardening check OK")

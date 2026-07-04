@@ -298,7 +298,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _mobileActionMode() {
-    return this._narrow || window.matchMedia?.("(max-width: 720px)")?.matches === true;
+    return this._narrow || window.matchMedia?.("(max-width: 1100px)")?.matches === true;
   }
 
   _openRowMenu(index) {
@@ -762,7 +762,7 @@ class TuevReminderPanel extends HTMLElement {
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
     const plate = vehicle.plate_display || vehicle.plate || "—";
     return `
-      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true">
+      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true" tabindex="-1">
         <div class="action-sheet">
           <div class="action-sheet-head">
             <strong>${this._escape(name)}</strong>
@@ -1090,7 +1090,7 @@ class TuevReminderPanel extends HTMLElement {
         .action-sheet-backdrop {
           position: fixed;
           inset: 0;
-          z-index: 80;
+          z-index: 10050;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1309,7 +1309,7 @@ class TuevReminderPanel extends HTMLElement {
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1100px) {
           .toolbar { padding: 8px 10px; }
           .summary-strip { padding: 8px 10px; }
           .list-add-row { padding: 8px 10px; }
@@ -1456,6 +1456,16 @@ class TuevReminderPanel extends HTMLElement {
       });
     });
 
+    const page = this.shadowRoot.querySelector(".page");
+    if (page) {
+      page.addEventListener("click", (event) => {
+        if (this._openMenuIndex === null) return;
+        const path = event.composedPath ? event.composedPath() : [];
+        const insideMenuCell = path.some((node) => node?.classList?.contains?.("menu-cell"));
+        if (!insideMenuCell) this._closeRowMenu();
+      });
+    }
+
     this.shadowRoot.querySelectorAll("button[data-menu-index]").forEach((button) => {
       let handledPointer = false;
       const openMenu = (event) => {
@@ -1537,6 +1547,7 @@ class TuevReminderPanel extends HTMLElement {
 
     const actionSheetBackdrop = this.shadowRoot.querySelector(".action-sheet-backdrop");
     if (actionSheetBackdrop) {
+      actionSheetBackdrop.focus({ preventScroll: true });
       actionSheetBackdrop.addEventListener("click", (event) => {
         if (event.target === actionSheetBackdrop) this._closeActionSheet();
       });

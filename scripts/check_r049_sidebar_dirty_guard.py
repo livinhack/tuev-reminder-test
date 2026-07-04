@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r052 Sidebar dirty guard and unchanged edit save behavior."""
+"""Validate r053 Sidebar dirty guard and unchanged edit save behavior."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r052 sidebar dirty guard check failed: {message}")
+    raise SystemExit(f"r053 sidebar dirty guard check failed: {message}")
 
 
 def require(text: str, needle: str, label: str) -> None:
@@ -22,10 +22,10 @@ def require(text: str, needle: str, label: str) -> None:
 
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r052":
-        fail("manifest version must be 0.1.0-r052")
-    if VERSION.read_text(encoding="utf-8").strip() != "r052":
-        fail("REMINDER_VERSION.txt must be r052")
+    if manifest.get("version") != "0.1.0-r054":
+        fail("manifest version must be 0.1.0-r054")
+    if VERSION.read_text(encoding="utf-8").strip() != "r054":
+        fail("REMINDER_VERSION.txt must be r053")
 
     panel = PANEL.read_text(encoding="utf-8")
     require(panel, "this._formSnapshot = null", "form snapshot state")
@@ -48,7 +48,7 @@ def main() -> int:
         if needle in panel:
             fail(f"Reminder Sidebar panel must not contain Card/action coupling {needle!r}")
 
-    print("r052 sidebar dirty guard check OK")
+    print("r053 sidebar dirty guard check OK")
     return 0
 
 

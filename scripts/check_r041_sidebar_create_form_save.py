@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r052 Sidebar create form save wiring."""
+"""Validate r053 Sidebar create form save wiring."""
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r052 create form save check failed: {message}")
+    raise SystemExit(f"r053 create form save check failed: {message}")
 
 
 def main() -> None:
@@ -21,10 +21,10 @@ def main() -> None:
     panel_py = PANEL_PY.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    if manifest.get("version") != "0.1.0-r052":
-        fail("manifest version must be 0.1.0-r052")
-    if VERSION.read_text(encoding="utf-8").strip() != "r052":
-        fail("REMINDER_VERSION.txt must be r052")
+    if manifest.get("version") != "0.1.0-r054":
+        fail("manifest version must be 0.1.0-r054")
+    if VERSION.read_text(encoding="utf-8").strip() != "r054":
+        fail("REMINDER_VERSION.txt must be r053")
 
     for marker in [
         "_formPayload()",
@@ -54,7 +54,7 @@ def main() -> None:
         if forbidden in panel:
             fail(f"panel JS must not include {forbidden!r}")
 
-    print("r052 create form save check OK")
+    print("r053 create form save check OK")
 
 
 if __name__ == "__main__":

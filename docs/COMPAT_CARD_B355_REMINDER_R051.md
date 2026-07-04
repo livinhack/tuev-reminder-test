@@ -1,3 +1,3 @@
-# Compatibility – Card b355+ with Reminder r052
+# Compatibility – Card b355+ with Reminder r053
 
-Reminder r052 keeps the existing entity attributes and Card bridge fields unchanged. It only changes the Sidebar manager touch target for the row action menu.
+Reminder r053 keeps the existing entity attributes and Card bridge fields unchanged. It only changes the Sidebar manager touch target for the row action menu.

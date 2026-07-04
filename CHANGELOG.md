@@ -1,6 +1,29 @@
 # Changelog
 
-## r052 – Sidebar Mobile Action Sheet
+## r054 – Brand Assets Path / Proxy Readiness
+
+- Bumped Reminder version to `0.1.0-r054`.
+- Added integration-local brand assets under `custom_components/tuev_reminder/brand/`.
+- Kept root-level `brand/icon.png` and `brand/logo.png` for repository/HACS renderer compatibility.
+- Added `scripts/check_r054_brand_assets_path.py`.
+- Added r054 docs and compatibility note.
+- No Sidebar CRUD/API/runtime behavior changes.
+
+
+## r054 – Mobile Action Overlay + Desktop Menu Close
+
+- Aligns mobile action mode and compact table CSS to `1100px` so smartphone landscape no longer falls back to the too-wide desktop table behavior.
+- Raises the centered mobile action sheet above panel/table layers and focuses it when opened, so `Bearbeiten`/`Löschen` are visible after tapping the three-dot button.
+- Desktop inline three-dot menus now close when clicking outside the menu cell.
+- Rows remain non-clickable; only the three-dot control opens actions.
+- Create/update/delete, duplicate guard and dirty guard remain unchanged.
+- Reminder/Card separation remains unchanged.
+
+---
+
+# Changelog
+
+## r054 – Sidebar Mobile Action Sheet
 
 - Replaces the inline row action dropdown with a centered action sheet on smartphone/narrow layouts.
 - Action sheet contains `Bearbeiten`, `Löschen`, and `Schließen`.
@@ -14,7 +37,7 @@
 
 # Changelog
 
-## r052 – Sidebar Mobile Action Hit Target Fix
+## r054 – Sidebar Mobile Action Hit Target Fix
 
 - Enlarged the three-dot row action hit target, especially on mobile/narrow screens.
 - Kept full rows non-clickable; only the three-dot control opens actions.
@@ -24,7 +47,7 @@
 
 # Changelog
 
-## r052 – Sidebar Dirty Guard
+## r054 – Sidebar Dirty Guard
 
 - Create/edit modal now stores a normalized snapshot when opened.
 - Closing a changed create/edit modal asks before discarding unsaved changes.
@@ -35,7 +58,7 @@
 
 # Changelog – TÜV Reminder
 
-## r052 – Sidebar CRUD Hardening
+## r054 – Sidebar CRUD Hardening
 
 - Adds backend duplicate protection for Sidebar create/update.
   - Blocks duplicate vehicle names.
@@ -48,7 +71,7 @@
 
 # Changelog – TÜV Reminder
 
-## r052 – Sidebar Delete Confirm
+## r054 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -292,7 +315,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r052 – Sidebar Row Actions + Sortable Headers
+## Reminder r054 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.
@@ -301,7 +324,7 @@
 - Preserved create/update API behavior from r041/r045.
 - Preserved Reminder/Card repository separation.
 
-## r052 – Sidebar Responsive Table Width
+## r054 – Sidebar Responsive Table Width
 
 - Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
 - Tabelle soll nicht mehr horizontal über den Viewport hinausragen.

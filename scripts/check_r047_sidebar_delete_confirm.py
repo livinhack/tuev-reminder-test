@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r052 Sidebar delete confirm flow."""
+"""Validate r053 Sidebar delete confirm flow."""
 from __future__ import annotations
 
 import json
@@ -11,13 +11,13 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r052 sidebar delete confirm check failed: {message}")
+    raise SystemExit(f"r053 sidebar delete confirm check failed: {message}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r052":
-    fail("manifest version must be 0.1.0-r052")
-if read("REMINDER_VERSION.txt").strip() != "r052":
-    fail("REMINDER_VERSION.txt must be r052")
+if manifest.get("version") != "0.1.0-r054":
+    fail("manifest version must be 0.1.0-r054")
+if read("REMINDER_VERSION.txt").strip() != "r054":
+    fail("REMINDER_VERSION.txt must be r053")
 
 manager = read("custom_components/tuev_reminder/manager.py")
 api = read("custom_components/tuev_reminder/manager_api.py")
@@ -40,4 +40,4 @@ require(panel, 'id="confirm-delete"', "confirm delete button")
 require(panel, 'Fahrzeug löschen', "delete dialog title")
 require(panel, 'Die getrennte Card-Konfiguration wird nicht verändert.', "card separation delete note")
 
-print("r052 sidebar delete confirm check OK")
+print("r053 sidebar delete confirm check OK")

@@ -1,6 +1,6 @@
-# Reminder r052 – Mobile Action Hit Target Fix
+# Reminder r053 – Mobile Action Hit Target Fix
 
-Follow-up to r050 responsive table width. r052 keeps the table layout but improves mobile touch reliability for the per-row three-dot actions.
+Follow-up to r050 responsive table width. r053 keeps the table layout but improves mobile touch reliability for the per-row three-dot actions.
 
 ## Changes
 
