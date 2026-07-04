@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r046 Backend Update API foundation."""
+"""Validate r047 Backend Update API foundation."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r046 backend update API check failed: {message}")
+    raise SystemExit(f"r047 backend update API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r046":
-        fail("manifest version must be 0.1.0-r046")
-    if read("REMINDER_VERSION.txt").strip() != "r046":
-        fail("REMINDER_VERSION.txt must be r046")
+    if manifest.get("version") != "0.1.0-r047":
+        fail("manifest version must be 0.1.0-r047")
+    if read("REMINDER_VERSION.txt").strip() != "r047":
+        fail("REMINDER_VERSION.txt must be r047")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -30,7 +30,7 @@ def main() -> None:
 
     for marker in [
         "MANAGER_API_VERSION = 3",
-        '"write_api_version": 2',
+        '"write_api_version": 3',
         '"tuev_reminder/manager/vehicles/create"',
         '"tuev_reminder/manager/vehicles/update"',
     ]:
@@ -51,10 +51,7 @@ def main() -> None:
         if marker not in manager_api:
             fail(f"manager_api.py missing {marker!r}")
 
-    if "vehicles/delete" in panel:
-        fail("r046 must not wire the delete path yet")
-    if "vehicles/delete" in manager_api:
-        fail("r046 must not add delete API")
+    # Delete is intentionally added after the r044 update foundation.
     if "No Card repository files" not in handover:
         fail("handover must preserve Reminder/Card separation")
 
@@ -65,7 +62,7 @@ def main() -> None:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r046 backend update API check OK")
+    print("r047 backend update API check OK")
 
 
 if __name__ == "__main__":

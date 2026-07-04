@@ -20,8 +20,8 @@ def main() -> int:
     js = JS.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    assert VERSION.read_text(encoding="utf-8").strip() == "r046"
-    assert manifest["version"] == "0.1.0-r046"
+    assert VERSION.read_text(encoding="utf-8").strip() == "r047"
+    assert manifest["version"] == "0.1.0-r047"
 
     require(js, 'this._view = "list"')
     require(js, "_renderCreateForm()")
@@ -43,11 +43,10 @@ def main() -> int:
         "tuev-card",
         "hui-",
         "lovelace",
-        "vehicles/delete",
     ]
     for needle in forbidden:
         if needle in js:
-            raise AssertionError(f"r046 Sidebar form skeleton must not include {needle!r}")
+            raise AssertionError(f"r047 Sidebar form skeleton must not include {needle!r}")
 
     return 0
 

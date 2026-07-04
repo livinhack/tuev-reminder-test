@@ -19,6 +19,7 @@ class TuevReminderPanel extends HTMLElement {
     this._selectedVehicle = null;
     this._form = this._defaultForm();
     this._saving = false;
+    this._deleting = false;
     this._formError = null;
     this._formInfo = null;
     this._openMenuIndex = null;
@@ -311,9 +312,17 @@ class TuevReminderPanel extends HTMLElement {
       return;
     }
     if (action === "delete") {
-      this._openDetailForm(vehicle);
-      this._formInfo = "Löschen ist als Menüpunkt vorbereitet. Die Delete-API folgt in einem späteren Backend-Schritt.";
+      this._openDeleteConfirm(vehicle);
     }
+  }
+
+  _openDeleteConfirm(vehicle) {
+    this._openMenuIndex = null;
+    this._selectedVehicle = vehicle;
+    this._formError = null;
+    this._formInfo = null;
+    this._view = "delete";
+    this._render();
   }
 
   _openCreateForm() {
@@ -353,7 +362,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _closeForm() {
-    if (this._saving) return;
+    if (this._saving || this._deleting) return;
     this._view = "list";
     this._selectedVehicle = null;
     this._formError = null;
@@ -427,6 +436,32 @@ class TuevReminderPanel extends HTMLElement {
       this._formError = err?.message || String(err);
     } finally {
       this._saving = false;
+      this._render();
+    }
+  }
+
+  async _deleteSelectedVehicle() {
+    if (!this._hass || this._view !== "delete" || this._deleting || !this._selectedVehicle?.entry_id) {
+      return;
+    }
+
+    this._deleting = true;
+    this._formError = null;
+    this._formInfo = "Fahrzeug wird gelöscht …";
+    this._render();
+
+    try {
+      const result = await this._hass.connection.sendMessagePromise({
+        type: "tuev_reminder/manager/vehicles/delete",
+        entry_id: this._selectedVehicle.entry_id,
+      });
+      this._applySaveResult(result);
+      if (!this._loaded) await this._refresh();
+      this._finishSuccessfulSave();
+    } catch (err) {
+      this._formError = err?.message || String(err);
+    } finally {
+      this._deleting = false;
       this._render();
     }
   }
@@ -615,6 +650,35 @@ class TuevReminderPanel extends HTMLElement {
     }).join("");
   }
 
+  _renderDeleteConfirm() {
+    const vehicle = this._selectedVehicle || {};
+    const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
+    const plate = vehicle.plate_display || vehicle.plate || "—";
+    return `
+      <section class="modal-backdrop" aria-label="Fahrzeug löschen" role="dialog" aria-modal="true">
+        <div class="form-shell delete-shell">
+          <div class="form-head">
+            <div>
+              <h2>Fahrzeug löschen</h2>
+              <p>Diese Reminder-ConfigEntry/Entität wird aus Home Assistant entfernt.</p>
+            </div>
+          </div>
+          <div class="form-card delete-card">
+            <p><strong>${this._escape(name)}</strong></p>
+            <div class="delete-preview">${this._platePreview(vehicle)}</div>
+            <p class="note">Löschen entfernt nur den Reminder-Eintrag. Die getrennte Card-Konfiguration wird nicht verändert.</p>
+            ${this._formError ? `<p class="form-error">${this._escape(this._formError)}</p>` : ""}
+            ${this._formInfo ? `<p class="muted">${this._escape(this._formInfo)}</p>` : ""}
+            <div class="form-actions modal-bottom-actions">
+              <button class="danger" id="confirm-delete" ${this._deleting ? "disabled" : ""}>${this._deleting ? "Löscht …" : "Löschen"}</button>
+              <button class="ghost" id="cancel-delete" ${this._deleting ? "disabled" : ""}>Schließen</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   _renderCreateForm() {
     const isDetail = this._view === "detail";
     const errors = this._formValidation();
@@ -784,7 +848,7 @@ class TuevReminderPanel extends HTMLElement {
           color: var(--secondary-text-color);
           pointer-events: none;
         }
-        input, select, button.action, button.ghost {
+        input, select, button.action, button.ghost, button.danger {
           height: 40px;
           box-sizing: border-box;
           border-radius: 4px;
@@ -808,7 +872,16 @@ class TuevReminderPanel extends HTMLElement {
           cursor: pointer;
           white-space: nowrap;
         }
-        button.action[disabled] { opacity: 0.52; cursor: not-allowed; }
+        button.action[disabled], button.danger[disabled] { opacity: 0.52; cursor: not-allowed; }
+        button.danger {
+          border: 0;
+          padding: 0 14px;
+          background: var(--error-color);
+          color: var(--text-primary-color);
+          font-weight: 500;
+          cursor: pointer;
+          white-space: nowrap;
+        }
         button.icon-action {
           width: auto;
           min-width: 0;
@@ -1030,6 +1103,9 @@ class TuevReminderPanel extends HTMLElement {
           margin-bottom: 18px;
         }
         .form-head p { margin: 0; color: var(--secondary-text-color); }
+        .delete-shell { width: min(520px, 100%); }
+        .delete-card p:first-child { margin-top: 0; }
+        .delete-preview { margin: 12px 0 16px; text-align: right; }
         .form-actions { display: flex; gap: 8px; align-items: center; }
         .modal-bottom-actions {
           justify-content: flex-end;
@@ -1101,7 +1177,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-API aktiv · Formular speichert Entitäten · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Formular speichert Entitäten · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
@@ -1115,7 +1191,7 @@ class TuevReminderPanel extends HTMLElement {
         <section class="list-add-row bottom" aria-label="Fahrzeug unten hinzufügen">
           <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
-        ${formOpen ? this._renderCreateForm() : ""}
+        ${formOpen ? (this._view === "delete" ? this._renderDeleteConfirm() : this._renderCreateForm()) : ""}
       </main>
     `;
 
@@ -1179,6 +1255,12 @@ class TuevReminderPanel extends HTMLElement {
 
     const saveUpdateButton = this.shadowRoot.querySelector("#save-update");
     if (saveUpdateButton) saveUpdateButton.addEventListener("click", () => this._saveUpdateForm());
+
+    const confirmDeleteButton = this.shadowRoot.querySelector("#confirm-delete");
+    if (confirmDeleteButton) confirmDeleteButton.addEventListener("click", () => this._deleteSelectedVehicle());
+
+    const cancelDeleteButton = this.shadowRoot.querySelector("#cancel-delete");
+    if (cancelDeleteButton) cancelDeleteButton.addEventListener("click", () => this._closeForm());
 
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       if (field.tagName === "SELECT") {

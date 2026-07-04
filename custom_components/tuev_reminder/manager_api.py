@@ -21,6 +21,7 @@ WS_TYPE_VEHICLES_LIST = "tuev_reminder/manager/vehicles/list"
 WS_TYPE_VEHICLE_GET = "tuev_reminder/manager/vehicles/get"
 WS_TYPE_VEHICLE_CREATE = "tuev_reminder/manager/vehicles/create"
 WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"
+WS_TYPE_VEHICLE_DELETE = "tuev_reminder/manager/vehicles/delete"
 
 
 @websocket_api.websocket_command(
@@ -152,6 +153,32 @@ async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg)
     )
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): WS_TYPE_VEHICLE_DELETE,
+        vol.Required("entry_id"): str,
+    }
+)
+@websocket_api.async_response
+async def websocket_manager_vehicle_delete(hass: HomeAssistant, connection, msg) -> None:
+    """Delete an existing TÜV Reminder vehicle ConfigEntry from the manager UI."""
+    entry = hass.config_entries.async_get_entry(msg["entry_id"])
+    if entry is None or entry.domain != DOMAIN:
+        connection.send_error(msg["id"], "not_found", "TÜV Reminder vehicle not found")
+        return
+
+    await hass.config_entries.async_remove(entry.entry_id)
+
+    connection.send_result(
+        msg["id"],
+        {
+            "deleted": True,
+            "entry_id": msg["entry_id"],
+            "vehicles": vehicle_records(hass),
+        },
+    )
+
+
 def async_register_manager_api(hass: HomeAssistant) -> None:
     """Register the manager WebSocket API commands once."""
     websocket_api.async_register_command(hass, websocket_manager_metadata)
@@ -159,3 +186,4 @@ def async_register_manager_api(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, websocket_manager_vehicle_get)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_create)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_update)
+    websocket_api.async_register_command(hass, websocket_manager_vehicle_delete)

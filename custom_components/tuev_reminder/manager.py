@@ -467,10 +467,11 @@ def manager_metadata() -> dict:
         "api_version": MANAGER_API_VERSION,
         "storage_model": "config_entries",
         "write_api": True,
-        "write_api_version": 2,
+        "write_api_version": 3,
         "write_commands": [
             "tuev_reminder/manager/vehicles/create",
             "tuev_reminder/manager/vehicles/update",
+            "tuev_reminder/manager/vehicles/delete",
         ],
         "manager_panel_ready": True,
         "plate_kinds": PLATE_KIND_OPTIONS,

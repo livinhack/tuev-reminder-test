@@ -11,8 +11,8 @@ def assert_contains(text: str, needle: str, label: str):
         raise AssertionError(f"Missing {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r046"
-assert read("REMINDER_VERSION.txt").strip() == "r046"
+assert manifest["version"] == "0.1.0-r047"
+assert read("REMINDER_VERSION.txt").strip() == "r047"
 
 const = read("custom_components/tuev_reminder/const.py")
 init = read("custom_components/tuev_reminder/__init__.py")

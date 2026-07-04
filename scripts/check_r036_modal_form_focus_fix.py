@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r046 Sidebar modal form and input focus fix."""
+"""Validate r047 Sidebar modal form and input focus fix."""
 from __future__ import annotations
 
 import json
@@ -12,15 +12,15 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r046 modal form focus fix check failed: {message}")
+    raise SystemExit(f"r047 modal form focus fix check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r046":
-        fail("manifest version must be 0.1.0-r046")
-    if VERSION.read_text(encoding="utf-8").strip() != "r046":
-        fail("REMINDER_VERSION.txt must be r046")
+    if manifest.get("version") != "0.1.0-r047":
+        fail("manifest version must be 0.1.0-r047")
+    if VERSION.read_text(encoding="utf-8").strip() != "r047":
+        fail("REMINDER_VERSION.txt must be r047")
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
@@ -30,7 +30,7 @@ def main() -> None:
         "_syncFormSummary()",
         "{ render: false }",
         "if (event.target === modalBackdrop) this._closeForm();",
-        "${formOpen ? this._renderCreateForm() : \"\"}",
+        "${formOpen ? (this._view === \"delete\" ? this._renderDeleteConfirm() : this._renderCreateForm()) : \"\"}",
         "${this._renderVehicles()}",
     ]
     for needle in required:
@@ -41,13 +41,12 @@ def main() -> None:
         "tuev-card",
         "confirm_passed",
         "set_due_date",
-        "vehicles/delete",
     ]
     for needle in forbidden:
         if needle in panel:
             fail(f"Sidebar panel must not include {needle!r}")
 
-    print("r046 modal form focus fix check OK")
+    print("r047 modal form focus fix check OK")
 
 
 if __name__ == "__main__":

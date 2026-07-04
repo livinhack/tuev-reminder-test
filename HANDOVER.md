@@ -475,9 +475,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r046 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r047 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r046
+## Implemented in r047
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -494,4 +494,22 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r046
+Reminder r047
+
+# r047 Handover Addendum – Sidebar Delete Confirm
+
+## Implemented in r047
+
+- `vehicles/delete` WebSocket API added.
+- Three-dot menu → Löschen now opens a centered confirmation dialog.
+- Confirmed deletion removes the matching Reminder ConfigEntry and refreshes the list.
+- Delete dialog explicitly notes that Card configuration is not changed.
+
+## Preserved
+
+- r041 create form save remains active.
+- r044/r045 update backend and frontend save remain active.
+- r046 row actions and sortable headers remain active.
+- No Card repository files are imported into Reminder.
+
+Reminder r047

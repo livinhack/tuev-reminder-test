@@ -1,3 +1,13 @@
+# Changelog – TÜV Reminder
+
+## r047 – Sidebar Delete Confirm
+
+- Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
+- Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
+- Wires the Sidebar three-dot menu `Löschen` action to a confirmation dialog.
+- Refreshes the vehicle list after successful deletion.
+- Keeps Card and Reminder repositories separated.
+
 # r045 – Sidebar Update Form Save
 
 - Bearbeiten-Modus im Sidebar-Modal mit `vehicles/update` verbunden.
@@ -234,7 +244,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r046 – Sidebar Row Actions + Sortable Headers
+## Reminder r047 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.
