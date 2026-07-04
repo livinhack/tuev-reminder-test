@@ -1,12 +1,12 @@
-# Handover – Reminder r049 Sidebar Dirty Guard
+# Handover – Reminder r050 Sidebar Dirty Guard
 
 ## Stand
 
-Current Reminder version: **r049** / manifest `0.1.0-r049`.
+Current Reminder version: **r050** / manifest `0.1.0-r050`.
 
-r049 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
+r050 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
 
-## Änderungen in r049
+## Änderungen in r050
 
 - Create/Edit-Modal merkt sich beim Öffnen einen normalisierten Formular-Snapshot.
 - Schließen per Button, Overlay oder Escape fragt bei ungespeicherten Änderungen nach.
@@ -33,15 +33,15 @@ r049 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches 
 - keine Lovelace-/Dashboard-Verwaltung
 - keine `HU bestanden`-/`set_due_date`-Dopplung
 
-# Handover – Reminder r049 Sidebar CRUD Hardening
+# Handover – Reminder r050 Sidebar CRUD Hardening
 
 ## Stand
 
-Current Reminder version: **r049** / manifest `0.1.0-r049`.
+Current Reminder version: **r050** / manifest `0.1.0-r050`.
 
-r049 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+r050 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
 
-## Änderungen in r049
+## Änderungen in r050
 
 - Duplicate-Schutz für `vehicles/create` und `vehicles/update`:
   - gleicher Fahrzeugname wird geblockt
@@ -527,9 +527,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r049 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r050 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r049
+## Implemented in r050
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -546,11 +546,11 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r049
+Reminder r050
 
-# r049 Handover Addendum – Sidebar Delete Confirm
+# r050 Handover Addendum – Sidebar Delete Confirm
 
-## Implemented in r049
+## Implemented in r050
 
 - `vehicles/delete` WebSocket API added.
 - Three-dot menu → Löschen now opens a centered confirmation dialog.
@@ -564,4 +564,12 @@ Reminder r049
 - r046 row actions and sortable headers remain active.
 - No Card repository files are imported into Reminder.
 
-Reminder r049
+Reminder r050
+
+## r050 – Sidebar Responsive Table Width
+
+- Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
+- Tabelle soll nicht mehr horizontal über den Viewport hinausragen.
+- Kennzeichen-Vorschau wird auf kleinen Displays ausgeblendet, Kennzeichentext erscheint kompakt unter dem Namen.
+- Auf sehr schmalen Displays wird die Erinnerungsspalte ausgeblendet, damit das Drei-Punkte-Menü erreichbar bleibt.
+- Keine Card-Vermischung; Create/Update/Delete/Dirty-Guard bleiben erhalten.

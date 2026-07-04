@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r050 Sidebar dirty guard and unchanged edit save behavior."""
+"""Validate r050 Sidebar responsive table width fix."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r050 sidebar dirty guard check failed: {message}")
+    raise SystemExit(f"r050 sidebar responsive table width check failed: {message}")
 
 
 def require(text: str, needle: str, label: str) -> None:
@@ -28,16 +28,16 @@ def main() -> int:
         fail("REMINDER_VERSION.txt must be r050")
 
     panel = PANEL.read_text(encoding="utf-8")
-    require(panel, "this._formSnapshot = null", "form snapshot state")
-    require(panel, "_payloadKey(payload = this._formPayload())", "normalized payload snapshot helper")
-    require(panel, "_rememberFormSnapshot()", "snapshot capture helper")
-    require(panel, "_formDirty()", "dirty-state helper")
-    require(panel, "_confirmDiscardChanges()", "discard confirmation helper")
-    require(panel, "Ungespeicherte Änderungen verwerfen?", "discard confirmation text")
-    require(panel, "this._view === \"detail\" && !this._formDirty()", "unchanged edit validation branch")
-    require(panel, "Keine Änderungen", "unchanged edit summary")
-    require(panel, "!this._formDirty() ? \"disabled\"", "edit save disabled until dirty")
-    require(panel, "Dirty-Guard", "status strip marker")
+    require(panel, "@media (max-width: 720px)", "narrow table media query")
+    require(panel, ".manager-table {", "manager table css")
+    require(panel, "min-width: 0;", "mobile min-width reset")
+    require(panel, "table-layout: fixed;", "fixed mobile table layout")
+    require(panel, ".col-preview, .preview-cell { display: none; }", "mobile preview column hide")
+    require(panel, ".mobile-plate-text", "mobile plate text fallback")
+    require(panel, "@media (max-width: 460px)", "very narrow media query")
+    require(panel, ".col-reminder, .reminder-cell { display: none; }", "very narrow reminder hide")
+    require(panel, "Responsive Tabelle", "status strip marker")
+    require(panel, "nur Drei-Punkte-Menü öffnet Aktionen", "row action boundary marker")
 
     forbidden = [
         "tuev-card",
@@ -48,7 +48,7 @@ def main() -> int:
         if needle in panel:
             fail(f"Reminder Sidebar panel must not contain Card/action coupling {needle!r}")
 
-    print("r050 sidebar dirty guard check OK")
+    print("r050 sidebar responsive table width check OK")
     return 0
 
 

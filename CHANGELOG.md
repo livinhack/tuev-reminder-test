@@ -1,6 +1,6 @@
 # Changelog
 
-## r049 – Sidebar Dirty Guard
+## r050 – Sidebar Dirty Guard
 
 - Create/edit modal now stores a normalized snapshot when opened.
 - Closing a changed create/edit modal asks before discarding unsaved changes.
@@ -11,7 +11,7 @@
 
 # Changelog – TÜV Reminder
 
-## r049 – Sidebar CRUD Hardening
+## r050 – Sidebar CRUD Hardening
 
 - Adds backend duplicate protection for Sidebar create/update.
   - Blocks duplicate vehicle names.
@@ -24,7 +24,7 @@
 
 # Changelog – TÜV Reminder
 
-## r049 – Sidebar Delete Confirm
+## r050 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -268,7 +268,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r049 – Sidebar Row Actions + Sortable Headers
+## Reminder r050 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.
@@ -276,3 +276,11 @@
 - Added ascending/descending sort toggling for Name, HU, Erinnerung, Status, and Kennzeichen.
 - Preserved create/update API behavior from r041/r045.
 - Preserved Reminder/Card repository separation.
+
+## r050 – Sidebar Responsive Table Width
+
+- Smartphone-/Narrow-Layout der Sidebar-Tabelle angepasst.
+- Tabelle soll nicht mehr horizontal über den Viewport hinausragen.
+- Kennzeichen-Vorschau wird auf kleinen Displays ausgeblendet, Kennzeichentext erscheint kompakt unter dem Namen.
+- Auf sehr schmalen Displays wird die Erinnerungsspalte ausgeblendet, damit das Drei-Punkte-Menü erreichbar bleibt.
+- Keine Card-Vermischung; Create/Update/Delete/Dirty-Guard bleiben erhalten.

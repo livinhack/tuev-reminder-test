@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r049 Backend Update API foundation."""
+"""Validate r050 Backend Update API foundation."""
 from __future__ import annotations
 
 import json
@@ -13,15 +13,15 @@ def read(relative: str) -> str:
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r049 backend update API check failed: {message}")
+    raise SystemExit(f"r050 backend update API check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r049":
-        fail("manifest version must be 0.1.0-r049")
-    if read("REMINDER_VERSION.txt").strip() != "r049":
-        fail("REMINDER_VERSION.txt must be r049")
+    if manifest.get("version") != "0.1.0-r050":
+        fail("manifest version must be 0.1.0-r050")
+    if read("REMINDER_VERSION.txt").strip() != "r050":
+        fail("REMINDER_VERSION.txt must be r050")
 
     manager = read("custom_components/tuev_reminder/manager.py")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -62,7 +62,7 @@ def main() -> None:
         if not (ROOT / relative).exists():
             fail(f"missing documentation file: {relative}")
 
-    print("r049 backend update API check OK")
+    print("r050 backend update API check OK")
 
 
 if __name__ == "__main__":

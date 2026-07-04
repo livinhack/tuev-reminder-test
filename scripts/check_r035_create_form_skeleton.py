@@ -20,8 +20,8 @@ def main() -> int:
     js = JS.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    assert VERSION.read_text(encoding="utf-8").strip() == "r049"
-    assert manifest["version"] == "0.1.0-r049"
+    assert VERSION.read_text(encoding="utf-8").strip() == "r050"
+    assert manifest["version"] == "0.1.0-r050"
 
     require(js, 'this._view = "list"')
     require(js, "_renderCreateForm()")
@@ -46,7 +46,7 @@ def main() -> int:
     ]
     for needle in forbidden:
         if needle in js:
-            raise AssertionError(f"r049 Sidebar form skeleton must not include {needle!r}")
+            raise AssertionError(f"r050 Sidebar form skeleton must not include {needle!r}")
 
     return 0
 

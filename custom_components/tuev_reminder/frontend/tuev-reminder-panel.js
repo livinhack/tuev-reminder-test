@@ -652,9 +652,9 @@ class TuevReminderPanel extends HTMLElement {
           <thead>
             <tr>
               ${this._sortHeader("Name", "name", "col-name")}
-              ${this._sortHeader("HU", "hu")}
-              ${this._sortHeader("Erinnerung", "reminder")}
-              ${this._sortHeader("Status", "status")}
+              ${this._sortHeader("HU", "hu", "col-hu")}
+              ${this._sortHeader("Erinnerung", "reminder", "col-reminder")}
+              ${this._sortHeader("Status", "status", "col-status")}
               ${this._sortHeader("Kennzeichen", "plate", "col-preview")}
               <th class="col-menu" aria-label="Menü"></th>
             </tr>
@@ -664,14 +664,15 @@ class TuevReminderPanel extends HTMLElement {
               <tr data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
                 <td class="name-cell">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
+                  <div class="mobile-plate-text">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</div>
                 </td>
-                <td>
+                <td class="hu-cell">
                   <div class="main-value">${this._escape(this._monthYear(vehicle))}</div>
                 </td>
-                <td>
+                <td class="reminder-cell">
                   <div class="main-value">${this._escape(this._dateLabel(vehicle.reminder_date))}</div>
                 </td>
-                <td><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
+                <td class="status-cell"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
                 <td class="menu-cell">
                   <button class="row-menu" data-menu-index="${index}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuIndex === index ? "true" : "false"}">⋮</button>
@@ -989,7 +990,7 @@ class TuevReminderPanel extends HTMLElement {
           padding: 32px 20px;
           background: rgba(0, 0, 0, .46);
         }
-        .list-shell { overflow-x: auto; }
+        .list-shell { overflow-x: auto; width: 100%; }
         .manager-table { width: 100%; min-width: 940px; border-collapse: collapse; }
         th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
         th { height: 32px; color: var(--secondary-text-color); font-size: 12px; font-weight: 600; }
@@ -1041,6 +1042,7 @@ class TuevReminderPanel extends HTMLElement {
         }
         .row-action-menu button:hover { background: var(--secondary-background-color); }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
+        .mobile-plate-text { display: none; margin-top: 2px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         .main-value { font-weight: 500; line-height: 1.25; }
         .status-pill {
@@ -1197,6 +1199,48 @@ class TuevReminderPanel extends HTMLElement {
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
+        @media (max-width: 720px) {
+          .toolbar { padding: 8px 10px; }
+          .summary-strip { padding: 8px 10px; }
+          .list-add-row { padding: 8px 10px; }
+          .list-shell { overflow-x: hidden; width: 100%; }
+          .manager-table {
+            width: 100%;
+            min-width: 0;
+            table-layout: fixed;
+          }
+          th, td {
+            padding: 8px 6px;
+            overflow: hidden;
+          }
+          .col-name { width: auto; }
+          .col-hu { width: 62px; }
+          .col-reminder { width: 92px; }
+          .col-status { width: 74px; }
+          .col-menu { width: 34px; }
+          .col-preview, .preview-cell { display: none; }
+          .sort-header { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .vehicle-title, .main-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .mobile-plate-text { display: block; }
+          .status-pill {
+            max-width: 100%;
+            padding: 2px 5px;
+            font-size: 11px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .row-menu { width: 30px; height: 30px; }
+          .row-action-menu { right: 0; top: 34px; }
+        }
+        @media (max-width: 460px) {
+          .col-reminder, .reminder-cell { display: none; }
+          .col-hu { width: 58px; }
+          .col-status { width: 72px; }
+          .col-menu { width: 32px; }
+          h1 { font-size: 18px; }
+          .version { display: none; }
+        }
         @media (max-width: 560px) {
           .field-pair { grid-template-columns: 1fr; }
         }
@@ -1228,7 +1272,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · Responsive Tabelle · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
