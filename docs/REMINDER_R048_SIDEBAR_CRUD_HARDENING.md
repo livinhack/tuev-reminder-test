@@ -1,6 +1,6 @@
-# Reminder r048 – Sidebar CRUD Hardening
+# Reminder r049 – Sidebar CRUD Hardening
 
-r048 adds a safety layer around the Sidebar manager CRUD path.
+r049 adds a safety layer around the Sidebar manager CRUD path.
 
 ## Backend
 

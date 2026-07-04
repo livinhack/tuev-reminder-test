@@ -1,12 +1,47 @@
-# Handover – Reminder r048 Sidebar CRUD Hardening
+# Handover – Reminder r049 Sidebar Dirty Guard
 
 ## Stand
 
-Current Reminder version: **r048** / manifest `0.1.0-r048`.
+Current Reminder version: **r049** / manifest `0.1.0-r049`.
 
-r048 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+r049 basiert auf r048 und härtet den Sidebar-CRUD-Dialog gegen versehentliches Verwerfen und unnötige No-op-Updates ab.
 
-## Änderungen in r048
+## Änderungen in r049
+
+- Create/Edit-Modal merkt sich beim Öffnen einen normalisierten Formular-Snapshot.
+- Schließen per Button, Overlay oder Escape fragt bei ungespeicherten Änderungen nach.
+- Im Bearbeiten-Modus ist **Speichern** erst aktiv, wenn wirklich etwas geändert wurde.
+- Die Vorschau-/Validierungsbox zeigt bei unverändertem Edit-Formular **Keine Änderungen**.
+- Die r036-Fokuskorrektur bleibt erhalten: normale Eingaben rebuilden das Formular nicht komplett.
+- Create, Update, Delete und Duplicate-Schutz aus r048 bleiben erhalten.
+- Reminder/Card-Trennung bleibt unverändert.
+
+## HA-Testfokus
+
+1. Sidebar öffnen und ein bestehendes Fahrzeug über die drei Punkte bearbeiten.
+2. Prüfen: Speichern ist zunächst deaktiviert und die Vorschau meldet `Keine Änderungen`.
+3. Ein Feld ändern: Speichern wird aktiv.
+4. Schließen/Overlay/Escape vor dem Speichern: Nachfrage zum Verwerfen erscheint.
+5. Abbrechen der Nachfrage hält das Modal offen.
+6. Bestätigen der Nachfrage schließt das Modal.
+7. Speichern nach Änderung aktualisiert weiterhin die Entität.
+
+## Nicht geändert
+
+- keine Card-Dateien im Reminder
+- kein Card-Renderer-Import
+- keine Lovelace-/Dashboard-Verwaltung
+- keine `HU bestanden`-/`set_due_date`-Dopplung
+
+# Handover – Reminder r049 Sidebar CRUD Hardening
+
+## Stand
+
+Current Reminder version: **r049** / manifest `0.1.0-r049`.
+
+r049 basiert auf r047 und härtet den vollständigen Sidebar-CRUD-Pfad ab: Create, Update und Delete bleiben erhalten; zusätzlich gibt es Backend-Duplicate-Schutz und kurze Erfolgsmeldungen im Panel.
+
+## Änderungen in r049
 
 - Duplicate-Schutz für `vehicles/create` und `vehicles/update`:
   - gleicher Fahrzeugname wird geblockt
@@ -492,9 +527,9 @@ change_plate_vehicle_text
 change_plate_vehicle_digit
 ```
 
-# r048 Handover Addendum – Sidebar Row Actions + Sortable Headers
+# r049 Handover Addendum – Sidebar Row Actions + Sortable Headers
 
-## Implemented in r048
+## Implemented in r049
 
 - Full vehicle rows are no longer clickable.
 - Only the three-dot button at the end of a row opens row actions.
@@ -511,11 +546,11 @@ change_plate_vehicle_digit
 - No Card repository files are imported into Reminder.
 
 
-Reminder r048
+Reminder r049
 
-# r048 Handover Addendum – Sidebar Delete Confirm
+# r049 Handover Addendum – Sidebar Delete Confirm
 
-## Implemented in r048
+## Implemented in r049
 
 - `vehicles/delete` WebSocket API added.
 - Three-dot menu → Löschen now opens a centered confirmation dialog.
@@ -529,4 +564,4 @@ Reminder r048
 - r046 row actions and sortable headers remain active.
 - No Card repository files are imported into Reminder.
 
-Reminder r048
+Reminder r049

@@ -1,6 +1,17 @@
+# Changelog
+
+## r049 – Sidebar Dirty Guard
+
+- Create/edit modal now stores a normalized snapshot when opened.
+- Closing a changed create/edit modal asks before discarding unsaved changes.
+- Edit-mode save button stays disabled until a real change exists.
+- Validation/preview column shows `Keine Änderungen` for unchanged edit forms.
+- Existing focus-preserving summary updates remain intact.
+- Reminder/Card separation remains unchanged.
+
 # Changelog – TÜV Reminder
 
-## r048 – Sidebar CRUD Hardening
+## r049 – Sidebar CRUD Hardening
 
 - Adds backend duplicate protection for Sidebar create/update.
   - Blocks duplicate vehicle names.
@@ -13,7 +24,7 @@
 
 # Changelog – TÜV Reminder
 
-## r048 – Sidebar Delete Confirm
+## r049 – Sidebar Delete Confirm
 
 - Adds backend WebSocket command `tuev_reminder/manager/vehicles/delete`.
 - Deletes a Reminder ConfigEntry by `entry_id` through Home Assistant config entries.
@@ -257,7 +268,7 @@
 - Establishes the Reminder as a project separate from the Card.
 - Adds the v3 roadmap and first vehicle plate option schema.
 
-## Reminder r048 – Sidebar Row Actions + Sortable Headers
+## Reminder r049 – Sidebar Row Actions + Sortable Headers
 
 - Removed full-row click handling in the Sidebar vehicle table.
 - Kept only the three-dot row menu as the action entry point for edit/delete actions.

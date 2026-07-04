@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r048 Sidebar edit/update save wiring."""
+"""Validate r049 Sidebar edit/update save wiring."""
 from __future__ import annotations
 
 import json
@@ -11,14 +11,14 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r048 sidebar update form save check failed: {message}")
+    raise SystemExit(f"r049 sidebar update form save check failed: {message}")
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r048":
-        fail("manifest version must be 0.1.0-r048")
-    if read("REMINDER_VERSION.txt").strip() != "r048":
-        fail("REMINDER_VERSION.txt must be r048")
+    if manifest.get("version") != "0.1.0-r049":
+        fail("manifest version must be 0.1.0-r049")
+    if read("REMINDER_VERSION.txt").strip() != "r049":
+        fail("REMINDER_VERSION.txt must be r049")
 
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
     manager_api = read("custom_components/tuev_reminder/manager_api.py")
@@ -58,7 +58,7 @@ def main() -> None:
     if "No Card repository files" not in handover:
         fail("handover must preserve Reminder/Card separation")
 
-    print("r048 sidebar update form save check OK")
+    print("r049 sidebar update form save check OK")
 
 if __name__ == "__main__":
     main()

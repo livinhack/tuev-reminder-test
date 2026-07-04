@@ -1,6 +1,6 @@
-# Reminder r048 – Backend Update API Foundation
+# Reminder r049 – Backend Update API Foundation
 
-r048 adds the Reminder-owned Manager WebSocket update command for existing vehicles.
+r049 adds the Reminder-owned Manager WebSocket update command for existing vehicles.
 
 ## Added
 

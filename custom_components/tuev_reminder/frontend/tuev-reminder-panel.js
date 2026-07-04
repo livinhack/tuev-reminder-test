@@ -25,6 +25,7 @@ class TuevReminderPanel extends HTMLElement {
     this._flashMessage = null;
     this._flashTimer = null;
     this._openMenuIndex = null;
+    this._formSnapshot = null;
   }
 
   set hass(hass) {
@@ -318,6 +319,32 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
+  _payloadKey(payload = this._formPayload()) {
+    const normalized = {};
+    Object.keys(payload || {}).sort().forEach((key) => {
+      normalized[key] = payload[key];
+    });
+    return JSON.stringify(normalized);
+  }
+
+  _rememberFormSnapshot() {
+    this._formSnapshot = this._payloadKey();
+  }
+
+  _formDirty() {
+    if (!["create", "detail"].includes(this._view) || !this._formSnapshot) {
+      return false;
+    }
+    return this._payloadKey() !== this._formSnapshot;
+  }
+
+  _confirmDiscardChanges() {
+    if (!["create", "detail"].includes(this._view) || !this._formDirty()) {
+      return true;
+    }
+    return window.confirm("Ungespeicherte Änderungen verwerfen?");
+  }
+
   _openDeleteConfirm(vehicle) {
     this._openMenuIndex = null;
     this._selectedVehicle = vehicle;
@@ -334,6 +361,7 @@ class TuevReminderPanel extends HTMLElement {
     this._formError = null;
     this._formInfo = null;
     this._view = "create";
+    this._rememberFormSnapshot();
     this._render();
   }
 
@@ -360,15 +388,18 @@ class TuevReminderPanel extends HTMLElement {
       change_plate_vehicle_digit: vehicle.change_plate_vehicle_digit || "",
     };
     this._view = "detail";
+    this._rememberFormSnapshot();
     this._render();
   }
 
-  _closeForm() {
+  _closeForm(options = {}) {
     if (this._saving || this._deleting) return;
+    if (!options.force && !this._confirmDiscardChanges()) return;
     this._view = "list";
     this._selectedVehicle = null;
     this._formError = null;
     this._formInfo = null;
+    this._formSnapshot = null;
     this._render();
   }
 
@@ -417,6 +448,7 @@ class TuevReminderPanel extends HTMLElement {
     this._form = this._defaultForm();
     this._formInfo = null;
     this._formError = null;
+    this._formSnapshot = null;
   }
 
   async _saveCreateForm() {
@@ -574,7 +606,8 @@ class TuevReminderPanel extends HTMLElement {
 
     const saveButton = this.shadowRoot.querySelector("#save-create, #save-update");
     if (saveButton) {
-      saveButton.disabled = this._saving || errors.length > 0 || !["create", "detail"].includes(this._view);
+      const saveAllowed = errors.length === 0 && ["create", "detail"].includes(this._view) && (this._view === "create" || this._formDirty());
+      saveButton.disabled = this._saving || !saveAllowed;
       saveButton.textContent = this._saving ? "Speichert …" : "Speichern";
     }
   }
@@ -585,6 +618,9 @@ class TuevReminderPanel extends HTMLElement {
     if (this._formInfo) state.push(`<p>${this._escape(this._formInfo)}</p>`);
     if (errors.length) {
       return `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>${state.join("")}`;
+    }
+    if (this._view === "detail" && !this._formDirty()) {
+      return `<strong>Keine Änderungen</strong><p>Ändere ein Feld, um Speichern zu aktivieren.</p>${state.join("")}`;
     }
     const actionText = this._view === "detail"
       ? "Die Änderungen können über die Reminder-Manager-API in der bestehenden ConfigEntry-Entität gespeichert werden."
@@ -783,7 +819,7 @@ class TuevReminderPanel extends HTMLElement {
             <p class="note">Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Card bleibt davon getrennt und liest danach nur die aktualisierten Entities/Attribute.</p>
             <div class="form-actions modal-bottom-actions">
               ${isDetail
-                ? `<button class="action" id="save-update" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
+                ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
                 : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
               <button class="ghost" id="back-to-list">Schließen</button>
             </div>
@@ -1192,7 +1228,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}

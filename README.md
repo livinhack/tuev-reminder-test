@@ -1,17 +1,29 @@
-# TÜV Reminder – r048
+# TÜV Reminder – r049
 
-Current working build: **Reminder r048**. r048 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+Current working build: **Reminder r049**. r049 hardens the Sidebar create/edit modal with a dirty-state guard and disables no-op edit saves. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
 
-## r048 Sidebar CRUD Hardening
+## r049 Sidebar Dirty Guard
+
+- Warns before closing a changed create/edit modal.
+- Keeps edit-mode save disabled until fields actually changed.
+- Shows `Keine Änderungen` in unchanged edit forms.
+- Preserves create/update/delete and duplicate protection from r048.
+- Keeps Reminder and Card repositories separated.
+
+# TÜV Reminder – r049
+
+Current working build: **Reminder r049**. r049 hardens the Sidebar CRUD path with backend duplicate protection and success feedback after create/update/delete. The Lovelace/Dashboard Card remains a separate project and is not bundled or imported.
+
+## r049 Sidebar CRUD Hardening
 
 - Backend duplicate checks for vehicle name and normalized/display kennzeichen during create/update.
 - Update excludes the edited ConfigEntry from duplicate comparison.
 - Sidebar shows short success feedback after create, update and delete.
 - Three-dot-only row actions, sortable headers and delete confirmation remain intact.
 
-# TÜV Reminder – r048
+# TÜV Reminder – r049
 
-Current working build: Reminder r048. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
+Current working build: Reminder r049. The Sidebar manager supports create, update, and delete for Reminder ConfigEntries through Reminder-owned WebSocket APIs. The Card remains a separate dashboard project and is not bundled or imported.
 
 # TÜV Reminder r045
 
@@ -314,9 +326,9 @@ r037 keeps the r036 modal form and focus behavior, but changes the create entry 
 
 r037 keeps the Reminder-owned r035 form skeleton, but opens it as a centered modal overlay over the existing vehicle list instead of replacing the list with a second page. Text and number inputs no longer trigger a full panel rebuild on each keystroke, so the active field keeps focus while the preview and local validation update in place. Save/Create remains disabled until a dedicated Reminder write API exists. Card code, Card actions and Dashboard/Lovelace behavior are not imported or duplicated.
 
-## r048 – Sidebar Row Actions + Sortable Headers
+## r049 – Sidebar Row Actions + Sortable Headers
 
-r048 keeps the Sidebar create/update flow and improves table interaction:
+r049 keeps the Sidebar create/update flow and improves table interaction:
 
 - rows themselves are no longer clickable;
 - only the three-dot menu opens per-vehicle actions;
@@ -325,4 +337,4 @@ r048 keeps the Sidebar create/update flow and improves table interaction:
 - the Card remains a separate Dashboard/Lovelace project.
 
 
-Reminder r048
+Reminder r049
