@@ -55,6 +55,7 @@ async def async_register_manager_panel(hass: HomeAssistant) -> None:
             "api_prefix": "tuev_reminder/manager",
             "mode": "vehicle_list_create_update_form",
             "write_api": True,
+            "requires_admin": False,
         },
     )
 

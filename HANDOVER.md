@@ -1,4 +1,337 @@
-# Handover – Reminder r066 Sidebar Form Payload Scrub
+# Handover – Reminder r075 Sidebar Release Candidate
+
+## Summary
+
+r075 is the release-candidate checkpoint for the current Sidebar Manager line. It keeps the r041–r074 runtime behavior and adds a guard that verifies the working checkout and generated public release ZIP are ready for a `v0.1.0` release-candidate test.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `HANDOVER.md`
+- `CHANGELOG.md`
+- `docs/REMINDER_R075_SIDEBAR_RELEASE_CANDIDATE.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R075.md`
+- `scripts/check_r075_sidebar_release_candidate.py`
+
+## Runtime status
+
+No runtime Sidebar behavior was changed compared with r074. The release candidate includes:
+
+- Sidebar `/tuev-reminder` for all authenticated HA users.
+- Vehicle list with responsive table and smartphone handling.
+- Create/Edit/Delete through Reminder Manager WebSocket API.
+- Desktop three-dot action menu and smartphone action sheet.
+- Dirty guard, duplicate guard and validation parity.
+- Brand assets in root and integration-local paths.
+
+## Preserved
+
+- No Card files in Reminder.
+- No Card renderer import.
+- No Card action duplication.
+- Existing Reminder/Card bridge attributes remain unchanged.
+
+## Test focus
+
+1. Run `python scripts/run_all_checks.py`.
+2. Build the public ZIP with `python scripts/build_public_release_zip.py`.
+3. Test Create/Edit/Delete in HA on desktop and smartphone.
+4. Confirm Home Assistant Integrations shows the Brand icon.
+5. Treat HACS icon absence as a known HACS-side display/cache limitation if HA itself shows the icon.
+
+---
+# Handover – Reminder r074 HACS Release Metadata Guard
+
+## Stand
+
+Reminder r074 keeps the functional Sidebar CRUD stack from r041–r073 and adds a release/HACS metadata guard. This is not a runtime UI feature step; it hardens the packaging path before a later release-candidate build.
+
+## Wichtig
+
+- Sidebar remains available to all authenticated Home Assistant users.
+- Create/Edit/Delete remain available.
+- Mobile action sheet, responsive table, dirty guard, duplicate checks, season validation and mobile form layout remain unchanged.
+- Home Assistant Integrations icon support remains prepared through integration-local Brand assets.
+- HACS list icon display can still depend on HACS cache/index behavior.
+- Card remains a separate repository/project.
+
+## Geändert
+
+- Version bumped to `0.1.0-r074` / `r074`.
+- Added `docs/REMINDER_R074_HACS_RELEASE_METADATA_GUARD.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R074.md`.
+- Added `scripts/check_r074_hacs_release_metadata_guard.py`.
+- The new check validates:
+  - HACS metadata file presence and core fields.
+  - manifest domain/version/dependencies/config-flow.
+  - Brand assets in root and integration-local locations.
+  - Sidebar panel/frontend files in the release tree.
+  - public release ZIP builder output and patched public metadata.
+  - absence of cache/staging artifacts in the public release ZIP.
+
+## Checks
+
+Run:
+
+```bash
+python scripts/run_all_checks.py
+```
+
+Expected:
+
+```text
+All TÜV Reminder checks passed without leaving generated cache artifacts.
+```
+
+## Nächster sinnvoller Schritt
+
+r075 should be a real release-candidate packaging step for the Sidebar CRUD milestone, unless HA testing of r073/r074 surfaces a runtime UI issue first.
+
+---
+
+# Handover – Reminder r073 Sidebar Mobile Form Compact Layout
+
+## Summary
+
+r073 keeps the r041–r072 Sidebar CRUD stack and improves the Create/Edit modal on smartphone-sized screens. The vehicle form now uses a near full-screen mobile layout, tighter spacing and a fixed bottom action bar for **Speichern** / **Schließen**.
+
+The Reminder/Card separation remains unchanged: no Card files are bundled or imported, and no Card actions are duplicated.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `docs/REMINDER_R073_SIDEBAR_MOBILE_FORM_COMPACT_LAYOUT.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R073.md`
+- `scripts/check_r073_sidebar_mobile_form_compact_layout.py`
+
+## Implementation notes
+
+- The Create/Edit modal shell now has a dedicated `vehicle-form-shell` class.
+- A new `@media (max-width: 720px)` block makes the vehicle form behave like a full-screen mobile dialog.
+- Mobile form spacing is reduced without changing desktop/tablet layout.
+- Modal inputs/selects use `font-size: 16px` in the mobile form to avoid automatic browser zoom.
+- The large Kennzeichen preview scales to the available mobile width.
+- The vehicle-form action buttons are fixed at the bottom on mobile and include `env(safe-area-inset-bottom)` padding.
+
+## Preserved
+
+- Sidebar access for all authenticated HA users.
+- Create/update/delete behavior.
+- Mobile action sheet and desktop three-dot action menu.
+- Duplicate preflight/backend duplicate guard.
+- Dirty guard and unsaved changes dialog.
+- Season range validation and form payload scrub.
+- First-run empty state from r072.
+- Brand assets path from r054/r055.
+- Reminder/Card separation.
+
+## Test focus
+
+1. Open Create and Edit on a smartphone in portrait mode.
+2. Confirm the form uses full width and avoids horizontal cramped layout.
+3. Scroll the form and confirm **Speichern** / **Schließen** stay reachable at the bottom.
+4. Confirm desktop Create/Edit still uses the two-column modal.
+5. Confirm Card entities/attributes remain unchanged.
+
+---
+# Handover – Reminder r072 Sidebar First-Run Empty State
+
+## Summary
+
+r072 keeps the working r041–r071 Sidebar CRUD stack and improves the true first-run/empty-manager experience. If no TÜV Reminder vehicles exist, the Sidebar now shows a centered **Noch keine Fahrzeuge** state with explanatory text and a plain `+` action that opens the existing Create modal.
+
+This is distinct from the r071 filter-empty state: when vehicles exist but search/status filters hide them, the Sidebar still shows **Keine Treffer** with **Filter zurücksetzen**.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `docs/REMINDER_R072_SIDEBAR_FIRST_RUN_EMPTY_STATE.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R072.md`
+- `scripts/check_r072_sidebar_first_run_empty_state.py`
+
+## Implementation notes
+
+- `_renderVehicles()` now returns a `first-run-state` card when `this._vehicles.length === 0`.
+- The first-run card uses the same `data-create-trigger` hook as the top/bottom `+` controls.
+- Added CSS for `.first-run-state` and `.empty-create`.
+- r071 filter no-match handling remains unchanged.
+
+## Preserved
+
+- Sidebar access for all authenticated HA users.
+- Create/update/delete behavior.
+- Mobile action sheet and desktop three-dot action menu.
+- Duplicate preflight/backend duplicate guard.
+- Dirty guard and unsaved changes dialog.
+- Season range validation and form payload scrub.
+- Brand assets path from r054/r055.
+- Reminder/Card separation.
+
+## Test focus
+
+1. Test with zero Reminder vehicles and confirm **Noch keine Fahrzeuge** appears.
+2. Press the centered `+` and confirm the Create modal opens.
+3. Create a vehicle and confirm the table appears normally.
+4. Apply a non-matching filter with at least one vehicle and confirm **Keine Treffer** / **Filter zurücksetzen** still works.
+
+---
+
+# Handover – Reminder r070 Sidebar Hass Update Render Guard
+
+## Summary
+
+r070 keeps the r041–r069 Sidebar CRUD stack and hardens render timing. Home Assistant can call the custom panel `hass` setter frequently. The panel now avoids rebuilding an already open create/edit/delete modal merely because unrelated HA state changed, reducing risk of focus loss, cursor jumps or transient mobile UI closing unexpectedly.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `docs/REMINDER_R070_SIDEBAR_HASS_RENDER_GUARD.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R070.md`
+- `scripts/check_r070_sidebar_hass_render_guard.py`
+
+## Implementation notes
+
+- `set hass(hass)` now tracks `firstHass`, updates the internal `hass` reference and still calls `_loadOnce()`.
+- The setter renders with `_renderPreservingListUiState()` only for initial/unloaded/list states.
+- Modal/action state changes still render through their dedicated handlers.
+
+## Preserved
+
+- Sidebar access for all authenticated HA users.
+- Create/update/delete behavior.
+- Mobile action sheet and desktop three-dot action menu.
+- Duplicate preflight/backend duplicate guard.
+- Dirty guard and unsaved changes dialog.
+- Season range validation and form payload scrub.
+- Brand assets path from r054/r055.
+- Reminder/Card separation.
+
+## Test focus
+
+1. Open Create/Edit and type continuously while HA state updates occur; input focus should remain stable.
+2. Save Create/Edit and confirm list refreshes.
+3. Test mobile three-dot action sheet.
+4. Confirm Card entities/attributes remain unchanged.
+
+---
+
+# Handover – Reminder r070 Remove Manager Admin Guard
+
+## Summary
+
+r070 corrects r068. The Sidebar Manager should be available to all authenticated Home Assistant users, not only administrators. The panel and Manager WebSocket API therefore no longer require admin-only access. Normal HA authentication still applies.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/panel.py`
+- `custom_components/tuev_reminder/manager.py`
+- `custom_components/tuev_reminder/manager_api.py`
+- `docs/REMINDER_R069_REMOVE_MANAGER_ADMIN_GUARD.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R069.md`
+- `scripts/check_r070_remove_admin_guard.py`
+
+## Implementation notes
+
+- `frontend.async_register_built_in_panel(..., require_admin=False, ...)` is used for the Sidebar panel.
+- Manager WebSocket handlers no longer call `connection.require_admin()`.
+- Manager metadata now includes `requires_admin: false`.
+- `MANAGER_API_VERSION` and `write_api_version` are now `5`.
+- The manager is still only reachable inside authenticated Home Assistant sessions.
+
+## Preserved
+
+- Create/update/delete behavior.
+- Mobile action sheet and desktop three-dot action menu.
+- Duplicate preflight/backend duplicate guard.
+- Dirty guard and unsaved changes dialog.
+- Season range validation and form payload scrub.
+- Brand assets path from r054/r055.
+- Reminder/Card separation.
+
+## Test focus
+
+1. Log in as a normal authenticated HA user and confirm `/tuev-reminder` loads.
+2. Create/edit/delete one test vehicle from the Sidebar.
+3. Confirm mobile action sheet and desktop three-dot menu still work.
+4. Confirm Card entities/attributes remain unchanged.
+
+---
+
+# Handover – Reminder r068 Manager Admin Guard
+
+## Summary
+
+r068 keeps the working Sidebar CRUD stack and adds an access-control hardening layer. The TÜV Reminder Manager can create, update and delete ConfigEntries and displays vehicle names/plates, so the Sidebar panel and Manager WebSocket API are now admin-only.
+
+## Changed files
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/panel.py`
+- `custom_components/tuev_reminder/manager.py`
+- `custom_components/tuev_reminder/manager_api.py`
+- `docs/REMINDER_R068_MANAGER_ADMIN_GUARD.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R068.md`
+- `scripts/check_r068_manager_admin_guard.py`
+
+## Implementation notes
+
+- `frontend.async_register_built_in_panel(..., require_admin=True, ...)` is used for the Sidebar panel.
+- All Manager WebSocket handlers call `connection.require_admin()` before returning or mutating manager data.
+- Manager metadata now includes `requires_admin: true`.
+- `MANAGER_API_VERSION` and `write_api_version` are now `4`.
+
+## Preserved
+
+- Create/update/delete behavior for admin users.
+- Mobile action sheet and desktop three-dot action menu.
+- Duplicate preflight/backend duplicate guard.
+- Dirty guard and unsaved changes dialog.
+- Season range validation and form payload scrub.
+- Brand assets path from r054/r055.
+- Reminder/Card separation.
+
+## Test focus
+
+1. Log in as admin and confirm `/tuev-reminder` still loads.
+2. Create/edit/delete one test vehicle from the Sidebar.
+3. Confirm non-admin access does not expose/use the manager panel/API.
+4. Confirm Card entities/attributes remain unchanged.
+
+# r067 Handover – Sidebar Season Range Validation Parity
+
+## Implemented in r067
+
+- Sidebar create/edit form now validates seasonal duration with the same 2–11 month rule used by the backend.
+- Invalid ranges such as April–April or full-year 12-month seasons disable save locally and show a German validation message.
+- Wrap-around ranges like November–March remain valid.
+
+## Preserved
+
+- r066 effective payload scrub remains active.
+- Manager Create/Update/Delete APIs remain unchanged.
+- Mobile action sheet, responsive table, Duplicate Preflight and Dirty Guard remain active.
+- Reminder and Card repositories remain separated.
+
+## Test focus
+
+1. Open Sidebar → TÜV Reminder.
+2. Create or edit a Saisonkennzeichen.
+3. Verify same start/end month is rejected.
+4. Verify a 12-month range is rejected.
+5. Verify a valid wrap-around range, for example 11–3, remains saveable.
+
+# Handover – Reminder r067 Sidebar Form Payload Scrub
 
 ## Base
 
@@ -19,9 +352,9 @@ After the Sidebar create/edit flow became functional, the form still kept hidden
 - Non-seasonal modes save neutral season values.
 - Green modes force H/E suffix flags off.
 - Existing detail records are scrubbed when opened for editing.
-- Added `docs/REMINDER_R066_SIDEBAR_FORM_PAYLOAD_SCRUB.md`.
-- Added `docs/COMPAT_CARD_B355_REMINDER_R066.md`.
-- Added `scripts/check_r066_sidebar_form_payload_scrub.py`.
+- Added `docs/REMINDER_R067_SIDEBAR_FORM_PAYLOAD_SCRUB.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R067.md`.
+- Added `scripts/check_r067_sidebar_form_payload_scrub.py`.
 
 ## Preserved
 
@@ -1282,3 +1615,8 @@ Reminder r054
 - Kennzeichen-Vorschau wird auf kleinen Displays ausgeblendet, Kennzeichentext erscheint kompakt unter dem Namen.
 - Auf sehr schmalen Displays wird die Erinnerungsspalte ausgeblendet, damit das Drei-Punkte-Menü erreichbar bleibt.
 - Keine Card-Vermischung; Create/Update/Delete/Dirty-Guard bleiben erhalten.
+
+
+# Preserved r066 – Sidebar Form Payload Scrub
+
+- Hidden or inactive fields remain scrubbed before validation, dirty checks and save payload creation.

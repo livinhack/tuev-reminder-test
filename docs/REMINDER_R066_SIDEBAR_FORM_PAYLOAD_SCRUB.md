@@ -1,6 +1,6 @@
-# Reminder r066 – Sidebar Form Payload Scrub
+# Reminder r067 – Sidebar Form Payload Scrub
 
-r066 hardens the Sidebar create/edit form so hidden or inactive fields do not leak stale values into the Manager write API payload.
+r067 hardens the Sidebar create/edit form so hidden or inactive fields do not leak stale values into the Manager write API payload.
 
 ## Implemented
 

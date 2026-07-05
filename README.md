@@ -1,10 +1,182 @@
-# TÜV Reminder – r066
+# TÜV Reminder – r075
 
-Current working build: **Reminder r066**. r066 keeps the Sidebar CRUD stack and hardens create/edit form state handling: hidden or inactive form branches are scrubbed before validation, dirty checks and Manager API payload creation.
+Current working build: **Reminder r075**. r075 is the Sidebar release-candidate checkpoint for the current Reminder Manager line. It keeps the r041–r074 CRUD and mobile UX behavior and adds a release-candidate guard for the public `v0.1.0` package shape.
 
 The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
 
-## r066 highlights
+## r075 highlights
+
+- Release-candidate checkpoint for the Sidebar Manager stack.
+- Confirms the package contains the full Sidebar CRUD path: list, create, edit, delete, responsive table, mobile action sheet, dirty guard, duplicate checks and validation parity.
+- Confirms the Manager remains available to all authenticated Home Assistant users, not admin-only.
+- Confirms local Brand assets remain present in both HACS/root and Home-Assistant integration-local locations.
+- Confirms the public release builder patches internal metadata to `0.1.0` / `v0.1.0`.
+- No runtime Sidebar behavior changed compared with r074.
+
+## Test focus
+
+1. Run `python scripts/run_all_checks.py`.
+2. Build the public release asset with `python scripts/build_public_release_zip.py`.
+3. In Home Assistant, test Create/Edit/Delete once on desktop and once on smartphone.
+4. Confirm the Card still reads Reminder entities normally, because no Card bridge contract changed.
+
+---
+# TÜV Reminder – r074
+
+Current working build: **Reminder r074**. r074 keeps the working Sidebar CRUD stack and adds a HACS/release metadata guard before the next release-candidate packaging step.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r074 highlights
+
+- New guard script: `scripts/check_r074_hacs_release_metadata_guard.py`.
+- Validates internal working version `0.1.0-r074` / `r074`.
+- Validates manifest domain, config flow and Sidebar dependencies.
+- Validates HACS metadata file presence and core fields.
+- Validates Brand assets at both required package locations:
+  - `brand/icon.png`
+  - `brand/logo.png`
+  - `custom_components/tuev_reminder/brand/icon.png`
+  - `custom_components/tuev_reminder/brand/logo.png`
+- Validates the public release ZIP builder output and patched public metadata.
+- No runtime Sidebar behavior changed compared with r073.
+
+## Test focus
+
+1. Run `python scripts/run_all_checks.py`.
+2. Confirm the r074 check builds and inspects a temporary public release ZIP.
+3. Confirm Create/Edit/Delete still behave like r073 in Home Assistant.
+4. Confirm Home Assistant Integrations still shows the local Brand icon.
+
+---
+# TÜV Reminder – r073
+
+Current working build: **Reminder r073**. r073 keeps the working Sidebar CRUD stack and optimizes the Create/Edit modal for smartphone-sized screens.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r073 highlights
+
+- Create/Edit modal switches to a near full-screen mobile layout below 720px width.
+- Mobile form padding, card spacing, headings and field gaps are reduced.
+- Native mobile input zoom is avoided by using 16px input/select text size in the modal.
+- The Kennzeichen preview is scaled down to fit smartphone width.
+- The explanatory note in the right preview area is hidden on small screens.
+- Save/Close actions become a fixed bottom action bar on small screens, including safe-area padding.
+- Desktop/tablet layout remains unchanged.
+- Create/Edit/Delete, mobile action sheet, first-run empty state, Brand assets and Reminder/Card separation remain unchanged.
+
+## Test focus
+
+1. Open `/tuev-reminder` on a smartphone and create a new vehicle.
+2. Confirm the form uses the full available screen width and does not feel cramped horizontally.
+3. Confirm Save/Close remain reachable at the bottom while scrolling through fields.
+4. Confirm editing, deleting and desktop layout still behave like r072.
+
+---
+# TÜV Reminder – r072
+
+Current working build: **Reminder r072**. r072 keeps the working Sidebar CRUD stack and improves the true first-run state when no Reminder vehicles exist yet.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r072 highlights
+
+- The Sidebar no longer shows only a plain text line when no vehicles exist.
+- A centered first-run state now shows **Noch keine Fahrzeuge** with explanatory text.
+- The first-run state includes a plain `+` action that opens the existing Create modal.
+- The r071 `Keine Treffer` / `Filter zurücksetzen` state for active filters remains unchanged.
+- Create/Edit/Delete, mobile action sheet, render guard, Brand assets and Reminder/Card separation remain unchanged.
+
+## Test focus
+
+1. Test a clean install or delete all Reminder vehicles and open `/tuev-reminder`.
+2. Confirm the first-run state is centered and the `+` opens the Create modal.
+3. Create a vehicle and confirm the normal table appears.
+4. Apply a filter with no matches and confirm the separate `Keine Treffer` state still works.
+
+---
+
+# TÜV Reminder – r070
+
+Current working build: **Reminder r070**. r070 keeps the working Sidebar CRUD stack and adds a render guard so frequent Home Assistant `hass` updates do not rebuild an open Create/Edit/Delete dialog unnecessarily.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r070 highlights
+
+- Create/Edit/Delete dialogs are no longer rebuilt only because Home Assistant emitted an unrelated `hass` setter update.
+- The list view remains live and still preserves focus/scroll state.
+- Form interactions continue to render from their own state changes, e.g. save/delete progress, validation, dirty guard and action sheets.
+- Sidebar remains available to all authenticated Home Assistant users.
+- Create/Edit/Delete behavior from r041–r069 remains available.
+- No Card code is bundled or imported; the Card remains a separate Dashboard/Lovelace project.
+
+## Test focus
+
+1. Open Create/Edit on `/tuev-reminder`, type in several fields and wait for normal HA state updates; focus/cursor should remain stable.
+2. Confirm Create/Edit/Delete still work.
+3. Confirm mobile three-dot action sheet still opens and stays visible.
+4. Confirm Card entities/attributes remain unchanged.
+
+---
+
+# TÜV Reminder – r070
+
+Current working build: **Reminder r070**. r070 corrects the temporary r068 access-control decision: the Sidebar Manager is available to all authenticated Home Assistant users again, while Create/Edit/Delete and the existing CRUD hardening remain intact.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r070 highlights
+
+- Sidebar panel registration no longer requires admin-only access.
+- Manager WebSocket commands no longer call `connection.require_admin()`.
+- Manager metadata now advertises `requires_admin: false`.
+- Manager metadata versions are bumped to `api_version: 5` / `write_api_version: 5`.
+- The Manager remains protected by normal Home Assistant authentication; it is not public/anonymous.
+- Create/Edit/Delete behavior from r041–r067 remains available.
+- No Card code is bundled or imported; the Card remains a separate Dashboard/Lovelace project.
+
+## Test focus
+
+1. Log in as a normal authenticated HA user and confirm `/tuev-reminder` is visible/usable.
+2. Confirm Create/Edit/Delete still work for the Sidebar Manager.
+3. Confirm the r055 mobile action sheet and r064/r065 dialogs still behave correctly.
+4. Confirm Card entities/attributes remain unchanged because bridge attributes are untouched.
+
+---
+
+# TÜV Reminder – r068
+
+Current working build: **Reminder r068**. r068 keeps the Sidebar CRUD stack from r041–r067 and hardens access control: the Sidebar Manager is now admin-only and all Manager WebSocket commands require an admin connection.
+
+## r068 highlights
+
+- Sidebar panel registration now uses `require_admin=True`.
+- Manager WebSocket commands now call `connection.require_admin()`:
+  - metadata
+  - vehicles/list
+  - vehicles/get
+  - vehicles/create
+  - vehicles/update
+  - vehicles/delete
+- Manager metadata now exposes `requires_admin: true`.
+- Create/Edit/Delete behavior is unchanged for admin users.
+- No Card code is bundled or imported; the Card remains a separate Dashboard/Lovelace project.
+
+## Test focus
+
+1. Admin user: Sidebar entry `TÜV Reminder` should still be visible and CRUD should continue to work.
+2. Non-admin user: Manager panel/API should not be usable.
+3. Card display should remain unchanged because bridge attributes are untouched.
+
+# TÜV Reminder – r067
+
+Current working build: **Reminder r067**. r067 keeps the Sidebar CRUD stack and adds local season-range validation parity with the backend: seasonal ranges must be 2–11 months before save is enabled.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r067 highlights
 
 - Wechselkennzeichen mode no longer carries stale normal-plate or H/E suffix values into the effective save payload.
 - Normal, green and seasonal modes no longer carry stale Wechselkennzeichen-only fields into the effective save payload.

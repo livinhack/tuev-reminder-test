@@ -37,9 +37,17 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   set hass(hass) {
+    const firstHass = !this._hass;
     this._hass = hass;
     this._loadOnce();
-    this._render();
+
+    // Home Assistant assigns `hass` frequently as states change. Rebuilding an
+    // open create/edit/delete dialog on every unrelated state update can steal
+    // focus from inputs or close transient mobile UI. List rendering remains
+    // live, but modal interactions render only from their own state changes.
+    if (firstHass || !this._loaded || this._view === "list") {
+      this._renderPreservingListUiState();
+    }
   }
 
   set narrow(narrow) {
@@ -119,6 +127,19 @@ class TuevReminderPanel extends HTMLElement {
       green: ["green", "green_seasonal"].includes(kind),
       change: kind === "change",
     };
+  }
+
+  _seasonDuration(startMonth, endMonth) {
+    return ((Number(endMonth) - Number(startMonth) + 12) % 12) + 1;
+  }
+
+  _isValidSeasonRange(startMonth, endMonth) {
+    const start = Number(startMonth);
+    const end = Number(endMonth);
+    if (!Number.isInteger(start) || !Number.isInteger(end)) return false;
+    if (start < 1 || start > 12 || end < 1 || end > 12) return false;
+    const duration = this._seasonDuration(start, end);
+    return duration >= 2 && duration <= 11;
   }
 
   _scrubFormForKind(form = this._form) {
@@ -357,6 +378,18 @@ class TuevReminderPanel extends HTMLElement {
     return vehicles.sort((a, b) => this._compareVehicles(a, b));
   }
 
+  _filtersActive() {
+    return Boolean(String(this._filter || "").trim()) || this._statusFilter !== "all";
+  }
+
+  _resetListFilters() {
+    this._filter = "";
+    this._statusFilter = "all";
+    this._openMenuIndex = null;
+    this._openMenuEntryId = null;
+    this._renderPreservingListUiState();
+  }
+
   _platePreviewFromText(text, options = {}) {
     const green = options.green === true;
     const seasonal = options.seasonal === true;
@@ -469,6 +502,8 @@ class TuevReminderPanel extends HTMLElement {
       const end = Number(clean.season_end_month);
       if (!Number.isInteger(start) || start < 1 || start > 12 || !Number.isInteger(end) || end < 1 || end > 12) {
         errors.push("Saisonmonate müssen zwischen 1 und 12 liegen.");
+      } else if (!this._isValidSeasonRange(start, end)) {
+        errors.push("Saisonzeitraum muss mindestens 2 und höchstens 11 Monate umfassen.");
       }
     }
     this._formDuplicateErrors().forEach((error) => errors.push(error));
@@ -926,12 +961,24 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     if (!this._vehicles.length) {
-      return `<p class="state muted">Noch keine TÜV-Reminder-Fahrzeuge gefunden. Nutze „+“, um ein neues Fahrzeug anzulegen.</p>`;
+      return `
+        <div class="state state-card first-run-state">
+          <strong>Noch keine Fahrzeuge</strong>
+          <p>Lege dein erstes Fahrzeug an. Es wird als normale TÜV-Reminder-ConfigEntry/Entity in Home Assistant erstellt.</p>
+          <button type="button" class="empty-create" data-create-trigger="empty" title="Erstes Fahrzeug anlegen" aria-label="Erstes Fahrzeug anlegen">+</button>
+        </div>
+      `;
     }
 
     const vehicles = this._visibleVehicles();
     if (!vehicles.length) {
-      return `<p class="state muted">Keine Fahrzeuge passen zum aktuellen Filter.</p>`;
+      return `
+        <div class="state state-card muted">
+          <strong>Keine Treffer</strong>
+          <p>Keine Fahrzeuge passen zur aktuellen Suche oder zum Statusfilter.</p>
+          ${this._filtersActive() ? `<button type="button" class="ghost" id="clear-filters">Filter zurücksetzen</button>` : ""}
+        </div>
+      `;
     }
 
     return `
@@ -1106,7 +1153,7 @@ class TuevReminderPanel extends HTMLElement {
 
     return `
       <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true" tabindex="-1">
-        <div class="form-shell">
+        <div class="form-shell vehicle-form-shell">
         <div class="form-head">
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
@@ -1587,6 +1634,45 @@ class TuevReminderPanel extends HTMLElement {
           transform: translateY(-1px);
         }
         .state { padding: 24px 16px; }
+        .state-card {
+          display: grid;
+          gap: 8px;
+          align-items: start;
+          justify-items: start;
+        }
+        .state-card strong { color: var(--primary-text-color); font-size: 15px; }
+        .state-card p { margin: 0; color: var(--secondary-text-color); font-size: 13px; }
+        .first-run-state {
+          align-items: center;
+          justify-items: center;
+          text-align: center;
+          margin: 24px;
+          border: 1px solid var(--divider-color);
+          border-radius: 12px;
+          background: var(--card-background-color);
+        }
+        .first-run-state p {
+          max-width: 560px;
+          line-height: 1.45;
+        }
+        button.empty-create {
+          width: 48px;
+          height: 48px;
+          min-width: 48px;
+          border: 0;
+          border-radius: 50%;
+          background: transparent;
+          color: var(--primary-text-color);
+          font-size: 38px;
+          font-weight: 300;
+          line-height: 1;
+          cursor: pointer;
+        }
+        button.empty-create:hover,
+        button.empty-create:focus-visible {
+          background: var(--secondary-background-color);
+          outline: none;
+        }
         .error { color: var(--error-color); }
         .form-shell {
           width: min(1120px, 100%);
@@ -1705,6 +1791,113 @@ class TuevReminderPanel extends HTMLElement {
           h1 { font-size: 18px; }
           .version { display: none; }
         }
+        @media (max-width: 720px) {
+          .modal-backdrop {
+            align-items: stretch;
+            justify-content: stretch;
+            padding: 0;
+            background: var(--primary-background-color);
+          }
+          .vehicle-form-shell {
+            width: 100%;
+            max-height: 100vh;
+            min-height: 100vh;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 12px 12px 88px;
+          }
+          .vehicle-form-shell .form-head {
+            margin-bottom: 12px;
+          }
+          .vehicle-form-shell h2 {
+            font-size: 20px;
+          }
+          .vehicle-form-shell .form-head p {
+            font-size: 13px;
+            line-height: 1.35;
+          }
+          .vehicle-form-shell h3 {
+            margin: 14px 0 8px;
+            font-size: 12px;
+          }
+          .vehicle-form-shell .form-grid {
+            gap: 12px;
+          }
+          .vehicle-form-shell .form-card {
+            padding: 12px;
+            border-radius: 8px;
+          }
+          .vehicle-form-shell .field-pair {
+            gap: 10px;
+          }
+          .vehicle-form-shell label {
+            font-size: 11px;
+          }
+          .vehicle-form-shell label input,
+          .vehicle-form-shell label select {
+            margin-top: 5px;
+            font-size: 16px;
+          }
+          .vehicle-form-shell input,
+          .vehicle-form-shell select {
+            height: 42px;
+          }
+          .vehicle-form-shell .check-row {
+            gap: 10px 16px;
+          }
+          .vehicle-form-shell .preview-card {
+            padding-bottom: 12px;
+          }
+          .vehicle-form-shell .large-preview .plate-preview {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            height: 44px;
+          }
+          .vehicle-form-shell .large-preview .plate-text {
+            font-size: 19px;
+          }
+          .vehicle-form-shell .large-preview .plate-eu {
+            width: 28px;
+          }
+          .vehicle-form-shell .large-preview .plate-season {
+            min-width: 30px;
+          }
+          .vehicle-form-shell .preview-card dl {
+            margin: 12px 0;
+          }
+          .vehicle-form-shell .preview-card dl div {
+            padding: 5px 0;
+            font-size: 12px;
+          }
+          .vehicle-form-shell .note {
+            display: none;
+          }
+          .vehicle-form-shell .validation {
+            padding: 10px;
+            font-size: 12px;
+          }
+          .vehicle-form-shell .modal-bottom-actions {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2147482000;
+            margin: 0;
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--divider-color);
+            background: var(--card-background-color);
+            box-shadow: 0 -8px 24px rgba(0,0,0,.18);
+          }
+          .vehicle-form-shell .modal-bottom-actions button {
+            min-height: 44px;
+          }
+          .vehicle-form-shell .modal-bottom-actions .action,
+          .vehicle-form-shell .modal-bottom-actions .ghost {
+            flex: 1 1 0;
+          }
+        }
         @media (max-width: 560px) {
           .field-pair { grid-template-columns: 1fr; }
         }
@@ -1721,7 +1914,7 @@ class TuevReminderPanel extends HTMLElement {
         <section class="toolbar" aria-label="Fahrzeugliste filtern und sortieren">
           <div class="search-wrap">
             <span class="search-icon">⌕</span>
-            <input id="filter" type="search" placeholder="Search" value="${this._escape(this._filter)}">
+            <input id="filter" type="search" placeholder="Suchen" value="${this._escape(this._filter)}">
           </div>
           <select id="status-filter" aria-label="Statusfilter">
             <option value="all" ${this._statusFilter === "all" ? "selected" : ""}>Alle Status</option>
@@ -1736,7 +1929,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · First-Run-Leerzustand · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -1783,6 +1976,11 @@ class TuevReminderPanel extends HTMLElement {
         this._openMenuEntryId = null;
         this._renderPreservingListUiState();
       });
+    }
+
+    const clearFiltersButton = this.shadowRoot.querySelector("#clear-filters");
+    if (clearFiltersButton) {
+      clearFiltersButton.addEventListener("click", () => this._resetListFilters());
     }
 
     this.shadowRoot.querySelectorAll("button[data-sort-key]").forEach((button) => {

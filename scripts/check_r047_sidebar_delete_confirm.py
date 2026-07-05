@@ -14,9 +14,9 @@ def fail(message: str) -> None:
     raise SystemExit(f"r053 sidebar delete confirm check failed: {message}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r066":
-    fail("manifest version must be 0.1.0-r066")
-if read("REMINDER_VERSION.txt").strip() != "r066":
+if manifest.get("version") != "0.1.0-r075":
+    fail("manifest version must be 0.1.0-r075")
+if read("REMINDER_VERSION.txt").strip() != "r075":
     fail("REMINDER_VERSION.txt must be r053")
 
 manager = read("custom_components/tuev_reminder/manager.py")
@@ -32,7 +32,7 @@ require(api, "async def websocket_manager_vehicle_delete", "delete websocket han
 require(api, "await hass.config_entries.async_remove(entry.entry_id)", "config entry removal")
 require(api, "websocket_api.async_register_command(hass, websocket_manager_vehicle_delete)", "delete websocket registration")
 require(manager, '"api_version": MANAGER_API_VERSION', "metadata api version")
-require(manager, '"write_api_version": 3', "write api version")
+require(manager, '"write_api_version": 5', "write api version")
 require(manager, '"tuev_reminder/manager/vehicles/delete"', "metadata delete command")
 require(panel, '_openDeleteConfirm(vehicle)', "delete confirm opener")
 require(panel, 'type: "tuev_reminder/manager/vehicles/delete"', "frontend delete websocket call")

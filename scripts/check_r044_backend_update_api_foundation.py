@@ -18,9 +18,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r066":
-        fail("manifest version must be 0.1.0-r066")
-    if read("REMINDER_VERSION.txt").strip() != "r066":
+    if manifest.get("version") != "0.1.0-r075":
+        fail("manifest version must be 0.1.0-r075")
+    if read("REMINDER_VERSION.txt").strip() != "r075":
         fail("REMINDER_VERSION.txt must be r053")
 
     manager = read("custom_components/tuev_reminder/manager.py")
@@ -29,8 +29,8 @@ def main() -> None:
     handover = read("HANDOVER.md")
 
     for marker in [
-        "MANAGER_API_VERSION = 3",
-        '"write_api_version": 3',
+        "MANAGER_API_VERSION = 5",
+        '"write_api_version": 5',
         '"tuev_reminder/manager/vehicles/create"',
         '"tuev_reminder/manager/vehicles/update"',
     ]:

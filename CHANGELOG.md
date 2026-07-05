@@ -1,8 +1,87 @@
+## r075 – Sidebar Release Candidate
+
+- Establishes the current Sidebar Manager line as a release-candidate checkpoint.
+- Adds `scripts/check_r075_sidebar_release_candidate.py`.
+- Guards the full Sidebar CRUD package shape and public `v0.1.0` release asset metadata.
+- Keeps runtime behavior unchanged from r074.
+- Preserves Reminder/Card separation.
+
+# r074 – HACS Release Metadata Guard
+
+- Bumped Reminder version to `0.1.0-r074`.
+- Added release/HACS metadata guard script: `scripts/check_r074_hacs_release_metadata_guard.py`.
+- Guard checks manifest domain/version/dependencies, HACS metadata, Brand asset paths, Sidebar files and release-builder output.
+- Guard verifies public release ZIP metadata is patched to `0.1.0` / `v0.1.0` and contains no generated cache/staging artifacts.
+- Added `docs/REMINDER_R074_HACS_RELEASE_METADATA_GUARD.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R074.md`.
+- No runtime Sidebar behavior changed.
+- No Card code bundled or imported.
+
+---
+# r073 – Sidebar Mobile Form Compact Layout
+
+- Bumped Reminder version to `0.1.0-r073`.
+- Added a dedicated smartphone layout for the Sidebar Create/Edit modal.
+- The form modal becomes near full-screen below 720px width.
+- Reduced mobile padding, heading sizes, form-card spacing and field gaps.
+- Increased mobile input/select font size to 16px to avoid mobile browser zoom.
+- Scaled the Kennzeichen preview to fit narrow screens.
+- Hid the explanatory Reminder/Card separation note inside the mobile modal to save vertical space.
+- Added a fixed bottom Save/Close action bar for the vehicle form on small screens.
+- Preserved Create/Edit/Delete, mobile action sheet, first-run empty state, Brand assets and Reminder/Card separation.
+
+---
+# r072 – Sidebar First-Run Empty State
+
+- Bumped Reminder version to `0.1.0-r072`.
+- Replaced the plain no-vehicle text with a centered first-run state.
+- Added **Noch keine Fahrzeuge** and explanatory text for clean installs/empty managers.
+- Added a plain `+` create action inside the first-run state.
+- Preserved the r071 filter no-match state with `Filter zurücksetzen`.
+- Preserved Create/Edit/Delete, mobile action sheet, render guard, Brand assets and Reminder/Card separation.
+
+---
+
+# r070 – Sidebar Hass Update Render Guard
+
+- Bumped Reminder version to `0.1.0-r070`.
+- Hardened the Sidebar panel `hass` setter against frequent unrelated Home Assistant state updates.
+- Open create/edit/delete dialogs are not rebuilt solely because a new `hass` object was assigned.
+- List rendering remains live and still preserves list UI state.
+- Preserved Create/Edit/Delete, duplicate checks, dirty guard, mobile action sheet, Brand assets and Reminder/Card separation.
+
+---
+
+# r070 – Remove Manager Admin Guard
+
+- Bumped Reminder version to `0.1.0-r070`.
+- Reverted the temporary r068 admin-only Sidebar access decision.
+- Sidebar panel registration now uses `require_admin=False`.
+- Removed `connection.require_admin()` from Manager WebSocket commands.
+- Manager metadata now advertises `requires_admin: false`, `api_version: 5` and `write_api_version: 5`.
+- Preserved Sidebar Create/Edit/Delete, CRUD hardening, mobile action sheet, dialogs, Brand assets and Reminder/Card separation.
+
+# r068 – Sidebar Manager Admin Guard
+
+- Bumped Reminder version to `0.1.0-r068`.
+- Registered the TÜV Reminder Sidebar panel with `require_admin=True`.
+- Added `connection.require_admin()` to all Manager WebSocket commands, including read commands and create/update/delete.
+- Manager metadata now advertises `requires_admin: true`, `api_version: 4` and `write_api_version: 4`.
+- Preserved Sidebar CRUD, mobile action sheet, form validation and Reminder/Card separation.
+
+# r067 – Sidebar Season Range Validation Parity
+
+- Adds local Sidebar validation for seasonal plate duration.
+- Seasonal and green seasonal plate ranges must now be at least 2 and at most 11 months before save is enabled.
+- Wrap-around season ranges remain supported.
+- Backend validation remains the source of truth; this only prevents avoidable Manager API validation errors earlier in the UI.
+- Preserves r066 payload scrub, Create/Update/Delete, mobile action sheet and Reminder/Card separation.
+
 # Changelog
 
-## r066 – Sidebar Form Payload Scrub
+## r067 – Sidebar Form Payload Scrub
 
-- Bumped Reminder version to `0.1.0-r066`.
+- Bumped Reminder version to `0.1.0-r067`.
 - Added `_formKindFlags(...)`, `_scrubFormForKind(...)` and `_sanitizeFieldValue(...)` to the Sidebar panel.
 - Scrubs inactive normal-plate, Wechselkennzeichen, season and H/E suffix fields before validation, dirty checks and Manager API payload creation.
 - Non-seasonal save payloads now send neutral season values instead of hidden stale month selections.

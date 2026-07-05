@@ -1,6 +1,6 @@
-# Compatibility – Card b355 / Reminder r066
+# Compatibility – Card b355 / Reminder r067
 
-Reminder r066 only changes Sidebar create/edit form state normalization before Manager API writes.
+Reminder r067 only changes Sidebar create/edit form state normalization before Manager API writes.
 
 The Card-facing entity attributes and the Reminder/Card bridge remain unchanged. Existing Card b355 compatibility is preserved.
 

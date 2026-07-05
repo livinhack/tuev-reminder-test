@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r066 Sidebar form payload scrubbing."""
+"""Validate r070 Sidebar form payload scrubbing."""
 from __future__ import annotations
 
 import json
@@ -9,14 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "custom_components" / "tuev_reminder" / "manifest.json"
 VERSION = ROOT / "REMINDER_VERSION.txt"
 PANEL = ROOT / "custom_components" / "tuev_reminder" / "frontend" / "tuev-reminder-panel.js"
-DOC = ROOT / "docs" / "REMINDER_R066_SIDEBAR_FORM_PAYLOAD_SCRUB.md"
-COMPAT = ROOT / "docs" / "COMPAT_CARD_B355_REMINDER_R066.md"
+DOC = ROOT / "docs" / "REMINDER_R067_SIDEBAR_FORM_PAYLOAD_SCRUB.md"
+COMPAT = ROOT / "docs" / "COMPAT_CARD_B355_REMINDER_R067.md"
 README = ROOT / "README.md"
 HANDOVER = ROOT / "HANDOVER.md"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r066 sidebar form payload scrub check failed: {message}")
+    raise SystemExit(f"r070 sidebar form payload scrub check failed: {message}")
 
 
 def require(text: str, needle: str, label: str) -> None:
@@ -25,10 +25,10 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r066":
-    fail("manifest version must be 0.1.0-r066")
-if VERSION.read_text(encoding="utf-8").strip() != "r066":
-    fail("REMINDER_VERSION.txt must be r066")
+if manifest.get("version") != "0.1.0-r075":
+    fail("manifest version must be 0.1.0-r075")
+if VERSION.read_text(encoding="utf-8").strip() != "r075":
+    fail("REMINDER_VERSION.txt must be r071")
 
 panel = PANEL.read_text(encoding="utf-8")
 
@@ -57,9 +57,9 @@ for forbidden in [
     if forbidden in panel:
         fail(f"unexpected Card/action coupling in panel: {forbidden}")
 
-require(DOC.read_text(encoding="utf-8"), "hidden or inactive fields", "r066 doc payload scrub note")
+require(DOC.read_text(encoding="utf-8"), "hidden or inactive fields", "r070 doc payload scrub note")
 require(COMPAT.read_text(encoding="utf-8"), "Card remains", "compat Card separation")
-require(README.read_text(encoding="utf-8"), "r066 highlights", "README r066 section")
-require(HANDOVER.read_text(encoding="utf-8"), "Sidebar Form Payload Scrub", "handover r066 title")
+require(README.read_text(encoding="utf-8"), "r070 highlights", "README r070 section")
+require(HANDOVER.read_text(encoding="utf-8"), "Sidebar Form Payload Scrub", "handover r070 title")
 
-print("r066 sidebar form payload scrub checks passed")
+print("r070 sidebar form payload scrub checks passed")
