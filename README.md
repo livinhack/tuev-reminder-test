@@ -1,3 +1,46 @@
+# TÜV Reminder – r077
+
+Current working build: **Reminder r077**. r077 continues normal function/UX development. Release work remains parked; this build focuses on Sidebar list controls and readability.
+
+## r077 highlights
+
+- Adds status summary chips for quick filtering: Alle, Abgelaufen, Fällig and Gültig.
+- Keeps the existing status dropdown for explicit filtering, but the chips provide faster everyday navigation.
+- Adds a compact Treffer/fällig summary in the Manager status area.
+- Makes table headers sticky while scrolling.
+- Refines status pills with a small colored dot for quicker visual scanning.
+- Shows `Lädt …` during manual refresh.
+- Keeps Create/Edit/Delete, mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive behavior.
+- Keeps the Reminder/Card boundary strict: the Sidebar manages Reminder entities only; the Card remains a separate Lovelace/dashboard project.
+
+## Current development note
+
+No release packaging or public-release steps should be inferred from r077. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
+# TÜV Reminder – r077
+
+Current working build: **Reminder r077**. r077 continues normal feature/UX development after the r075 checkpoint. Release work is intentionally parked; this build focuses on Sidebar form structure, visual polish, and day-to-day usability.
+
+## r077 highlights
+
+- Reworks the Create/Edit modal into clearer sections:
+  - Fahrzeug
+  - HU & Erinnerung
+  - Kennzeichen
+  - Saison, only when relevant
+- Keeps Create/Edit/Delete functionality from the earlier Sidebar CRUD line.
+- Keeps mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive table behavior.
+- Improves table affordance with subtler row hover and clearer status pills.
+- Keeps the Reminder/Card boundary strict: the Sidebar manages Reminder entities only; the Card remains a separate Lovelace/dashboard project.
+
+## Current development note
+
+No release packaging or public-release steps should be inferred from r077. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
 # TÜV Reminder – r075
 
 Current working build: **Reminder r075**. r075 is the Sidebar release-candidate checkpoint for the current Reminder Manager line. It keeps the r041–r074 CRUD and mobile UX behavior and adds a release-candidate guard for the public `v0.1.0` package shape.

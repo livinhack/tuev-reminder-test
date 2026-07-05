@@ -241,6 +241,27 @@ class TuevReminderPanel extends HTMLElement {
     }, {});
   }
 
+
+  _statusChip(label, value, count) {
+    const active = this._statusFilter === value ? " active" : "";
+    const disabled = value !== "all" && Number(count || 0) === 0 ? " disabled" : "";
+    return `<button type="button" class="status-filter-chip${active}${disabled}" data-status-chip="${this._escape(value)}" aria-pressed="${active ? "true" : "false"}"><span>${this._escape(label)}</span><strong>${this._escape(count)}</strong></button>`;
+  }
+
+  _summaryChips(counts, visibleCount) {
+    const total = this._vehicles.length;
+    const urgent = (counts.due || 0) + (counts.expired || 0);
+    return `
+      <div class="summary-chip-row" aria-label="Status Schnellfilter">
+        ${this._statusChip("Alle", "all", total)}
+        ${this._statusChip("Abgelaufen", "expired", counts.expired || 0)}
+        ${this._statusChip("Fällig", "due", counts.due || 0)}
+        ${this._statusChip("Gültig", "valid", counts.valid || 0)}
+        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong> Treffer · <strong>${this._escape(urgent)}</strong> fällig/abgelaufen</span>
+      </div>
+    `;
+  }
+
   _sortValue(vehicle, key) {
     if (key === "name") return String(vehicle.vehicle_name || vehicle.title || "").toLowerCase();
     if (key === "hu") return String(vehicle.due_date || `${String(vehicle.year || "9999").padStart(4, "0")}-${String(vehicle.month || "99").padStart(2, "0")}-01`);
@@ -1162,53 +1183,84 @@ class TuevReminderPanel extends HTMLElement {
         </div>
 
         <div class="form-grid">
-          <div class="form-card fields-card">
-            <h3>Basisdaten</h3>
-            <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(clean.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
-            <div class="field-pair">
-              <label>HU-Monat<select data-field="month">${this._renderMonthOptions(clean.month)}</select></label>
-              <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(clean.year)}"></label>
-            </div>
-            <div class="field-pair">
-              <label>Intervall<select data-field="interval">${this._renderIntervalOptions(clean.interval)}</select></label>
-              <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(clean.reminder_offset_days)}"></label>
-            </div>
+          <div class="form-stack fields-stack" aria-label="Fahrzeugdaten bearbeiten">
+            <section class="form-card form-section">
+              <div class="section-head">
+                <span class="section-kicker">Fahrzeug</span>
+                <h3>Basisdaten</h3>
+                <p>Name und Hauptdaten für die Reminder-Entität.</p>
+              </div>
+              <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(clean.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
+            </section>
 
-            <h3>Kennzeichen</h3>
-            <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, clean.plate_kind)}</select></label>
-            <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, clean.plate_format)}</select></label>
-
-            ${change ? `
+            <section class="form-card form-section">
+              <div class="section-head">
+                <span class="section-kicker">Termin</span>
+                <h3>HU & Erinnerung</h3>
+                <p>Fälligkeit, Prüfintervall und Vorlauf der Erinnerung.</p>
+              </div>
               <div class="field-pair">
-                <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(clean.change_plate_common_text)}" placeholder="z. B. B AB"></label>
-                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(clean.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+                <label>HU-Monat<select data-field="month">${this._renderMonthOptions(clean.month)}</select></label>
+                <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(clean.year)}"></label>
               </div>
-            ` : `
-              <label>Kennzeichen<input data-field="plate" value="${this._escape(clean.plate)}" placeholder="z. B. B AB 123"></label>
-              <div class="check-row ${green ? "disabled-row" : ""}">
-                <label><input type="checkbox" data-field="plate_suffix_h" ${clean.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
-                <label><input type="checkbox" data-field="plate_suffix_e" ${clean.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
+              <div class="field-pair">
+                <label>Intervall<select data-field="interval">${this._renderIntervalOptions(clean.interval)}</select></label>
+                <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(clean.reminder_offset_days)}"></label>
               </div>
-            `}
+            </section>
+
+            <section class="form-card form-section">
+              <div class="section-head">
+                <span class="section-kicker">Kennzeichen</span>
+                <h3>Art & Nummer</h3>
+                <p>Format und Kennzeichentext; Sonderfelder erscheinen nur bei passender Art.</p>
+              </div>
+              <div class="field-pair">
+                <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, clean.plate_kind)}</select></label>
+                <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, clean.plate_format)}</select></label>
+              </div>
+
+              ${change ? `
+                <div class="field-pair">
+                  <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(clean.change_plate_common_text)}" placeholder="z. B. B AB"></label>
+                  <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(clean.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+                </div>
+              ` : `
+                <label>Kennzeichen<input data-field="plate" value="${this._escape(clean.plate)}" placeholder="z. B. B AB 123"></label>
+                <div class="check-row ${green ? "disabled-row" : ""}">
+                  <label><input type="checkbox" data-field="plate_suffix_h" ${clean.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
+                  <label><input type="checkbox" data-field="plate_suffix_e" ${clean.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
+                </div>
+              `}
+            </section>
 
             ${seasonal ? `
-              <h3>Saison</h3>
-              <div class="field-pair">
-                <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
-                <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
-              </div>
+              <section class="form-card form-section special-section">
+                <div class="section-head">
+                  <span class="section-kicker">Saison</span>
+                  <h3>Saisonzeitraum</h3>
+                  <p>Mindestens 2 und höchstens 11 Monate; Übergang über den Jahreswechsel ist möglich.</p>
+                </div>
+                <div class="field-pair">
+                  <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
+                  <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
+                </div>
+              </section>
             ` : ""}
           </div>
 
           <aside class="form-card preview-card">
-            <h3>Kennzeichen</h3>
+            <div class="preview-head">
+              <span class="section-kicker">Überblick</span>
+              <h3>Kennzeichen</h3>
+            </div>
             <div class="large-preview">${this._platePreviewFromText(this._formPlateText(), {
               green,
               seasonal,
               seasonStart: clean.season_start_month,
               seasonEnd: clean.season_end_month,
             })}</div>
-            <dl>
+            <dl class="summary-list">
               <div><dt>Name</dt><dd data-summary="name">${this._escape(clean.vehicle_name || "—")}</dd></div>
               <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(clean.month).padStart(2, "0"))}/${this._escape(clean.year || "—")}</dd></div>
               <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
@@ -1217,15 +1269,14 @@ class TuevReminderPanel extends HTMLElement {
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               ${this._validationHtml(errors)}
             </div>
-            <p class="note">Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Card bleibt davon getrennt und liest danach nur die aktualisierten Entities/Attribute.</p>
+            <p class="note">Die Sidebar verwaltet nur Reminder-Daten. Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Dashboard-Card bleibt ein getrenntes Projekt und liest danach die aktualisierten Entities/Attribute.</p>
             <div class="form-actions modal-bottom-actions">
               ${isDetail
                 ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
                 : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
               <button class="ghost" id="back-to-list">Schließen</button>
             </div>
-          </aside>
-        </div>
+          </aside>        </div>
         </div>
       </section>
     `;
@@ -1370,15 +1421,63 @@ class TuevReminderPanel extends HTMLElement {
           white-space: nowrap;
         }
         .summary-strip {
-          display: ${listMode ? "flex" : "none"};
-          flex-wrap: wrap;
-          gap: 16px;
+          display: ${listMode ? "grid" : "none"};
+          gap: 8px;
           padding: 10px 16px;
           color: var(--secondary-text-color);
           font-size: 13px;
           border-bottom: 1px solid var(--divider-color);
         }
-        .summary-strip strong { color: var(--primary-text-color); font-weight: 500; }
+        .summary-strip strong { color: var(--primary-text-color); font-weight: 600; }
+        .summary-chip-row {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 8px;
+          min-width: 0;
+        }
+        .status-filter-chip {
+          min-height: 32px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          border: 1px solid var(--divider-color);
+          border-radius: 999px;
+          background: var(--card-background-color);
+          color: var(--primary-text-color);
+          padding: 0 10px;
+          font: inherit;
+          cursor: pointer;
+        }
+        .status-filter-chip strong {
+          min-width: 18px;
+          height: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          background: var(--secondary-background-color);
+          font-size: 11px;
+          padding: 0 4px;
+        }
+        .status-filter-chip.active {
+          border-color: var(--primary-color);
+          background: color-mix(in srgb, var(--primary-color) 12%, var(--card-background-color));
+        }
+        .status-filter-chip.disabled { opacity: .55; }
+        .status-filter-chip:hover, .status-filter-chip:focus-visible {
+          border-color: var(--primary-color);
+          outline: none;
+        }
+        .summary-info {
+          color: var(--secondary-text-color);
+          white-space: nowrap;
+        }
+        .summary-detail {
+          color: var(--secondary-text-color);
+          font-size: 12px;
+          line-height: 1.35;
+        }
         .content { padding: 0; }
         .modal-backdrop {
           position: fixed;
@@ -1417,9 +1516,19 @@ class TuevReminderPanel extends HTMLElement {
           line-height: 1.45;
         }
         .list-shell { overflow-x: auto; width: 100%; }
-        .manager-table { width: 100%; min-width: 940px; border-collapse: collapse; }
+        .manager-table { width: 100%; min-width: 940px; border-collapse: separate; border-spacing: 0; }
         th, td { padding: 10px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--divider-color); }
-        th { height: 32px; color: var(--secondary-text-color); font-size: 12px; font-weight: 600; }
+        th {
+          position: sticky;
+          top: 0;
+          z-index: 2;
+          height: 32px;
+          color: var(--secondary-text-color);
+          font-size: 12px;
+          font-weight: 600;
+          background: var(--primary-background-color);
+        }
+        tbody tr { transition: background .12s ease; }
         .sort-header {
           display: inline-flex;
           align-items: center;
@@ -1438,6 +1547,8 @@ class TuevReminderPanel extends HTMLElement {
         .col-preview .sort-header { justify-content: flex-end; }
         tbody tr { cursor: default; }
         tbody tr:hover { background: var(--secondary-background-color); }
+        tbody td:first-child { border-left: 3px solid transparent; }
+        tbody tr:hover td:first-child { border-left-color: var(--primary-color); }
         .col-name { width: 38%; }
         .col-preview { width: 240px; text-align: right; }
         .col-menu { width: 48px; }
@@ -1524,6 +1635,7 @@ class TuevReminderPanel extends HTMLElement {
         .status-pill {
           display: inline-flex;
           align-items: center;
+          gap: 6px;
           border-radius: 999px;
           padding: 3px 9px;
           border: 1px solid var(--divider-color);
@@ -1531,9 +1643,29 @@ class TuevReminderPanel extends HTMLElement {
           font-weight: 500;
           background: var(--card-background-color);
         }
-        .status-expired { color: var(--error-color); }
-        .status-due { color: var(--warning-color, var(--state-icon-active-color)); }
-        .status-valid { color: var(--success-color, var(--primary-color)); }
+        .status-pill::before {
+          content: "";
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: currentColor;
+          flex: 0 0 auto;
+        }
+        .status-expired {
+          color: var(--error-color);
+          background: color-mix(in srgb, var(--error-color) 12%, transparent);
+          border-color: color-mix(in srgb, var(--error-color) 32%, var(--divider-color));
+        }
+        .status-due {
+          color: var(--warning-color, var(--state-icon-active-color));
+          background: color-mix(in srgb, var(--warning-color, var(--state-icon-active-color)) 12%, transparent);
+          border-color: color-mix(in srgb, var(--warning-color, var(--state-icon-active-color)) 32%, var(--divider-color));
+        }
+        .status-valid {
+          color: var(--success-color, var(--primary-color));
+          background: color-mix(in srgb, var(--success-color, var(--primary-color)) 10%, transparent);
+          border-color: color-mix(in srgb, var(--success-color, var(--primary-color)) 28%, var(--divider-color));
+        }
         .tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
         .tag {
           display: inline-flex;
@@ -1700,14 +1832,20 @@ class TuevReminderPanel extends HTMLElement {
           padding-top: 16px;
           border-top: 1px solid var(--divider-color);
         }
-        .form-grid { display: grid; grid-template-columns: minmax(360px, 680px) minmax(280px, 420px); gap: 18px; align-items: start; }
+        .form-grid { display: grid; grid-template-columns: minmax(380px, 700px) minmax(280px, 420px); gap: 18px; align-items: start; }
+        .form-stack { display: grid; gap: 12px; }
         .form-card {
           border: 1px solid var(--divider-color);
-          border-radius: 10px;
+          border-radius: 12px;
           background: var(--card-background-color);
-          padding: 18px;
+          padding: 16px;
           box-sizing: border-box;
         }
+        .form-section { display: grid; gap: 12px; }
+        .section-head, .preview-head { display: grid; gap: 3px; margin-bottom: 2px; }
+        .section-head h3, .preview-head h3 { margin: 0; color: var(--primary-text-color); text-transform: none; letter-spacing: 0; font-size: 16px; }
+        .section-head p { margin: 0; color: var(--secondary-text-color); font-size: 12px; line-height: 1.4; }
+        .section-kicker { color: var(--primary-color); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
         label { display: block; color: var(--secondary-text-color); font-size: 12px; font-weight: 500; }
         label input, label select { margin-top: 6px; color: var(--primary-text-color); font-size: 14px; }
         .field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -1715,6 +1853,7 @@ class TuevReminderPanel extends HTMLElement {
         .check-row label { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-text-color); font-size: 13px; }
         .check-row input { width: auto; height: auto; margin: 0; }
         .disabled-row { opacity: .55; }
+        .preview-card { position: sticky; top: 16px; }
         .preview-card dl { margin: 18px 0; }
         .preview-card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--divider-color); }
         dt { color: var(--secondary-text-color); }
@@ -1729,7 +1868,10 @@ class TuevReminderPanel extends HTMLElement {
         @media (max-width: 980px) {
           .toolbar { grid-template-columns: 1fr; }
           select, button.action { width: 100%; }
-          .summary-strip { gap: 8px 14px; }
+          .summary-strip { gap: 8px; padding-left: 10px; padding-right: 10px; }
+          .summary-chip-row { gap: 6px; }
+          .status-filter-chip { min-height: 30px; padding: 0 8px; font-size: 12px; }
+          .summary-info { flex-basis: 100%; }
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
@@ -1818,8 +1960,10 @@ class TuevReminderPanel extends HTMLElement {
             line-height: 1.35;
           }
           .vehicle-form-shell h3 {
-            margin: 14px 0 8px;
-            font-size: 12px;
+            font-size: 15px;
+          }
+          .vehicle-form-shell .section-head p {
+            display: none;
           }
           .vehicle-form-shell .form-grid {
             gap: 12px;
@@ -1827,6 +1971,12 @@ class TuevReminderPanel extends HTMLElement {
           .vehicle-form-shell .form-card {
             padding: 12px;
             border-radius: 8px;
+          }
+          .vehicle-form-shell .form-stack {
+            gap: 10px;
+          }
+          .vehicle-form-shell .preview-card {
+            position: static;
           }
           .vehicle-form-shell .field-pair {
             gap: 10px;
@@ -1922,14 +2072,12 @@ class TuevReminderPanel extends HTMLElement {
             <option value="due" ${this._statusFilter === "due" ? "selected" : ""}>Fällig</option>
             <option value="valid" ${this._statusFilter === "valid" ? "selected" : ""}>Gültig</option>
           </select>
-          <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>Aktualisieren</button>
+          <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>${this._loading ? "Lädt …" : "Aktualisieren"}</button>
         </section>
 
         <section class="summary-strip" aria-label="Manager Status">
-          <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
-          <span><strong>${visibleCount}</strong> Treffer</span>
-          <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · First-Run-Leerzustand · keine Card-Funktionen</span>
+          ${this._summaryChips(counts, visibleCount)}
+          <span class="summary-detail">Reminder-eigene Seite · Create/Edit/Delete aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · Mobile-Action-Sheet · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · First-Run-Leerzustand · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -1982,6 +2130,15 @@ class TuevReminderPanel extends HTMLElement {
     if (clearFiltersButton) {
       clearFiltersButton.addEventListener("click", () => this._resetListFilters());
     }
+
+    this.shadowRoot.querySelectorAll("button[data-status-chip]").forEach((button) => {
+      button.addEventListener("click", () => {
+        this._statusFilter = button.dataset.statusChip || "all";
+        this._openMenuIndex = null;
+        this._openMenuEntryId = null;
+        this._renderPreservingListUiState();
+      });
+    });
 
     this.shadowRoot.querySelectorAll("button[data-sort-key]").forEach((button) => {
       button.addEventListener("click", () => {

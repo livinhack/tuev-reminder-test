@@ -1,3 +1,26 @@
+## r077 – Sidebar List Controls Bundle
+
+- Bundles list/readability improvements without release work.
+- Adds clickable status summary chips for Alle, Abgelaufen, Fällig and Gültig.
+- Keeps the existing status select while syncing the same filter state.
+- Adds a compact Treffer/fällig summary next to the chips.
+- Makes table headers sticky while scrolling the list area.
+- Adds colored status-dot affordance inside status pills.
+- Refresh button now shows `Lädt …` while Manager data is loading.
+- Keeps rows non-clickable; only the three-dot action opens edit/delete.
+- Keeps Create/Edit/Delete, mobile Action Sheet and Reminder/Card separation unchanged.
+- No release-candidate/public-release step added.
+
+## r077 – Sidebar UX Structure Bundle
+
+- Bundles multiple small UX improvements into one working build to reduce ZIP churn.
+- Reorganizes the Create/Edit modal into semantic sections for Fahrzeug, HU/Erinnerung, Kennzeichen and Saison.
+- Improves the right-side overview/preview panel wording and preserves bottom actions.
+- Refines table row hover and status pill visuals without making rows clickable again.
+- Keeps Create/Edit/Delete, Duplicate Preflight, Dirty Guard, Mobile Action Sheet and responsive layout behavior intact.
+- Keeps Reminder/Card separation unchanged.
+- No release-candidate/public-release step added.
+
 ## r075 – Sidebar Release Candidate
 
 - Establishes the current Sidebar Manager line as a release-candidate checkpoint.

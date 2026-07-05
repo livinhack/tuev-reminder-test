@@ -1,3 +1,77 @@
+# Handover – Reminder r077 Sidebar List Controls Bundle
+
+## Purpose
+
+r077 bundles several list-control and readability improvements into one working build to reduce ZIP churn. It is not a release step. It continues from r076 and focuses on the vehicle list rather than the Create/Edit form.
+
+## What changed in r077
+
+- Added clickable status summary chips:
+  - Alle
+  - Abgelaufen
+  - Fällig
+  - Gültig
+- Chips and the existing status select share the same `_statusFilter` state.
+- Added compact Treffer/fällig summary text in the Manager strip.
+- Table headers are sticky while scrolling the list area.
+- Status pills now include a small colored dot for faster scanning.
+- Manual refresh button displays `Lädt …` while the Manager API is loading.
+- Rows remain non-clickable; only the three-dot action menu opens edit/delete.
+- Create/Edit/Delete, mobile action sheet, dirty guard, duplicate checks and payload scrub remain unchanged.
+- No Card code was imported or copied into the Reminder repo.
+
+## Test focus for HA
+
+1. Open Sidebar page on desktop.
+2. Click each status chip and confirm the list filters correctly.
+3. Confirm the status dropdown stays consistent with chip-selected filters.
+4. Confirm sorting via headers still works after using chips.
+5. Confirm edit/delete still open only via the three-dot menu.
+6. On smartphone, confirm chips wrap cleanly and the mobile Action Sheet still opens.
+
+## Next likely bundled direction
+
+A useful next bundled step would be a create/edit form polish pass around field hints/defaults and a more compact preview summary, not release work.
+
+---
+
+# Handover – Reminder r077 Sidebar UX Structure Bundle
+
+## Purpose
+
+r077 deliberately bundles several small UI/UX improvements into one working build to reduce ZIP churn. It is not a release step. It continues from the r075 Sidebar baseline and focuses on the Create/Edit modal structure and list readability.
+
+## What changed in r077
+
+- Create/Edit modal is split into clearer visual sections:
+  - Fahrzeug / Basisdaten
+  - Termin / HU & Erinnerung
+  - Kennzeichen / Art & Nummer
+  - Saisonzeitraum, shown only for seasonal kinds
+- Right preview area now uses a clearer overview header and keeps save/close actions at the bottom.
+- Table rows get a subtler visual hover affordance without making rows clickable again.
+- Status pills now have stronger visual differentiation.
+- Mobile layout from r073 is preserved, including bottom action bar.
+- CRUD behavior from r041/r045/r047 remains intact.
+- Non-admin access decision from r069 remains intact: all authenticated HA users can use the Manager page.
+- No Card code was imported or copied into the Reminder repo.
+
+## Test focus for HA
+
+1. Open Sidebar page on desktop and smartphone.
+2. Create a normal vehicle.
+3. Edit the vehicle via three dots.
+4. Create/edit a Saison vehicle and confirm the Saison section appears only when needed.
+5. Create/edit a Wechselkennzeichen vehicle and confirm the normal plate/H/E fields do not leak into the payload.
+6. Confirm the table row itself is not clickable; only the three-dot action is.
+7. Confirm smartphone Action Sheet still stays visible and usable.
+
+## Next likely bundled direction
+
+A useful next bundled step would be a table/list visual pass plus optional column-density settings, not release work.
+
+---
+
 # Handover – Reminder r075 Sidebar Release Candidate
 
 ## Summary
