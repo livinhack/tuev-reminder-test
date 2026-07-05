@@ -1,37 +1,37 @@
-# Handover – Reminder r098 Sidebar Form Season Below Overview
+# Handover – Reminder r099 Sidebar Season Block Below Overview Card
 
-Reminder r098 continues from r097 and adjusts the vehicle create/edit form. The modal is slightly taller, the seasonal Start/End fields are shown below the Überblick/Kennzeichen summary on the right, and the old left-column Saison block is removed. This keeps the form usable without adding a height slider.
+Reminder r099 continues from r097 and adjusts the vehicle create/edit form. The modal is slightly taller, the seasonal Start/End fields are shown below the Überblick/Kennzeichen card on the right, and the old left-column Saison block is removed. This keeps the form usable without adding a height slider.
 
 Compatibility context remains unchanged: Card b355 is still the current bridge reference, `calendar.tuev_reminder` remains the integration calendar entity, and `reminder_offset_days` remains the reminder lead-time field.
 
-## What changed in r098
+## What changed in r099
 
-- Internal version bumped to `0.1.0-r098` / `r098`.
+- Internal version bumped to `0.1.0-r099` / `r099`.
 - `vehicle-form-shell` modal uses a taller max-height budget: `min(920px, calc(100vh - 40px))`.
-- Saison Start/End controls now render in an inline section below the overview summary.
+- Saison Start/End controls now render in an separate section below the overview card.
 - The left form stack no longer contains a separate Saison card.
 - r089/r091 compact dark plate fallback is preserved.
 - No Card detection, no Card renderer integration, no release work.
 
-## Files changed in r098
+## Files changed in r099
 
 - `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
 - `custom_components/tuev_reminder/manifest.json`
 - `REMINDER_VERSION.txt`
-- `scripts/check_r098_sidebar_form_season_below_overview.py`
+- `scripts/check_r099_sidebar_form_season_below_overview.py`
 - `README.md`
 - `CHANGELOG.md`
 - `HANDOVER.md`
 
-## HA smoke test focus for r098
+## HA smoke test focus for r099
 
 1. Open create form and switch Kennzeichenart to Saisonkennzeichen.
-2. Verify Saison fields are below Überblick/Kennzeichen on the right.
+2. Verify Saison fields are below the Überblick/Kennzeichen card on the right.
 3. Verify no height slider exists and the modal feels slightly less cramped.
 4. Test invalid and valid season ranges.
 5. Check existing list controls, menu actions, and plate fallback.
 
-Continue functional/visual Sidebar work from r098. Do not start release work unless explicitly requested.
+Continue functional/visual Sidebar work from r099. Do not start release work unless explicitly requested.
 
 # Handover – Reminder r097 Sidebar Single Create Action
 

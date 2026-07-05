@@ -18,7 +18,7 @@ config_flow = read("custom_components/tuev_reminder/config_flow.py")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r098"', "manifest r014 version")
+assert_contains(manifest, '"version": "0.1.0-r099"', "manifest r014 version")
 assert_contains(
     config_flow,
     "PLATE_KIND_CHANGE: {\n        PLATE_FORMAT_SINGLE_LINE,\n        PLATE_FORMAT_TWO_LINE,\n        PLATE_FORMAT_MOTORCYCLE,\n    }",

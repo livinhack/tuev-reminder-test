@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r098 vehicle form season placement and modal height polish."""
+"""Validate r099 vehicle form season placement and modal height polish."""
 from __future__ import annotations
 
 import json
@@ -12,20 +12,20 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r098 sidebar form season below overview check failed: {message}")
+    raise SystemExit(f"r099 sidebar form season below overview check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r098":
-        fail("manifest version must be 0.1.0-r098")
-    if VERSION.read_text(encoding="utf-8").strip() != "r098":
-        fail("REMINDER_VERSION.txt must be r098")
+    if manifest.get("version") != "0.1.0-r099":
+        fail("manifest version must be 0.1.0-r099")
+    if VERSION.read_text(encoding="utf-8").strip() != "r099":
+        fail("REMINDER_VERSION.txt must be r099")
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
         'max-height: min(920px, calc(100vh - 40px));',
-        'class="inline-season-section"',
+        'class="form-card inline-season-section season-below-overview"',
         'aria-label="Saisonzeitraum"',
         'class="field-pair compact-season-fields"',
         '.inline-season-section {',
@@ -38,12 +38,20 @@ def main() -> None:
             fail(f"missing {needle!r}")
 
     summary_idx = panel.find('<dl class="summary-list">')
-    season_idx = panel.find('class="inline-season-section"')
+    season_idx = panel.find('class="form-card inline-season-section season-below-overview"')
     validation_idx = panel.find('<div class="validation ${errors.length ? "has-errors" : "ok"}">')
     if not (summary_idx != -1 and season_idx != -1 and validation_idx != -1):
         fail("could not locate summary, inline season section and validation")
     if not (summary_idx < season_idx < validation_idx):
         fail("inline season fields must render below overview summary and above validation")
+
+    aside_start = panel.find('<aside class="form-card preview-card">')
+    aside_end = panel.find('</aside>', aside_start)
+    if aside_start == -1 or aside_end == -1:
+        fail("could not locate preview aside bounds")
+    preview_card = panel[aside_start:aside_end]
+    if 'inline-season-section' in preview_card or 'season-below-overview' in preview_card:
+        fail("season controls must be below the overview card, not inside it")
 
     left_stack_start = panel.find('<div class="form-stack fields-stack"')
     preview_start = panel.find('<aside class="form-card preview-card">')
@@ -68,7 +76,7 @@ def main() -> None:
         if needle in panel:
             fail(f"must not contain {needle!r}")
 
-    print("r098 sidebar form season below overview check OK")
+    print("r099 sidebar form season below overview check OK")
 
 
 if __name__ == "__main__":

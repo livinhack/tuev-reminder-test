@@ -1265,25 +1265,27 @@ class TuevReminderPanel extends HTMLElement {
 
           </div>
 
-          <aside class="form-card preview-card">
-            <div class="preview-head">
-              <span class="section-kicker">Überblick</span>
-              <h3>Kennzeichen</h3>
-            </div>
-            <div class="large-preview">${this._platePreviewFromText(this._formPlateText(), {
-              green,
-              seasonal,
-              seasonStart: clean.season_start_month,
-              seasonEnd: clean.season_end_month,
-            })}</div>
-            <dl class="summary-list">
-              <div><dt>Name</dt><dd data-summary="name">${this._escape(clean.vehicle_name || "—")}</dd></div>
-              <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(clean.month).padStart(2, "0"))}/${this._escape(clean.year || "—")}</dd></div>
-              <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
-              <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
-            </dl>
+          <div class="form-side-stack">
+            <aside class="form-card preview-card">
+              <div class="preview-head">
+                <span class="section-kicker">Überblick</span>
+                <h3>Kennzeichen</h3>
+              </div>
+              <div class="large-preview">${this._platePreviewFromText(this._formPlateText(), {
+                green,
+                seasonal,
+                seasonStart: clean.season_start_month,
+                seasonEnd: clean.season_end_month,
+              })}</div>
+              <dl class="summary-list">
+                <div><dt>Name</dt><dd data-summary="name">${this._escape(clean.vehicle_name || "—")}</dd></div>
+                <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(clean.month).padStart(2, "0"))}/${this._escape(clean.year || "—")}</dd></div>
+                <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
+                <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
+              </dl>
+            </aside>
             ${seasonal ? `
-              <section class="inline-season-section" aria-label="Saisonzeitraum">
+              <section class="form-card inline-season-section season-below-overview" aria-label="Saisonzeitraum">
                 <div class="section-head compact-section-head">
                   <span class="section-kicker">Saison</span>
                   <h3>Saisonzeitraum</h3>
@@ -1305,7 +1307,7 @@ class TuevReminderPanel extends HTMLElement {
                 : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
               <button class="ghost" id="back-to-list">Schließen</button>
             </div>
-          </aside>        </div>
+          </div>        </div>
         </div>
       </section>
     `;
@@ -1975,14 +1977,12 @@ class TuevReminderPanel extends HTMLElement {
         .check-row label { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-text-color); font-size: 13px; }
         .check-row input { width: auto; height: auto; margin: 0; }
         .disabled-row { opacity: .55; }
-        .preview-card { position: sticky; top: 16px; }
+        .form-side-stack { display: grid; gap: 12px; position: sticky; top: 16px; }
+        .preview-card { position: static; }
         .preview-card dl { margin: 18px 0; }
         .preview-card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--divider-color); }
         .inline-season-section {
-          margin: 16px 0;
           padding: 14px;
-          border: 1px solid var(--divider-color);
-          border-radius: 10px;
           background: var(--secondary-background-color);
         }
         .compact-section-head { margin-bottom: 10px; }
@@ -2169,8 +2169,9 @@ class TuevReminderPanel extends HTMLElement {
           .vehicle-form-shell .form-stack {
             gap: 10px;
           }
-          .vehicle-form-shell .preview-card {
+          .vehicle-form-shell .form-side-stack {
             position: static;
+            gap: 10px;
           }
           .vehicle-form-shell .field-pair {
             gap: 10px;
