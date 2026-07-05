@@ -1,3 +1,78 @@
+# Handover – Reminder r089 Sidebar Renderer-Ready Plate Slot
+
+r089 is a focused Sidebar UI/internal-structure step on top of r088. The visible output remains intentionally conservative: license plates in the vehicle list are still shown as neutral text. Internally, the right-column area is now a dedicated slot that can later receive the real Card/license-plate renderer once Card detection and renderer reuse are implemented.
+
+## What changed in r089
+
+- Internal version bumped to `0.1.0-r089` / `r089`.
+- Desktop list now wraps the neutral plate text in `plate-render-slot`.
+- Slot exposes renderer-state attributes for future renderer handoff.
+- Mobile plate fallback is marked consistently as a text fallback slot.
+- No renderer logic was added; no Card detection was added.
+- No fake plate graphic was reintroduced.
+
+## Files changed in r089
+
+- `custom_components/tuev_reminder/manifest.json`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `docs/REMINDER_R089_SIDEBAR_RENDERER_READY_PLATE_SLOT.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R089.md`
+- `scripts/check_r089_sidebar_renderer_ready_plate_slot.py`
+
+## HA test focus
+
+1. Desktop: right column should still show only neutral plate text.
+2. Desktop: plate text slot and three-dot action menu should remain aligned.
+3. Mobile: plate text should remain under the vehicle name.
+4. Search, status chips, sorting, empty states, edit/delete and mobile action sheet should remain unchanged from r088.
+
+## Next sensible step
+
+Continue Sidebar function/visual work. The actual Card renderer detection and mounting should be treated as a separate larger step, not mixed into this small list-slot preparation.
+
+---
+
+# Handover – Reminder r088 Sidebar Neutral Plate Slot
+
+r088 is a focused Sidebar UI cleanup on top of r087. It removes the temporary pseudo-rendered license plate from the list because the final goal is to render the real plate through the Card renderer only once that renderer/card can be detected and reused cleanly.
+
+## What changed in r088
+
+- Internal version bumped to `0.1.0-r088` / `r088`.
+- Vehicle list right column now uses `.plate-text-slot` with plain neutral plate text.
+- The old pseudo-plate output is no longer used in list rows.
+- The create/edit form preview remains untouched for now.
+- Search clear X, status chips, compact controls and empty/search states remain as in r087.
+
+## Files changed in r088
+
+- `REMINDER_VERSION.txt`
+- `custom_components/tuev_reminder/manifest.json`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `docs/REMINDER_R088_SIDEBAR_NEUTRAL_PLATE_SLOT.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R088.md`
+- `scripts/check_r088_sidebar_neutral_plate_slot.py`
+
+## HA test focus
+
+- Desktop list: right column must show neutral plate text, not fake EU/physical plate rendering.
+- Sorting by Kennzeichen must still work.
+- Mobile list must still show plate text under the vehicle name.
+- Three-dot menu/action sheet must still open reliably.
+
+## Next likely work
+
+Continue Sidebar UI/function work. A future larger step can introduce real Card-renderer detection and a clean fallback policy: if Card renderer exists, render the corresponding physical plate; if not, hide plate-renderer-specific controls and keep only actual vehicle traits.
+
+---
+
 # Handover – Reminder r087 Sidebar Empty/Search State Polish
 
 r087 is a focused Sidebar UI step on top of r086. It does not change the data model, Manager API or Card bridge. The purpose is to make empty and no-result states more precise without reintroducing duplicate reset controls.

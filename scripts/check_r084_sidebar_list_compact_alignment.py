@@ -13,9 +13,9 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r087":
-    fail("manifest version must be 0.1.0-r087")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r087":
+if manifest.get("version") != "0.1.0-r089":
+    fail("manifest version must be 0.1.0-r089")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r089":
     fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
@@ -25,7 +25,7 @@ required = [
     "padding: 7px 6px;",
     "padding: 10px 56px 6px 12px;",
     "grid-template-columns: 82px minmax(0, 1fr);",
-    ".mobile-plate-text { display: block; font-size: 11px; margin-top: 2px; }",
+    ".mobile-plate-slot { display: block; font-size: 11px; margin-top: 2px; }",
 ]
 for needle in required:
     if needle not in panel:

@@ -1,3 +1,23 @@
+## r089 – Sidebar Renderer-Ready Plate Slot
+
+- Bumped Reminder version to `0.1.0-r089`.
+- Changed the list right-column license-plate area from a plain text wrapper to a renderer-ready slot.
+- Added `data-plate-render-slot="text"` and `data-renderer-state="text"` markers for the future Card-renderer integration path.
+- Kept the current UI deliberately neutral: no pseudo-rendered license plate and no Card-rendering logic yet.
+- Kept the mobile fallback as neutral text under the vehicle name.
+- No Card files, no release steps.
+
+---
+
+## r088 – Sidebar Neutral Plate Slot
+
+- Bumped Reminder version to `0.1.0-r088`.
+- Removed the temporary fake rendered plate graphic from the Sidebar vehicle list.
+- Replaced the right-column list preview with a neutral plain text plate slot.
+- Kept the future Card-renderer path conceptually open: the list no longer pretends to render the final physical plate.
+- Preserved r087 search/empty-state behavior, status chips and mobile action sheet.
+- No data model, Manager API, Card bridge or release packaging changes.
+
 ## r087 – Sidebar Empty/Search State Polish
 
 - Bumped Reminder version to `0.1.0-r087`.

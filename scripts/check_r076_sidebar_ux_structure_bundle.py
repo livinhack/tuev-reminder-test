@@ -26,8 +26,8 @@ changelog = read("CHANGELOG.md")
 doc = read("docs/REMINDER_R076_SIDEBAR_UX_STRUCTURE_BUNDLE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R076.md")
 
-require(manifest["version"] == "0.1.0-r087", "manifest version must be r083")
-require(version == "r087", "REMINDER_VERSION must be r085")
+require(manifest["version"] == "0.1.0-r089", "manifest version must be r083")
+require(version == "r089", "REMINDER_VERSION must be r085")
 
 for marker in [
     "form-stack fields-stack",

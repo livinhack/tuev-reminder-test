@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -1031,7 +1031,7 @@ class TuevReminderPanel extends HTMLElement {
               <tr class="vehicle-row" data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
                 <td class="name-cell" data-label="Fahrzeug">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
-                  <div class="mobile-plate-text">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</div>
+                  <div class="mobile-plate-slot" data-plate-render-slot="text" data-renderer-state="text" title="Kennzeichen">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</div>
                 </td>
                 <td class="hu-cell" data-label="HU">
                   <div class="main-value hu-value">${this._escape(this._monthYear(vehicle))}</div>
@@ -1040,7 +1040,7 @@ class TuevReminderPanel extends HTMLElement {
                   <div class="main-value">${this._escape(this._dateLabel(vehicle.reminder_date))}</div>
                 </td>
                 <td class="status-cell" data-label="Status"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
-                <td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack">${this._platePreview(vehicle)}</div></td>
+                <td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack"><div class="plate-render-slot" data-plate-render-slot="text" data-renderer-state="text" title="Kennzeichen"><span class="plate-text-slot">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</span></div></div></td>
                 <td class="menu-cell">
                   <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>
                   ${this._openMenuEntryId === vehicle.entry_id ? `
@@ -1670,7 +1670,37 @@ class TuevReminderPanel extends HTMLElement {
         .sheet-cancel { text-align: center; border-bottom: 0; color: var(--secondary-text-color); }
         .danger-text { color: var(--error-color); }
         .vehicle-title { font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .mobile-plate-text { display: none; margin-top: 2px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mobile-plate-slot { display: none; margin-top: 2px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .plate-render-slot {
+          display: inline-flex;
+          align-items: center;
+          justify-content: flex-end;
+          max-width: 100%;
+          min-height: 28px;
+          box-sizing: border-box;
+          padding: 3px 8px;
+          border: 1px solid var(--divider-color);
+          border-radius: 6px;
+          background: var(--card-background-color);
+          color: var(--primary-text-color);
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        .plate-render-slot[data-renderer-state="text"] {
+          opacity: .92;
+        }
+        .plate-text-slot {
+          display: block;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: .02em;
+          white-space: nowrap;
+        }
         .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         .main-value { font-weight: 500; line-height: 1.2; }
         .hu-value { font-weight: 700; }
@@ -1947,7 +1977,7 @@ class TuevReminderPanel extends HTMLElement {
           .col-preview, .preview-cell { display: none; }
           .sort-header { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .vehicle-title, .main-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-          .mobile-plate-text { display: block; }
+          .mobile-plate-slot { display: block; }
           .status-pill {
             max-width: 100%;
             padding: 2px 5px;
@@ -2034,7 +2064,7 @@ class TuevReminderPanel extends HTMLElement {
             width: auto;
             padding: 0;
           }
-          .mobile-plate-text { display: block; font-size: 11px; margin-top: 2px; }
+          .mobile-plate-slot { display: block; font-size: 11px; margin-top: 2px; }
           .status-pill { justify-self: start; padding: 2px 8px; font-size: 12px; }
           .col-reminder, .reminder-cell { display: grid; }
           .col-hu, .col-status, .col-menu { width: auto; }

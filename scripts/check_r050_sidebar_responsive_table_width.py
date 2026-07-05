@@ -22,9 +22,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r087":
-        fail("manifest version must be 0.1.0-r087")
-    if VERSION.read_text(encoding="utf-8").strip() != "r087":
+    if manifest.get("version") != "0.1.0-r089":
+        fail("manifest version must be 0.1.0-r089")
+    if VERSION.read_text(encoding="utf-8").strip() != "r089":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = PANEL.read_text(encoding="utf-8")
@@ -33,7 +33,7 @@ def main() -> int:
     require(panel, "min-width: 0;", "mobile min-width reset")
     require(panel, "table-layout: fixed;", "fixed mobile table layout")
     require(panel, ".col-preview, .preview-cell { display: none; }", "mobile preview column hide")
-    require(panel, ".mobile-plate-text", "mobile plate text fallback")
+    require(panel, ".mobile-plate-slot", "mobile plate text fallback")
     require(panel, "@media (max-width: 460px)", "very narrow media query")
     require(panel, ".col-reminder, .reminder-cell { display: none; }", "very narrow reminder hide")
     require(panel, "Responsive Tabelle", "status strip marker")

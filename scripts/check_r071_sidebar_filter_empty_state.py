@@ -11,8 +11,8 @@ def read(relative: str) -> str:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r087"
-assert read("REMINDER_VERSION.txt").strip() == "r087"
+assert manifest["version"] == "0.1.0-r089"
+assert read("REMINDER_VERSION.txt").strip() == "r089"
 
 panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 assert "_filtersActive()" in panel

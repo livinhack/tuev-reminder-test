@@ -1,3 +1,50 @@
+# TÜV Reminder – r089
+
+Current working build: **Reminder r089**. r089 continues Sidebar function/UI work on top of r088 and prepares the vehicle-list license-plate area as a renderer-ready slot. It still shows only neutral text today, but the DOM/CSS is now separated from the displayed text so the real Card renderer can later mount into the same right-column slot without another list-layout refactor.
+
+## r089 highlights
+
+- Bumped Reminder version to `0.1.0-r089` / `r089`.
+- Replaced the plain right-column wrapper with a semantic `plate-render-slot`.
+- Kept the visible fallback neutral: no pseudo-rendered plate, no EU field, no fake Card renderer.
+- Added renderer-state attributes for the later Card-renderer handoff.
+- Mobile list keeps the neutral plate text under the vehicle name, also marked as a text fallback slot.
+- No release work and no Card files changed.
+
+## HA smoke test focus for r089
+
+1. Desktop list: right column still shows only neutral plate text, not a fake plate graphic.
+2. Right column alignment: plate text and three-dot menu should still sit consistently.
+3. Mobile list: plate text still appears under the vehicle name.
+4. Search, status chips, sort headers and the mobile action sheet should behave as in r088.
+
+No release packaging or public-release steps should be inferred from r089. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
+# TÜV Reminder – r088
+
+Current working build: **Reminder r088**. r088 continues Sidebar function/UI work on top of r087 and removes the temporary fake rendered license-plate preview from the vehicle list. Until the real Card renderer can be detected and reused, the right column now shows only a neutral plain plate text slot.
+
+## r088 highlights
+
+- Bumped Reminder version to `0.1.0-r088` / `r088`.
+- Vehicle list no longer uses the temporary pseudo-plate graphic in the right column.
+- Right column now shows a compact neutral plate text slot.
+- This avoids suggesting that the Sidebar is already using the final Card/physical license-plate renderer.
+- Search, status chips, empty states, create/edit/delete, mobile action sheet and dirty guard remain unchanged from r087.
+
+## HA smoke test focus for r088
+
+1. Open the Sidebar list on desktop and verify the right column shows plain neutral plate text, not the fake EU-style pseudo-plate.
+2. Verify the row still sorts by `Kennzeichen`.
+3. Verify mobile layout still shows the compact plain plate text under the vehicle name.
+4. Quickly retest search clear, status chips and the three-dot action menu.
+
+No release packaging or public-release steps should be inferred from r088. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
 # TÜV Reminder – r087
 
 Current working build: **Reminder r087**. r087 continues Sidebar function/UI work on top of r086 and focuses on empty/search states: the first-run view no longer competes with extra add rows, filtered-empty states explain the active constraint, and search can be cleared directly from that empty state without introducing another global reset chip.
