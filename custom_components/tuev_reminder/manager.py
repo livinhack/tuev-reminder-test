@@ -361,7 +361,7 @@ def validate_and_normalize_vehicle_payload(payload: dict) -> tuple[dict, dict]:
     month = _int_or_default(payload.get(CONF_MONTH), 0)
     year = _int_or_default(payload.get(CONF_YEAR), 0)
     interval = _int_or_default(payload.get(CONF_INTERVAL), 2)
-    reminder_offset_days = reminder_offset_days_from_values(payload)
+    reminder_offset_days = _int_or_default(payload.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
 
     if not 1 <= month <= 12:
         errors[CONF_MONTH] = "invalid_month"
@@ -370,6 +370,9 @@ def validate_and_normalize_vehicle_payload(payload: dict) -> tuple[dict, dict]:
     if interval not in {1, 2}:
         errors[CONF_INTERVAL] = "invalid_interval"
         interval = 2
+    if not 0 <= reminder_offset_days <= 365:
+        errors[CONF_REMINDER_OFFSET_DAYS] = "invalid_offset"
+        reminder_offset_days = min(365, max(0, reminder_offset_days))
 
     values[CONF_MONTH] = month
     values[CONF_YEAR] = year

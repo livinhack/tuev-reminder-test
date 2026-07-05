@@ -22,9 +22,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r060":
-        fail("manifest version must be 0.1.0-r060")
-    if VERSION.read_text(encoding="utf-8").strip() != "r060":
+    if manifest.get("version") != "0.1.0-r066":
+        fail("manifest version must be 0.1.0-r066")
+    if VERSION.read_text(encoding="utf-8").strip() != "r066":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = PANEL.read_text(encoding="utf-8")
@@ -32,8 +32,9 @@ def main() -> int:
     require(panel, "_payloadKey(payload = this._formPayload())", "normalized payload snapshot helper")
     require(panel, "_rememberFormSnapshot()", "snapshot capture helper")
     require(panel, "_formDirty()", "dirty-state helper")
-    require(panel, "_confirmDiscardChanges()", "discard confirmation helper")
-    require(panel, "Ungespeicherte Änderungen verwerfen?", "discard confirmation text")
+    require(panel, "_shouldPromptDiscardChanges()", "discard confirmation helper")
+    require(panel, "_renderDiscardConfirm()", "custom discard dialog helper")
+    require(panel, "Ungespeicherte Änderungen", "discard confirmation text")
     require(panel, "this._view === \"detail\" && !this._formDirty()", "unchanged edit validation branch")
     require(panel, "Keine Änderungen", "unchanged edit summary")
     require(panel, "!this._formDirty() ? \"disabled\"", "edit save disabled until dirty")

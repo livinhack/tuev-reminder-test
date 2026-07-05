@@ -19,9 +19,9 @@ def main() -> None:
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
     handover = read("HANDOVER.md")
 
-    if '"version": "0.1.0-r060"' not in manifest:
-        fail("manifest version must be 0.1.0-r060")
-    if version != "r060":
+    if '"version": "0.1.0-r066"' not in manifest:
+        fail("manifest version must be 0.1.0-r066")
+    if version != "r066":
         fail("REMINDER_VERSION.txt must be r053")
 
     head_start = panel.index('<div class="form-head">')

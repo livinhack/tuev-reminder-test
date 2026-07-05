@@ -1,3 +1,101 @@
+# TÜV Reminder – r066
+
+Current working build: **Reminder r066**. r066 keeps the Sidebar CRUD stack and hardens create/edit form state handling: hidden or inactive form branches are scrubbed before validation, dirty checks and Manager API payload creation.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r066 highlights
+
+- Wechselkennzeichen mode no longer carries stale normal-plate or H/E suffix values into the effective save payload.
+- Normal, green and seasonal modes no longer carry stale Wechselkennzeichen-only fields into the effective save payload.
+- Non-seasonal modes save neutral season values instead of stale hidden season months.
+- Green plate modes force H/E suffix flags off consistently.
+- Wechselkennzeichen vehicle digit is locally sanitized to one numeric character.
+- Preview, validation, duplicate preflight, dirty guard and save payload now use the same scrubbed form state.
+- Create/Update/Delete, mobile action sheet, responsive table, dialog focus hardening and Brand assets remain intact.
+
+---
+
+# TÜV Reminder – r065
+
+Current working build: **Reminder r065**. r065 keeps the Sidebar CRUD stack and hardens dialog keyboard/focus behavior. Opened Sidebar overlays now receive explicit focus where needed, and Escape handling is consistent across create/edit, delete, the unsaved-changes dialog, the smartphone action sheet, and the desktop three-dot menu.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r065 highlights
+
+- Create/Edit and Delete modal backdrops are focusable.
+- Escape on Create/Edit/Delete closes through the existing guarded path.
+- Escape with unsaved Create/Edit changes opens the in-panel discard dialog instead of losing data.
+- Escape closes the smartphone action sheet and desktop row-action menu.
+- Returning from `Weiter bearbeiten` restores focus to the underlying modal.
+- Create/Update/Delete, duplicate checks, fresh row-action data, responsive table, mobile action sheet and Brand assets remain intact.
+
+---
+
+# TÜV Reminder – r064
+
+Current working build: **Reminder r064**. r064 keeps the Sidebar CRUD stack and replaces the native unsaved-changes browser prompt with a centered HA-style discard dialog. Create/Edit forms no longer use `window.confirm(...)`; users can explicitly choose **Verwerfen** or **Weiter bearbeiten**.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r064 highlights
+
+- Native dirty-guard confirm replaced by an in-panel discard dialog.
+- Unsaved changes are protected when closing via button, backdrop or Escape.
+- `Weiter bearbeiten` keeps the modal open; `Verwerfen` returns to the list.
+- Create/Update/Delete, duplicate checks, fresh row-action data, mobile action sheet and responsive table remain intact.
+
+---
+
+# TÜV Reminder – r063
+
+Current working build: **Reminder r063**. r063 keeps the Sidebar CRUD stack from r041–r062 and hardens row actions: Bearbeiten and Löschen now fetch the selected vehicle by stable `entry_id` via the Manager API before opening the modal.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r063 highlights
+
+- Drei-Punkte row actions fetch fresh vehicle data through `tuev_reminder/manager/vehicles/get`.
+- The local list cache is updated before the edit/delete modal opens.
+- If a selected record no longer exists, the Sidebar shows an error flash and refreshes.
+- Duplicate preflight, Create/Update/Delete, Dirty-Guard, mobile action sheet, responsive table and Brand assets remain intact.
+
+---
+
+# TÜV Reminder – r062
+
+Current working build: **Reminder r062**. r062 keeps the Sidebar CRUD stack from r041–r061 and adds local duplicate preflight validation in the create/edit modal. The backend duplicate guard remains the source of truth; the Sidebar now surfaces duplicate names or duplicate normalized/display plates before the user presses Save.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r062 highlights
+
+- Sidebar create/edit modal checks existing vehicles locally for duplicate vehicle names.
+- Sidebar create/edit modal checks existing vehicles locally for duplicate normalized/display plates.
+- Edit mode excludes the current `entry_id`, so unchanged records remain valid.
+- Save is disabled while local duplicate errors are present.
+- Backend duplicate checks from r048 remain unchanged as the authoritative guard.
+
+---
+
+# TÜV Reminder – r061
+
+Current working build: **Reminder r061**. r061 closes a backend validation gap for the Sidebar Manager write API: `Erinnerungs-Vorlauf Tage` is now rejected outside `0–365` instead of being silently clamped when a direct WebSocket payload bypasses the UI controls.
+
+The Sidebar create/edit modal also now labels the preview area as **Kennzeichen**. Create/Update/Delete, duplicate guard, dirty guard, mobile action sheet, responsive table, HA integration brand icon path, backend validation runtime fix, list state preservation, and plate-format filtering remain unchanged.
+
+The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r061 highlights
+
+- Backend create/update validates `reminder_offset_days` explicitly.
+- Invalid offset values outside `0–365` return a German Manager API validation error.
+- Modal heading `Vorschau` changed to `Kennzeichen`.
+- r041 create, r045 update, r047 delete, r055 mobile action sheet, r058 list state preservation, r060 format filtering and brand assets remain intact.
+
+---
+
 # TÜV Reminder – r060
 
 Current working build: **Reminder r060**. r060 tightens the Sidebar create/edit form so the available `Format` choices follow the selected `Kennzeichenart`.

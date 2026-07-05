@@ -23,9 +23,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r060":
-    fail("manifest version must be 0.1.0-r060")
-if VERSION.read_text(encoding="utf-8").strip() != "r060":
+if manifest.get("version") != "0.1.0-r066":
+    fail("manifest version must be 0.1.0-r066")
+if VERSION.read_text(encoding="utf-8").strip() != "r066":
     fail("REMINDER_VERSION.txt must be r060")
 
 panel = PANEL.read_text(encoding="utf-8")
@@ -33,10 +33,10 @@ for needle, label in [
     ("_allowedPlateFormatValues(kind = this._form.plate_kind)", "allowed-format helper"),
     ("this._metadata?.plate_formats_by_kind", "metadata-driven format map"),
     ("_plateFormatOptionsForKind(kind = this._form.plate_kind)", "filtered format options helper"),
-    ("const plateFormats = this._plateFormatOptionsForKind(this._form.plate_kind);", "form uses filtered formats"),
+    ("const plateFormats = this._plateFormatOptionsForKind(clean.plate_kind);", "form uses filtered formats"),
     ("Kennzeichenformat passt nicht zur Kennzeichenart.", "local compatibility validation"),
-    ("const allowedFormats = this._allowedPlateFormatValues(value);", "kind-change allowed format recalculation"),
-    ("this._form.plate_format = allowedFormats[0] || \"single_line\";", "incompatible format reset"),
+    ("const allowedFormats = this._allowedPlateFormatValues(clean.plate_kind);", "kind-change allowed format recalculation"),
+    ("clean.plate_format = allowedFormats[0] || \"single_line\";", "incompatible format reset"),
 ]:
     require(panel, needle, label)
 

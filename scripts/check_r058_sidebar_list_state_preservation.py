@@ -23,9 +23,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r060":
-    fail("manifest version must be 0.1.0-r060")
-if VERSION.read_text(encoding="utf-8").strip() != "r060":
+if manifest.get("version") != "0.1.0-r066":
+    fail("manifest version must be 0.1.0-r066")
+if VERSION.read_text(encoding="utf-8").strip() != "r066":
     fail("REMINDER_VERSION.txt must be r058")
 
 panel = PANEL.read_text(encoding="utf-8")

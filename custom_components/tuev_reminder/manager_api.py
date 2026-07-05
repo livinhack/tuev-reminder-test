@@ -8,7 +8,7 @@ from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
-from .const import CONF_VEHICLE_NAME
+from .const import CONF_VEHICLE_NAME, CONF_REMINDER_OFFSET_DAYS
 from .manager import (
     entry_title_from_vehicle_values,
     manager_metadata,
@@ -41,6 +41,7 @@ _FIELD_ERROR_MESSAGES = {
     ("month", "invalid_month"): "HU-Monat muss zwischen 1 und 12 liegen.",
     ("year", "invalid_year"): "HU-Jahr muss zwischen 1900 und 2100 liegen.",
     ("interval", "invalid_interval"): "Prüfintervall muss 1 oder 2 Jahre betragen.",
+    (CONF_REMINDER_OFFSET_DAYS, "invalid_offset"): "Erinnerungs-Vorlauf muss zwischen 0 und 365 Tagen liegen.",
 }
 
 

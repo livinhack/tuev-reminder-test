@@ -1,5 +1,78 @@
 # Changelog
 
+## r066 – Sidebar Form Payload Scrub
+
+- Bumped Reminder version to `0.1.0-r066`.
+- Added `_formKindFlags(...)`, `_scrubFormForKind(...)` and `_sanitizeFieldValue(...)` to the Sidebar panel.
+- Scrubs inactive normal-plate, Wechselkennzeichen, season and H/E suffix fields before validation, dirty checks and Manager API payload creation.
+- Non-seasonal save payloads now send neutral season values instead of hidden stale month selections.
+- Green plate modes consistently clear H/E suffix flags.
+- Wechselkennzeichen vehicle digit input is normalized to one numeric character.
+- Preserves Create/Update/Delete, duplicate preflight, mobile action sheet, responsive table, Brand assets and strict Reminder/Card separation.
+
+---
+
+# Changelog
+
+## r065 – Sidebar Dialog Keyboard Focus Hardening
+
+- Bumped Reminder version to `0.1.0-r065`.
+- Added explicit focus state for Sidebar dialogs/action overlays so newly opened modals can reliably receive keyboard events.
+- Create/Edit and Delete modal backdrops are now focusable with `tabindex="-1"`.
+- Escape handling is centralized for discard dialog, mobile action sheet, create/edit/delete modals and desktop row action menus.
+- Escape on Create/Edit still respects the unsaved-changes dialog instead of discarding changes directly.
+- Continue-edit from the unsaved-changes dialog returns focus to the underlying form modal.
+- Preserves Create/Update/Delete, duplicate preflight, fresh row-action data, responsive/mobile action sheet, brand assets and strict Reminder/Card separation.
+
+---
+
+# Changelog
+
+## r064 – Sidebar Unsaved Changes Dialog
+
+- Bumped Reminder version to `0.1.0-r064`.
+- Replaced the native browser `window.confirm(...)` dirty-guard prompt with a Home-Assistant-style centered discard dialog.
+- Closing create/edit with unsaved changes now opens an overlay with `Verwerfen` and `Weiter bearbeiten`.
+- Backdrop click and Escape on the discard dialog keep the user in the form instead of immediately losing changes.
+- Force-closing after `Verwerfen` resets the form state and returns to the list.
+- Preserves Create/Update/Delete, duplicate preflight, fresh row-action data, mobile action sheet, responsive table, brand assets and strict Reminder/Card separation.
+
+---
+
+## r063 – Sidebar Row Action Fresh Record
+
+- Bumped Reminder version to `0.1.0-r063`.
+- Sidebar row actions now fetch a fresh vehicle record through `tuev_reminder/manager/vehicles/get` before opening Bearbeiten or Löschen.
+- Updates the local list cache with the fetched record before the modal opens.
+- Shows an error flash and refreshes the list if the selected entry no longer exists.
+- Adds a row-action loading guard to prevent duplicate action dispatches.
+- Preserves Create/Update/Delete, duplicate preflight, mobile action sheet, responsive table, brand assets and strict Reminder/Card separation.
+
+---
+
+## r062 – Sidebar Duplicate Preflight
+
+- Bumped Reminder version to `0.1.0-r062`.
+- Adds local duplicate preflight validation in the Sidebar create/edit modal.
+- Detects duplicate vehicle names before save.
+- Detects duplicate normalized/display plates before save.
+- Excludes the current `entry_id` while editing, so unchanged records remain saveable/valid.
+- Keeps backend duplicate checks authoritative and unchanged.
+- Preserves Create/Update/Delete, mobile action sheet, responsive table, brand assets and strict Reminder/Card separation.
+
+---
+
+
+## r061 – Backend Offset Validation Parity
+
+- Bumped Reminder version to `0.1.0-r061`.
+- Backend Manager create/update now rejects invalid `Erinnerungs-Vorlauf Tage` values outside `0–365` instead of silently clamping direct WebSocket payloads.
+- Added German backend error message for invalid reminder offset payloads.
+- Renamed the create/edit modal preview heading from `Vorschau` to `Kennzeichen`.
+- Preserves Create/Update/Delete, mobile action sheet, responsive table, brand assets and strict Reminder/Card separation.
+
+---
+
 ## r060 – Sidebar Plate Format by Kind UI
 
 - Bumped Reminder version to `0.1.0-r060`.

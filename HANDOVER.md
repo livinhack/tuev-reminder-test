@@ -1,3 +1,296 @@
+# Handover – Reminder r066 Sidebar Form Payload Scrub
+
+## Base
+
+Built on r065 (`tuev-reminder-r065-sidebar-dialog-keyboard-focus.zip`).
+
+## Why this step
+
+After the Sidebar create/edit flow became functional, the form still kept hidden branch values in memory when switching between Kennzeichenarten. The backend already normalizes most of this, but the Sidebar should validate, preview, dirty-check and save the same effective state instead of letting stale hidden values influence payloads or duplicate checks.
+
+## Implemented
+
+- Added `_formKindFlags(...)` to centralize seasonal/green/Wechselkennzeichen state.
+- Added `_scrubFormForKind(...)` for effective form-state normalization.
+- Added `_sanitizeFieldValue(...)` for field-level UI sanitization.
+- `_formPayload(...)`, `_formPlateText(...)`, `_formValidation(...)`, duplicate preflight and summary updates now use scrubbed state.
+- Wechselkennzeichen mode clears normal plate and H/E suffixes in the effective state.
+- Non-Wechselkennzeichen modes clear Wechselkennzeichen-only values in the effective state.
+- Non-seasonal modes save neutral season values.
+- Green modes force H/E suffix flags off.
+- Existing detail records are scrubbed when opened for editing.
+- Added `docs/REMINDER_R066_SIDEBAR_FORM_PAYLOAD_SCRUB.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R066.md`.
+- Added `scripts/check_r066_sidebar_form_payload_scrub.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation/API.
+- r048/r062 duplicate guards.
+- r055 mobile action-sheet tap-race fix.
+- r058 list state preservation.
+- r064 unsaved-changes dialog.
+- r065 dialog keyboard/focus hardening.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Open create form, switch Kennzeichenart between Standard, Saison, Grün and Wechselkennzeichen.
+2. Confirm hidden field branches do not reappear with stale values after switching back and forth.
+3. Create and edit Standard, Saison, Grün and Wechselkennzeichen records.
+4. Recheck duplicate preflight and dirty guard after switching Kennzeichenart.
+5. Recheck smartphone three-dot action sheet and desktop row-action menus.
+
+---
+
+# Handover – Reminder r065 Sidebar Dialog Keyboard Focus Hardening
+
+## Base
+
+Built on r064 (`tuev-reminder-r064-sidebar-unsaved-changes-dialog.zip`).
+
+## Why this step
+
+After r064, the Sidebar has several overlays: create/edit, delete, discard confirmation and the smartphone action sheet. They worked by click/tap, but keyboard focus and Escape handling were distributed across the individual overlays. r065 centralizes and hardens that behavior so dialog closing remains predictable in HA desktop, mobile and WebView contexts.
+
+## Implemented
+
+- Added `_dialogFocusPending` state to the Sidebar panel.
+- Create/Edit and Delete modal backdrops now have `tabindex="-1"`.
+- Newly opened create/edit/delete modals can receive focus without scrolling the page.
+- Newly opened discard and action-sheet overlays focus only when requested, instead of stealing focus on every render.
+- Added centralized Escape handling on the panel page:
+  - discard prompt: Escape closes the discard prompt and keeps editing;
+  - mobile action sheet: Escape closes the action sheet;
+  - create/edit/delete: Escape closes through `_closeForm(...)`, preserving dirty-guard behavior;
+  - desktop row menu: Escape closes the menu.
+- Existing overlay-specific Escape handlers now stop propagation to avoid double-close races.
+- Added `docs/REMINDER_R065_SIDEBAR_DIALOG_KEYBOARD_FOCUS.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R065.md`.
+- Added `scripts/check_r065_sidebar_dialog_keyboard_focus.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation/API.
+- r048 backend duplicate guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059/r060/r061 validation parity.
+- r062 local duplicate preflight.
+- r063 fresh row-action records.
+- r064 in-panel unsaved-changes dialog.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Open Neues Fahrzeug, type one value, press Escape: the unsaved-changes dialog should appear.
+2. Press Weiter bearbeiten: the create/edit modal should stay open.
+3. Press Escape again, then Verwerfen: the form should close only after explicit discard.
+4. Open Drei Punkte on desktop and press Escape: the inline menu should close.
+5. Open Drei Punkte on smartphone and press Escape/back: the action sheet should close without affecting the list.
+6. Recheck Create/Update/Delete and the confirmed smartphone three-dot tap behavior.
+
+---
+
+# Handover – Reminder r064 Sidebar Unsaved Changes Dialog
+
+## Base
+
+Built on r063 (`tuev-reminder-r063-sidebar-row-action-fresh-record.zip`).
+
+## Why this step
+
+The dirty guard from r049 still used the browser-native `window.confirm(...)`. That works technically, but it feels inconsistent in the Sidebar UI and behaves differently across HA desktop, mobile and WebView contexts. r064 replaces it with an in-panel centered dialog.
+
+## Implemented
+
+- Added `_discardPromptOpen` state to the Sidebar panel.
+- Replaced native `window.confirm(...)` usage with `_openDiscardPrompt(...)`.
+- Added `_renderDiscardConfirm(...)` with `Verwerfen` and `Weiter bearbeiten`.
+- Closing create/edit with unsaved changes now shows the custom discard dialog.
+- Backdrop click and Escape on the discard dialog cancel the discard prompt and keep the form open.
+- Confirming `Verwerfen` force-closes the form and resets transient form state.
+- Added `docs/REMINDER_R064_SIDEBAR_UNSAVED_CHANGES_DIALOG.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R064.md`.
+- Added `scripts/check_r064_sidebar_unsaved_changes_dialog.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 backend duplicate guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059/r060/r061 validation parity.
+- r062 local duplicate preflight.
+- r063 fresh row-action records.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Open Neues Fahrzeug, type one value, then press Schließen: a centered unsaved-changes dialog should appear.
+2. Press Weiter bearbeiten: the form should remain open with input preserved.
+3. Press Schließen again, then Verwerfen: the modal should close and return to the list.
+4. Repeat with Bearbeiten on an existing vehicle.
+5. Recheck Create/Update/Delete and smartphone three-dot action sheet.
+
+---
+
+# Handover – Reminder r063 Sidebar Row Action Fresh Record
+
+## Base
+
+Built on r062 (`tuev-reminder-r062-sidebar-duplicate-preflight.zip`).
+
+## Why this step
+
+Create/Edit/Delete now work, but row actions previously opened their modal directly from the currently rendered list record. If another browser tab/session changed or removed that entry, the modal could start from stale data. r063 fetches the selected record by stable `entry_id` before opening Bearbeiten or Löschen.
+
+## Implemented
+
+- Added `_fetchVehicleRecord(...)` to the Sidebar panel.
+- Bearbeiten and Löschen now call `tuev_reminder/manager/vehicles/get` before opening the modal.
+- The local vehicle cache is updated with the freshly fetched record.
+- If the record cannot be fetched, the Sidebar shows an error flash and refreshes the list.
+- Added `_rowActionLoadingEntryId` to prevent duplicate row-action dispatches.
+- Three-dot buttons show a temporary busy state while the selected record is being fetched.
+- Added `docs/REMINDER_R063_SIDEBAR_ROW_ACTION_FRESH_RECORD.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R063.md`.
+- Added `scripts/check_r063_sidebar_row_action_fresh_record.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 backend duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059/r060/r061 validation parity.
+- r062 local duplicate preflight.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Drei Punkte → Bearbeiten should still open the modal with current data.
+2. Drei Punkte → Löschen should still open the confirmation dialog.
+3. Try editing after a manual refresh or in a second browser session; the modal should use fresh Manager API data.
+4. Recheck smartphone action sheet and desktop outside-click menu close.
+
+---
+
+# Handover – Reminder r062 Sidebar Duplicate Preflight
+
+## Base
+
+Built on r061 (`tuev-reminder-r061-backend-offset-validation.zip`).
+
+## Why this step
+
+The backend already blocks duplicate vehicle names and duplicate Kennzeichen during create/update. The Sidebar now mirrors that rule locally so users see duplicate errors before pressing Save. The backend remains the authoritative source of truth.
+
+## Implemented
+
+- Added `_duplicateKey(...)` for stable local comparison of names and plates.
+- Added `_formDuplicateErrors(...)` in the Sidebar panel.
+- Local validation now reports duplicate vehicle names.
+- Local validation now reports duplicate normalized/display plates.
+- Edit mode excludes the selected vehicle's own `entry_id`.
+- Added `docs/REMINDER_R062_SIDEBAR_DUPLICATE_PREFLIGHT.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R062.md`.
+- Added `scripts/check_r062_sidebar_duplicate_preflight.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 backend duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059/r060/r061 validation parity.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Try creating a second vehicle with an existing Fahrzeugname; the modal should show a duplicate error before Save.
+2. Try creating a second vehicle with an existing Kennzeichen; the modal should show a duplicate error before Save.
+3. Edit an existing vehicle without changing name/plate; it should not report itself as duplicate.
+4. Edit one vehicle to another vehicle's name/plate; the modal should block saving locally and the backend guard remains in place.
+5. Recheck smartphone three-dot action sheet and desktop three-dot menu behavior.
+
+---
+
+# Handover – Reminder r061 Backend Offset Validation Parity
+
+## Base
+
+Built on r060 (`tuev-reminder-r060-sidebar-plate-format-by-kind-ui.zip`).
+
+## Why this step
+
+After the Sidebar field controls and `plate_formats_by_kind` filtering were aligned with the backend, one backend gap remained: `reminder_offset_days` was constrained in the UI but direct Manager API payloads were still silently clamped by the read-side helper. The write path should reject invalid data instead of accepting and normalizing it implicitly.
+
+## Implemented
+
+- Explicit backend validation for `CONF_REMINDER_OFFSET_DAYS` in `validate_and_normalize_vehicle_payload(...)`.
+- New backend field error code `invalid_offset` for values outside `0–365`.
+- Friendly German WebSocket validation message: `Erinnerungs-Vorlauf muss zwischen 0 und 365 Tagen liegen.`
+- Create/edit modal heading changed from `Vorschau` to `Kennzeichen`.
+- Added `docs/REMINDER_R061_BACKEND_OFFSET_VALIDATION.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R061.md`.
+- Added `scripts/check_r061_backend_offset_validation.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059 form validation parity.
+- r060 plate format by kind filtering.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Create/edit normal vehicles with valid Erinnerung values `0`, `7`, and `365`.
+2. Confirm normal Sidebar saves still work.
+3. If possible via WebSocket/dev tooling, submit invalid `reminder_offset_days` like `-1` or `999` and verify the Manager API rejects it with the German validation message.
+4. Confirm the modal now labels the preview area as `Kennzeichen`.
+5. Recheck smartphone three-dot action sheet and desktop three-dot menu behavior.
+
+---
+
 # Handover – Reminder r060 Sidebar Plate Format by Kind UI
 
 ## Base

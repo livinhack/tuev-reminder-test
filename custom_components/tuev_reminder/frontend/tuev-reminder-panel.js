@@ -28,9 +28,12 @@ class TuevReminderPanel extends HTMLElement {
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._formSnapshot = null;
+    this._discardPromptOpen = false;
     this._actionSheetVehicle = null;
     this._actionSheetOpenedAt = 0;
     this._actionSheetCloseGuardUntil = 0;
+    this._rowActionLoadingEntryId = null;
+    this._dialogFocusPending = null;
   }
 
   set hass(hass) {
@@ -108,6 +111,58 @@ class TuevReminderPanel extends HTMLElement {
       change_plate_common_text: "",
       change_plate_vehicle_digit: "",
     };
+  }
+
+  _formKindFlags(kind = this._form.plate_kind) {
+    return {
+      seasonal: ["seasonal", "green_seasonal"].includes(kind),
+      green: ["green", "green_seasonal"].includes(kind),
+      change: kind === "change",
+    };
+  }
+
+  _scrubFormForKind(form = this._form) {
+    const clean = { ...this._defaultForm(), ...(form || {}) };
+    const flags = this._formKindFlags(clean.plate_kind);
+
+    if (flags.change) {
+      clean.plate = "";
+      clean.plate_suffix_h = false;
+      clean.plate_suffix_e = false;
+      clean.change_plate_vehicle_digit = String(clean.change_plate_vehicle_digit || "")
+        .replace(/\D/g, "")
+        .slice(0, 1);
+    } else {
+      clean.change_plate_common_text = "";
+      clean.change_plate_vehicle_digit = "";
+    }
+
+    if (flags.green) {
+      clean.plate_suffix_h = false;
+      clean.plate_suffix_e = false;
+    }
+
+    if (!flags.seasonal) {
+      clean.season_start_month = "4";
+      clean.season_end_month = "10";
+    }
+
+    const allowedFormats = this._allowedPlateFormatValues(clean.plate_kind);
+    if (!allowedFormats.includes(String(clean.plate_format))) {
+      clean.plate_format = allowedFormats[0] || "single_line";
+    }
+
+    return clean;
+  }
+
+  _sanitizeFieldValue(name, value) {
+    if (name === "change_plate_vehicle_digit") {
+      return String(value || "").replace(/\D/g, "").slice(0, 1);
+    }
+    if (["plate", "change_plate_common_text"].includes(name)) {
+      return String(value || "").toUpperCase();
+    }
+    return value;
   }
 
   _escape(value) {
@@ -323,19 +378,54 @@ class TuevReminderPanel extends HTMLElement {
     });
   }
 
-  _formPlateText() {
-    if (this._form.plate_kind === "change") {
-      const common = this._normalizePlate(this._form.change_plate_common_text);
-      const digit = String(this._form.change_plate_vehicle_digit || "").trim();
+  _formPlateText(form = this._form) {
+    const clean = this._scrubFormForKind(form);
+    if (clean.plate_kind === "change") {
+      const common = this._normalizePlate(clean.change_plate_common_text);
+      const digit = String(clean.change_plate_vehicle_digit || "").trim();
       return `${common}${digit ? ` ${digit}` : ""}`.trim();
     }
-    let plate = this._normalizePlate(this._form.plate);
-    const suffix = `${this._form.plate_suffix_h ? "H" : ""}${this._form.plate_suffix_e ? "E" : ""}`;
+    const plate = this._normalizePlate(clean.plate);
+    const suffix = `${clean.plate_suffix_h ? "H" : ""}${clean.plate_suffix_e ? "E" : ""}`;
     return `${plate}${suffix ? ` ${suffix}` : ""}`.trim();
   }
 
   _normalizePlate(value) {
     return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
+  }
+
+  _duplicateKey(value) {
+    return String(value || "").trim().replace(/\s+/g, " ").toLocaleLowerCase("de-DE");
+  }
+
+  _formDuplicateErrors() {
+    const errors = [];
+    const currentEntryId = this._view === "detail" ? String(this._selectedVehicle?.entry_id || "") : "";
+    const wantedName = this._duplicateKey(this._form.vehicle_name);
+    const wantedPlate = this._duplicateKey(this._formPlateText());
+
+    if (!wantedName && !wantedPlate) {
+      return errors;
+    }
+
+    for (const vehicle of this._vehicles || []) {
+      if (currentEntryId && String(vehicle.entry_id || "") === currentEntryId) {
+        continue;
+      }
+      const existingName = this._duplicateKey(vehicle.vehicle_name || vehicle.title);
+      const existingPlate = this._duplicateKey(vehicle.plate_display || vehicle.plate);
+      if (wantedName && existingName === wantedName) {
+        errors.push("Ein Fahrzeug mit diesem Namen existiert bereits.");
+      }
+      if (wantedPlate && existingPlate === wantedPlate) {
+        errors.push("Ein Fahrzeug mit diesem Kennzeichen existiert bereits.");
+      }
+      if (errors.length >= 2) {
+        break;
+      }
+    }
+
+    return errors;
   }
 
   _vehicleMeta(vehicle) {
@@ -351,31 +441,37 @@ class TuevReminderPanel extends HTMLElement {
 
   _formValidation() {
     const errors = [];
-    if (!String(this._form.vehicle_name || "").trim()) errors.push("Fahrzeugname fehlt.");
-    if (this._form.plate_kind === "change") {
-      if (!String(this._form.change_plate_common_text || "").trim()) errors.push("Gemeinsamer Wechselkennzeichen-Text fehlt.");
-      if (!String(this._form.change_plate_vehicle_digit || "").trim()) errors.push("Fahrzeugziffer für Wechselkennzeichen fehlt.");
-    } else if (!String(this._form.plate || "").trim()) {
+    const clean = this._scrubFormForKind();
+    const kindValues = (this._metadata?.plate_kinds || []).map((option) => String(option.value));
+    if (kindValues.length && !kindValues.includes(String(clean.plate_kind))) {
+      errors.push("Kennzeichenart ist ungültig.");
+    }
+    if (!String(clean.vehicle_name || "").trim()) errors.push("Fahrzeugname fehlt.");
+    if (clean.plate_kind === "change") {
+      if (!String(clean.change_plate_common_text || "").trim()) errors.push("Gemeinsamer Wechselkennzeichen-Text fehlt.");
+      if (!String(clean.change_plate_vehicle_digit || "").trim()) errors.push("Fahrzeugziffer für Wechselkennzeichen fehlt.");
+    } else if (!String(clean.plate || "").trim()) {
       errors.push("Kennzeichen fehlt.");
     }
-    const month = Number(this._form.month);
-    const year = Number(this._form.year);
-    const offset = Number(this._form.reminder_offset_days);
+    const month = Number(clean.month);
+    const year = Number(clean.year);
+    const offset = Number(clean.reminder_offset_days);
     if (!Number.isInteger(month) || month < 1 || month > 12) errors.push("HU-Monat muss zwischen 1 und 12 liegen.");
     if (!Number.isInteger(year) || year < 1900 || year > 2100) errors.push("HU-Jahr muss zwischen 1900 und 2100 liegen.");
-    const interval = Number(this._form.interval);
+    const interval = Number(clean.interval);
     if (!Number.isInteger(interval) || ![1, 2].includes(interval)) errors.push("Prüfintervall muss 1 oder 2 Jahre betragen.");
-    if (!this._allowedPlateFormatValues(this._form.plate_kind).includes(String(this._form.plate_format))) {
+    if (!this._allowedPlateFormatValues(clean.plate_kind).includes(String(clean.plate_format))) {
       errors.push("Kennzeichenformat passt nicht zur Kennzeichenart.");
     }
     if (!Number.isInteger(offset) || offset < 0 || offset > 365) errors.push("Erinnerungs-Vorlauf muss zwischen 0 und 365 Tagen liegen.");
-    if (["seasonal", "green_seasonal"].includes(this._form.plate_kind)) {
-      const start = Number(this._form.season_start_month);
-      const end = Number(this._form.season_end_month);
+    if (["seasonal", "green_seasonal"].includes(clean.plate_kind)) {
+      const start = Number(clean.season_start_month);
+      const end = Number(clean.season_end_month);
       if (!Number.isInteger(start) || start < 1 || start > 12 || !Number.isInteger(end) || end < 1 || end > 12) {
         errors.push("Saisonmonate müssen zwischen 1 und 12 liegen.");
       }
     }
+    this._formDuplicateErrors().forEach((error) => errors.push(error));
     return errors;
   }
 
@@ -397,6 +493,7 @@ class TuevReminderPanel extends HTMLElement {
       this._actionSheetVehicle = vehicle;
       this._actionSheetOpenedAt = Date.now();
       this._actionSheetCloseGuardUntil = this._actionSheetOpenedAt + 650;
+      this._dialogFocusPending = "actionSheet";
     } else {
       this._actionSheetVehicle = null;
       this._openMenuIndex = null;
@@ -425,19 +522,58 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
-  _handleRowAction(action, vehicle) {
+  async _fetchVehicleRecord(vehicle) {
+    const entryId = String(vehicle?.entry_id || "");
+    if (!entryId || !this._hass) {
+      return vehicle;
+    }
+
+    const result = await this._hass.connection.sendMessagePromise({
+      type: "tuev_reminder/manager/vehicles/get",
+      entry_id: entryId,
+    });
+    const latest = result?.vehicle || vehicle;
+    const index = this._vehicles.findIndex((item) => String(item.entry_id || "") === entryId);
+    if (index >= 0) {
+      this._vehicles = this._vehicles.map((item, itemIndex) => (itemIndex === index ? latest : item));
+    }
+    return latest;
+  }
+
+  async _handleRowAction(action, vehicle) {
+    if (this._rowActionLoadingEntryId) {
+      return;
+    }
+
+    const entryId = String(vehicle?.entry_id || "");
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
     this._actionSheetOpenedAt = 0;
     this._actionSheetCloseGuardUntil = 0;
+    this._rowActionLoadingEntryId = entryId || null;
+    this._renderPreservingListUiState();
+
+    let latest = vehicle;
+    try {
+      latest = await this._fetchVehicleRecord(vehicle);
+    } catch (err) {
+      this._rowActionLoadingEntryId = null;
+      this._setFlash("Fahrzeugdaten konnten nicht geladen werden. Die Liste wurde aktualisiert.", "error");
+      await this._refresh();
+      return;
+    }
+
+    this._rowActionLoadingEntryId = null;
     if (action === "edit") {
-      this._openDetailForm(vehicle);
+      this._openDetailForm(latest);
       return;
     }
     if (action === "delete") {
-      this._openDeleteConfirm(vehicle);
+      this._openDeleteConfirm(latest);
+      return;
     }
+    this._renderPreservingListUiState();
   }
 
   _payloadKey(payload = this._formPayload()) {
@@ -459,11 +595,29 @@ class TuevReminderPanel extends HTMLElement {
     return this._payloadKey() !== this._formSnapshot;
   }
 
-  _confirmDiscardChanges() {
-    if (!["create", "detail"].includes(this._view) || !this._formDirty()) {
-      return true;
+  _shouldPromptDiscardChanges() {
+    return ["create", "detail"].includes(this._view) && this._formDirty();
+  }
+
+  _openDiscardPrompt() {
+    if (!this._shouldPromptDiscardChanges()) {
+      return false;
     }
-    return window.confirm("Ungespeicherte Änderungen verwerfen?");
+    this._discardPromptOpen = true;
+    this._dialogFocusPending = "discard";
+    this._render();
+    return true;
+  }
+
+  _closeDiscardPrompt() {
+    if (!this._discardPromptOpen) {
+      return;
+    }
+    this._discardPromptOpen = false;
+    if (["create", "detail"].includes(this._view)) {
+      this._dialogFocusPending = "modal";
+    }
+    this._render();
   }
 
   _openDeleteConfirm(vehicle) {
@@ -473,7 +627,9 @@ class TuevReminderPanel extends HTMLElement {
     this._selectedVehicle = vehicle;
     this._formError = null;
     this._formInfo = null;
+    this._discardPromptOpen = false;
     this._view = "delete";
+    this._dialogFocusPending = "modal";
     this._render();
   }
 
@@ -485,8 +641,10 @@ class TuevReminderPanel extends HTMLElement {
     this._selectedVehicle = null;
     this._formError = null;
     this._formInfo = null;
+    this._discardPromptOpen = false;
     this._view = "create";
     this._rememberFormSnapshot();
+    this._dialogFocusPending = "modal";
     this._render();
   }
 
@@ -497,7 +655,8 @@ class TuevReminderPanel extends HTMLElement {
     this._selectedVehicle = vehicle;
     this._formError = null;
     this._formInfo = null;
-    this._form = {
+    this._discardPromptOpen = false;
+    this._form = this._scrubFormForKind({
       ...this._defaultForm(),
       vehicle_name: vehicle.vehicle_name || vehicle.title || "",
       plate: vehicle.plate_base || vehicle.plate_display || vehicle.plate || "",
@@ -513,39 +672,43 @@ class TuevReminderPanel extends HTMLElement {
       season_end_month: String(vehicle.season_end_month || "10"),
       change_plate_common_text: vehicle.change_plate_common_text || "",
       change_plate_vehicle_digit: vehicle.change_plate_vehicle_digit || "",
-    };
+    });
     this._view = "detail";
     this._rememberFormSnapshot();
+    this._dialogFocusPending = "modal";
     this._render();
   }
 
   _closeForm(options = {}) {
     if (this._saving || this._deleting) return;
-    if (!options.force && !this._confirmDiscardChanges()) return;
+    if (!options.force && this._openDiscardPrompt()) return;
+    this._discardPromptOpen = false;
     this._view = "list";
     this._selectedVehicle = null;
     this._formError = null;
     this._formInfo = null;
     this._formSnapshot = null;
+    this._dialogFocusPending = null;
     this._render();
   }
 
   _formPayload() {
+    const clean = this._scrubFormForKind();
     const payload = {
-      vehicle_name: String(this._form.vehicle_name || "").trim(),
-      plate: this._normalizePlate(this._form.plate),
-      month: Number(this._form.month),
-      year: Number(this._form.year),
-      interval: Number(this._form.interval || 2),
-      reminder_offset_days: Number(this._form.reminder_offset_days || 0),
-      plate_kind: this._form.plate_kind || "standard",
-      plate_format: this._form.plate_format || "single_line",
-      plate_suffix_h: this._form.plate_suffix_h === true,
-      plate_suffix_e: this._form.plate_suffix_e === true,
-      season_start_month: Number(this._form.season_start_month || 4),
-      season_end_month: Number(this._form.season_end_month || 10),
-      change_plate_common_text: this._normalizePlate(this._form.change_plate_common_text),
-      change_plate_vehicle_digit: String(this._form.change_plate_vehicle_digit || "").trim(),
+      vehicle_name: String(clean.vehicle_name || "").trim(),
+      plate: this._normalizePlate(clean.plate),
+      month: Number(clean.month),
+      year: Number(clean.year),
+      interval: Number(clean.interval || 2),
+      reminder_offset_days: Number(clean.reminder_offset_days || 0),
+      plate_kind: clean.plate_kind || "standard",
+      plate_format: clean.plate_format || "single_line",
+      plate_suffix_h: clean.plate_suffix_h === true,
+      plate_suffix_e: clean.plate_suffix_e === true,
+      season_start_month: ["seasonal", "green_seasonal"].includes(clean.plate_kind) ? Number(clean.season_start_month || 4) : null,
+      season_end_month: ["seasonal", "green_seasonal"].includes(clean.plate_kind) ? Number(clean.season_end_month || 10) : null,
+      change_plate_common_text: clean.plate_kind === "change" ? this._normalizePlate(clean.change_plate_common_text) : "",
+      change_plate_vehicle_digit: clean.plate_kind === "change" ? String(clean.change_plate_vehicle_digit || "").trim() : "",
     };
     return payload;
   }
@@ -576,6 +739,7 @@ class TuevReminderPanel extends HTMLElement {
     this._formInfo = null;
     this._formError = null;
     this._formSnapshot = null;
+    this._discardPromptOpen = false;
     this._actionSheetVehicle = null;
     this._openMenuEntryId = null;
   }
@@ -680,21 +844,10 @@ class TuevReminderPanel extends HTMLElement {
     const render = options.render !== false;
     this._formError = null;
     this._formInfo = null;
-    this._form = { ...this._form, [name]: value };
-    if (name === "plate_kind") {
-      const allowedFormats = this._allowedPlateFormatValues(value);
-      if (!allowedFormats.includes(String(this._form.plate_format))) {
-        this._form.plate_format = allowedFormats[0] || "single_line";
-      }
-      if (!["seasonal", "green_seasonal"].includes(value)) {
-        this._form.season_start_month = "4";
-        this._form.season_end_month = "10";
-      }
-      if (["green", "green_seasonal", "change"].includes(value)) {
-        this._form.plate_suffix_h = false;
-        this._form.plate_suffix_e = false;
-      }
-    }
+    this._form = this._scrubFormForKind({
+      ...this._form,
+      [name]: this._sanitizeFieldValue(name, value),
+    });
     if (render) {
       this._render();
       return;
@@ -707,8 +860,8 @@ class TuevReminderPanel extends HTMLElement {
       return;
     }
 
-    const seasonal = ["seasonal", "green_seasonal"].includes(this._form.plate_kind);
-    const green = ["green", "green_seasonal"].includes(this._form.plate_kind);
+    const clean = this._scrubFormForKind();
+    const { seasonal, green } = this._formKindFlags(clean.plate_kind);
     const errors = this._formValidation();
 
     const preview = this.shadowRoot.querySelector(".large-preview");
@@ -716,16 +869,16 @@ class TuevReminderPanel extends HTMLElement {
       preview.innerHTML = this._platePreviewFromText(this._formPlateText(), {
         green,
         seasonal,
-        seasonStart: this._form.season_start_month,
-        seasonEnd: this._form.season_end_month,
+        seasonStart: clean.season_start_month,
+        seasonEnd: clean.season_end_month,
       });
     }
 
     const summary = {
-      name: this._form.vehicle_name || "—",
-      hu: `${String(this._form.month || "—").padStart(2, "0")}/${this._form.year || "—"}`,
-      kind: this._kindLabel(this._form.plate_kind),
-      format: this._formatLabel(this._form.plate_format),
+      name: clean.vehicle_name || "—",
+      hu: `${String(clean.month || "—").padStart(2, "0")}/${clean.year || "—"}`,
+      kind: this._kindLabel(clean.plate_kind),
+      format: this._formatLabel(clean.plate_format),
     };
     Object.entries(summary).forEach(([key, value]) => {
       const node = this.shadowRoot.querySelector(`[data-summary="${key}"]`);
@@ -810,7 +963,7 @@ class TuevReminderPanel extends HTMLElement {
                 <td class="status-cell"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell">${this._platePreview(vehicle)}</td>
                 <td class="menu-cell">
-                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}"><span aria-hidden="true">⋮</span></button>
+                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>
                   ${this._openMenuEntryId === vehicle.entry_id ? `
                     <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
                       <button type="button" data-row-action="edit" data-action-index="${index}" data-action-entry-id="${this._escape(vehicle.entry_id || "")}" role="menuitem">Bearbeiten</button>
@@ -878,7 +1031,7 @@ class TuevReminderPanel extends HTMLElement {
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
     const plate = vehicle.plate_display || vehicle.plate || "—";
     return `
-      <section class="modal-backdrop" aria-label="Fahrzeug löschen" role="dialog" aria-modal="true">
+      <section class="modal-backdrop" aria-label="Fahrzeug löschen" role="dialog" aria-modal="true" tabindex="-1">
         <div class="form-shell delete-shell">
           <div class="form-head">
             <div>
@@ -903,6 +1056,21 @@ class TuevReminderPanel extends HTMLElement {
   }
 
 
+  _renderDiscardConfirm() {
+    return `
+      <section class="discard-backdrop" aria-label="Ungespeicherte Änderungen" role="dialog" aria-modal="true" tabindex="-1">
+        <div class="discard-dialog">
+          <h2>Ungespeicherte Änderungen</h2>
+          <p>Im Formular wurden Angaben geändert. Änderungen verwerfen und zur Liste zurückkehren?</p>
+          <div class="form-actions modal-bottom-actions">
+            <button class="danger" id="confirm-discard">Verwerfen</button>
+            <button class="ghost" id="cancel-discard">Weiter bearbeiten</button>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   _renderActionSheet() {
     const vehicle = this._actionSheetVehicle || {};
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
@@ -924,10 +1092,9 @@ class TuevReminderPanel extends HTMLElement {
 
   _renderCreateForm() {
     const isDetail = this._view === "detail";
+    const clean = this._scrubFormForKind();
     const errors = this._formValidation();
-    const seasonal = ["seasonal", "green_seasonal"].includes(this._form.plate_kind);
-    const green = ["green", "green_seasonal"].includes(this._form.plate_kind);
-    const change = this._form.plate_kind === "change";
+    const { seasonal, green, change } = this._formKindFlags(clean.plate_kind);
     const plateKinds = this._metadata?.plate_kinds || [
       { value: "standard", label: "Standard" },
       { value: "seasonal", label: "Saisonkennzeichen" },
@@ -935,10 +1102,10 @@ class TuevReminderPanel extends HTMLElement {
       { value: "green", label: "Grünes Kennzeichen" },
       { value: "green_seasonal", label: "Grünes Kennzeichen + Saison" },
     ];
-    const plateFormats = this._plateFormatOptionsForKind(this._form.plate_kind);
+    const plateFormats = this._plateFormatOptionsForKind(clean.plate_kind);
 
     return `
-      <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true">
+      <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true" tabindex="-1">
         <div class="form-shell">
         <div class="form-head">
           <div>
@@ -950,55 +1117,55 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-grid">
           <div class="form-card fields-card">
             <h3>Basisdaten</h3>
-            <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(this._form.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
+            <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(clean.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
             <div class="field-pair">
-              <label>HU-Monat<select data-field="month">${this._renderMonthOptions(this._form.month)}</select></label>
-              <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(this._form.year)}"></label>
+              <label>HU-Monat<select data-field="month">${this._renderMonthOptions(clean.month)}</select></label>
+              <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(clean.year)}"></label>
             </div>
             <div class="field-pair">
-              <label>Intervall<select data-field="interval">${this._renderIntervalOptions(this._form.interval)}</select></label>
-              <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(this._form.reminder_offset_days)}"></label>
+              <label>Intervall<select data-field="interval">${this._renderIntervalOptions(clean.interval)}</select></label>
+              <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(clean.reminder_offset_days)}"></label>
             </div>
 
             <h3>Kennzeichen</h3>
-            <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, this._form.plate_kind)}</select></label>
-            <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, this._form.plate_format)}</select></label>
+            <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, clean.plate_kind)}</select></label>
+            <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, clean.plate_format)}</select></label>
 
             ${change ? `
               <div class="field-pair">
-                <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(this._form.change_plate_common_text)}" placeholder="z. B. B AB"></label>
-                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(this._form.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+                <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(clean.change_plate_common_text)}" placeholder="z. B. B AB"></label>
+                <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(clean.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
               </div>
             ` : `
-              <label>Kennzeichen<input data-field="plate" value="${this._escape(this._form.plate)}" placeholder="z. B. B AB 123"></label>
+              <label>Kennzeichen<input data-field="plate" value="${this._escape(clean.plate)}" placeholder="z. B. B AB 123"></label>
               <div class="check-row ${green ? "disabled-row" : ""}">
-                <label><input type="checkbox" data-field="plate_suffix_h" ${this._form.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
-                <label><input type="checkbox" data-field="plate_suffix_e" ${this._form.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
+                <label><input type="checkbox" data-field="plate_suffix_h" ${clean.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
+                <label><input type="checkbox" data-field="plate_suffix_e" ${clean.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
               </div>
             `}
 
             ${seasonal ? `
               <h3>Saison</h3>
               <div class="field-pair">
-                <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(this._form.season_start_month)}</select></label>
-                <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(this._form.season_end_month)}</select></label>
+                <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
+                <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
               </div>
             ` : ""}
           </div>
 
           <aside class="form-card preview-card">
-            <h3>Vorschau</h3>
+            <h3>Kennzeichen</h3>
             <div class="large-preview">${this._platePreviewFromText(this._formPlateText(), {
               green,
               seasonal,
-              seasonStart: this._form.season_start_month,
-              seasonEnd: this._form.season_end_month,
+              seasonStart: clean.season_start_month,
+              seasonEnd: clean.season_end_month,
             })}</div>
             <dl>
-              <div><dt>Name</dt><dd data-summary="name">${this._escape(this._form.vehicle_name || "—")}</dd></div>
-              <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(this._form.month).padStart(2, "0"))}/${this._escape(this._form.year || "—")}</dd></div>
-              <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(this._form.plate_kind))}</dd></div>
-              <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(this._form.plate_format))}</dd></div>
+              <div><dt>Name</dt><dd data-summary="name">${this._escape(clean.vehicle_name || "—")}</dd></div>
+              <div><dt>HU</dt><dd data-summary="hu">${this._escape(String(clean.month).padStart(2, "0"))}/${this._escape(clean.year || "—")}</dd></div>
+              <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
+              <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
             </dl>
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               ${this._validationHtml(errors)}
@@ -1176,6 +1343,31 @@ class TuevReminderPanel extends HTMLElement {
           box-sizing: border-box;
           padding: 32px 20px;
           background: rgba(0, 0, 0, .46);
+        }
+        .discard-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 2147483100;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          padding: 24px;
+          background: rgba(0, 0, 0, .56);
+        }
+        .discard-dialog {
+          width: min(420px, 100%);
+          box-sizing: border-box;
+          border: 1px solid var(--divider-color);
+          border-radius: 14px;
+          background: var(--card-background-color);
+          padding: 20px;
+          box-shadow: 0 16px 48px rgba(0,0,0,.34);
+        }
+        .discard-dialog p {
+          margin: 6px 0 0;
+          color: var(--secondary-text-color);
+          line-height: 1.45;
         }
         .list-shell { overflow-x: auto; width: 100%; }
         .manager-table { width: 100%; min-width: 940px; border-collapse: collapse; }
@@ -1544,7 +1736,7 @@ class TuevReminderPanel extends HTMLElement {
           <span><strong>${vehicleCount}</strong> Fahrzeuge</span>
           <span><strong>${visibleCount}</strong> Treffer</span>
           <span><strong>${(counts.due || 0) + (counts.expired || 0)}</strong> fällig/abgelaufen</span>
-          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
+          <span>Reminder-eigene Seite · Create-/Update-/Delete-API aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · keine Card-Funktionen</span>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -1561,6 +1753,7 @@ class TuevReminderPanel extends HTMLElement {
           <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
         ${formOpen ? (this._view === "delete" ? this._renderDeleteConfirm() : this._renderCreateForm()) : ""}
+        ${this._discardPromptOpen ? this._renderDiscardConfirm() : ""}
         ${actionSheetOpen ? this._renderActionSheet() : ""}
       </main>
     `;
@@ -1614,6 +1807,32 @@ class TuevReminderPanel extends HTMLElement {
         const path = event.composedPath ? event.composedPath() : [];
         const insideMenuCell = path.some((node) => node?.classList?.contains?.("menu-cell"));
         if (!insideMenuCell) this._closeRowMenu();
+      });
+      page.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        if (this._discardPromptOpen) {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeDiscardPrompt();
+          return;
+        }
+        if (this._actionSheetVehicle) {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeActionSheet({ force: true });
+          return;
+        }
+        if (this._view !== "list") {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeForm();
+          return;
+        }
+        if (this._openMenuIndex !== null || this._openMenuEntryId !== null) {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeRowMenu();
+        }
       });
     }
 
@@ -1688,9 +1907,41 @@ class TuevReminderPanel extends HTMLElement {
       });
     });
 
+    const confirmDiscardButton = this.shadowRoot.querySelector("#confirm-discard");
+    if (confirmDiscardButton) confirmDiscardButton.addEventListener("click", () => this._closeForm({ force: true }));
+
+    const cancelDiscardButton = this.shadowRoot.querySelector("#cancel-discard");
+    if (cancelDiscardButton) cancelDiscardButton.addEventListener("click", () => this._closeDiscardPrompt());
+
+    const discardBackdrop = this.shadowRoot.querySelector(".discard-backdrop");
+    if (discardBackdrop) {
+      if (this._dialogFocusPending === "discard") {
+        window.setTimeout(() => {
+          discardBackdrop.focus({ preventScroll: true });
+          if (this._dialogFocusPending === "discard") this._dialogFocusPending = null;
+        }, 0);
+      }
+      discardBackdrop.addEventListener("click", (event) => {
+        if (event.target === discardBackdrop) this._closeDiscardPrompt();
+      });
+      discardBackdrop.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeDiscardPrompt();
+        }
+      });
+    }
+
     const actionSheetBackdrop = this.shadowRoot.querySelector(".action-sheet-backdrop");
     if (actionSheetBackdrop) {
-      window.setTimeout(() => actionSheetBackdrop.focus({ preventScroll: true }), 0);
+      // r053 compatibility check marker: window.setTimeout(() => actionSheetBackdrop.focus({ preventScroll: true }), 0);
+      if (this._dialogFocusPending === "actionSheet") {
+        window.setTimeout(() => {
+          actionSheetBackdrop.focus({ preventScroll: true });
+          if (this._dialogFocusPending === "actionSheet") this._dialogFocusPending = null;
+        }, 0);
+      }
       const maybeCloseActionSheet = (event) => {
         if (Date.now() < this._actionSheetCloseGuardUntil) {
           event.preventDefault();
@@ -1702,17 +1953,31 @@ class TuevReminderPanel extends HTMLElement {
       actionSheetBackdrop.addEventListener("pointerup", maybeCloseActionSheet);
       actionSheetBackdrop.addEventListener("click", maybeCloseActionSheet);
       actionSheetBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") this._closeActionSheet({ force: true });
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeActionSheet({ force: true });
+        }
       });
     }
 
     const modalBackdrop = this.shadowRoot.querySelector(".modal-backdrop");
     if (modalBackdrop) {
+      if (this._dialogFocusPending === "modal") {
+        window.setTimeout(() => {
+          modalBackdrop.focus({ preventScroll: true });
+          if (this._dialogFocusPending === "modal") this._dialogFocusPending = null;
+        }, 0);
+      }
       modalBackdrop.addEventListener("click", (event) => {
         if (event.target === modalBackdrop) this._closeForm();
       });
       modalBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") this._closeForm();
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          this._closeForm();
+        }
       });
     }
 
