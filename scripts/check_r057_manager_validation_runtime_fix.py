@@ -23,9 +23,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r059":
-    fail("manifest version must be 0.1.0-r059")
-if VERSION.read_text(encoding="utf-8").strip() != "r059":
+if manifest.get("version") != "0.1.0-r060":
+    fail("manifest version must be 0.1.0-r060")
+if VERSION.read_text(encoding="utf-8").strip() != "r060":
     fail("REMINDER_VERSION.txt must be r057")
 
 api = API.read_text(encoding="utf-8")

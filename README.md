@@ -1,10 +1,27 @@
-# TÜV Reminder – r059
+# TÜV Reminder – r060
 
-Current working build: **Reminder r059**. r059 tightens the Sidebar create/edit form so local validation and input controls match the backend Manager API rules more closely.
+Current working build: **Reminder r060**. r060 tightens the Sidebar create/edit form so the available `Format` choices follow the selected `Kennzeichenart`.
+
+The Manager metadata already exposes `plate_formats_by_kind`; the Sidebar now uses that contract directly. For example, Wechselkennzeichen no longer offers formats that the backend would reject. If the user changes Kennzeichenart and the currently selected format is no longer valid, the form switches to the first allowed format.
+
+Create/Update/Delete, duplicate guard, dirty guard, mobile action sheet, HA integration brand icon path, backend validation runtime fix, and list state preservation remain unchanged. The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
+
+## r060 highlights
+
+- `Format` select is filtered by selected `Kennzeichenart`.
+- Local validation detects incompatible Kennzeichenart/Format combinations.
+- Incompatible formats are reset automatically when changing Kennzeichenart.
+- Backend remains the source of truth; UI now prevents another avoidable invalid payload earlier.
+
+---
+
+# TÜV Reminder – r060
+
+Current working build: **Reminder r060**. r060 tightens the Sidebar create/edit form so local validation and input controls match the backend Manager API rules more closely.
 
 The confirmed create/update/delete flows, duplicate guard, dirty guard, mobile action sheet, HA integration brand icon path, and backend validation runtime fix remain unchanged. The Lovelace/Dashboard Card remains a separate project and is not bundled, imported, or action-duplicated.
 
-## r059 highlights
+## r060 highlights
 
 - Intervall is now a select with `1 Jahr` / `2 Jahre`, matching the backend rule.
 - Local form validation now blocks invalid inspection intervals before the WebSocket call.

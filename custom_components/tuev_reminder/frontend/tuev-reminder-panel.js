@@ -365,6 +365,9 @@ class TuevReminderPanel extends HTMLElement {
     if (!Number.isInteger(year) || year < 1900 || year > 2100) errors.push("HU-Jahr muss zwischen 1900 und 2100 liegen.");
     const interval = Number(this._form.interval);
     if (!Number.isInteger(interval) || ![1, 2].includes(interval)) errors.push("Prüfintervall muss 1 oder 2 Jahre betragen.");
+    if (!this._allowedPlateFormatValues(this._form.plate_kind).includes(String(this._form.plate_format))) {
+      errors.push("Kennzeichenformat passt nicht zur Kennzeichenart.");
+    }
     if (!Number.isInteger(offset) || offset < 0 || offset > 365) errors.push("Erinnerungs-Vorlauf muss zwischen 0 und 365 Tagen liegen.");
     if (["seasonal", "green_seasonal"].includes(this._form.plate_kind)) {
       const start = Number(this._form.season_start_month);
@@ -678,13 +681,19 @@ class TuevReminderPanel extends HTMLElement {
     this._formError = null;
     this._formInfo = null;
     this._form = { ...this._form, [name]: value };
-    if (name === "plate_kind" && !["seasonal", "green_seasonal"].includes(value)) {
-      this._form.season_start_month = "4";
-      this._form.season_end_month = "10";
-    }
-    if (name === "plate_kind" && value === "green") {
-      this._form.plate_suffix_h = false;
-      this._form.plate_suffix_e = false;
+    if (name === "plate_kind") {
+      const allowedFormats = this._allowedPlateFormatValues(value);
+      if (!allowedFormats.includes(String(this._form.plate_format))) {
+        this._form.plate_format = allowedFormats[0] || "single_line";
+      }
+      if (!["seasonal", "green_seasonal"].includes(value)) {
+        this._form.season_start_month = "4";
+        this._form.season_end_month = "10";
+      }
+      if (["green", "green_seasonal", "change"].includes(value)) {
+        this._form.plate_suffix_h = false;
+        this._form.plate_suffix_e = false;
+      }
     }
     if (render) {
       this._render();
@@ -835,6 +844,35 @@ class TuevReminderPanel extends HTMLElement {
     ].map((option) => `<option value="${option.value}" ${String(selected) === option.value ? "selected" : ""}>${option.label}</option>`).join("");
   }
 
+  _allowedPlateFormatValues(kind = this._form.plate_kind) {
+    const formatsByKind = this._metadata?.plate_formats_by_kind || {};
+    const configured = formatsByKind[kind];
+    if (Array.isArray(configured) && configured.length) {
+      return configured.map((value) => String(value));
+    }
+    const allFormats = this._metadata?.plate_formats || [];
+    if (Array.isArray(allFormats) && allFormats.length) {
+      return allFormats.map((option) => String(option.value));
+    }
+    if (kind === "change") {
+      return ["single_line", "two_line", "motorcycle"];
+    }
+    return ["single_line", "two_line", "small_two_line", "motorcycle"];
+  }
+
+  _plateFormatOptionsForKind(kind = this._form.plate_kind) {
+    const fallback = [
+      { value: "single_line", label: "Einzeilig" },
+      { value: "two_line", label: "Zweizeilig" },
+      { value: "small_two_line", label: "Verkleinert zweizeilig" },
+      { value: "motorcycle", label: "Motorrad" },
+    ];
+    const allFormats = this._metadata?.plate_formats?.length ? this._metadata.plate_formats : fallback;
+    const allowed = new Set(this._allowedPlateFormatValues(kind));
+    const filtered = allFormats.filter((option) => allowed.has(String(option.value)));
+    return filtered.length ? filtered : allFormats;
+  }
+
   _renderDeleteConfirm() {
     const vehicle = this._selectedVehicle || {};
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
@@ -897,12 +935,7 @@ class TuevReminderPanel extends HTMLElement {
       { value: "green", label: "Grünes Kennzeichen" },
       { value: "green_seasonal", label: "Grünes Kennzeichen + Saison" },
     ];
-    const plateFormats = this._metadata?.plate_formats || [
-      { value: "single_line", label: "Einzeilig" },
-      { value: "two_line", label: "Zweizeilig" },
-      { value: "small_two_line", label: "Verkleinert zweizeilig" },
-      { value: "motorcycle", label: "Motorrad" },
-    ];
+    const plateFormats = this._plateFormatOptionsForKind(this._form.plate_kind);
 
     return `
       <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true">

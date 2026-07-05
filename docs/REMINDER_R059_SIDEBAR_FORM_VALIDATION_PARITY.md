@@ -1,6 +1,6 @@
-# Reminder r059 – Sidebar Form Validation Parity
+# Reminder r060 – Sidebar Form Validation Parity
 
-r059 tightens the Sidebar create/edit form so the local UI rules match the backend Manager API more closely before a save request is sent.
+r060 tightens the Sidebar create/edit form so the local UI rules match the backend Manager API more closely before a save request is sent.
 
 ## Problem
 

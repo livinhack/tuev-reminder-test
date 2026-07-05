@@ -1,8 +1,16 @@
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Plate Format by Kind UI
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
+- Filters the Sidebar `Format` select by the selected `Kennzeichenart` using Manager metadata `plate_formats_by_kind`.
+- Automatically resets incompatible formats when the Kennzeichenart changes.
+- Adds local validation for Kennzeichenart/Format compatibility before save.
+- Preserves Create/Update/Delete, mobile action sheet, list state preservation, brand assets and strict Reminder/Card separation.
+
+## r060 – Sidebar Form Validation Parity
+
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -24,9 +32,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -48,9 +56,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -74,9 +82,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -98,9 +106,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -131,9 +139,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -155,9 +163,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -175,9 +183,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -226,9 +234,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.
@@ -248,9 +256,9 @@
 
 # Changelog
 
-## r059 – Sidebar Form Validation Parity
+## r060 – Sidebar Form Validation Parity
 
-- Bumped Reminder version to `0.1.0-r059`.
+- Bumped Reminder version to `0.1.0-r060`.
 - Changed Sidebar `Intervall` from a free numeric text field to a `1 Jahr` / `2 Jahre` select.
 - Added local interval validation to match the backend Manager API.
 - Aligned local HU year validation with backend range `1900–2100`.

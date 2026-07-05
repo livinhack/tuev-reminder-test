@@ -1,4 +1,51 @@
-# Handover – Reminder r059 Sidebar Form Validation Parity
+# Handover – Reminder r060 Sidebar Plate Format by Kind UI
+
+## Base
+
+Built on r059 (`tuev-reminder-r059-sidebar-form-validation-parity.zip`).
+
+## Why this step
+
+After r059 aligned interval/year/offset input constraints with the backend, the next mismatch was the Kennzeichen format selector. The backend Manager metadata already provides `plate_formats_by_kind`, but the Sidebar still offered all formats for every Kennzeichenart. That could allow a user to select a format that the backend then rejects.
+
+## Implemented
+
+- Added `_allowedPlateFormatValues(kind)` to read allowed formats from Manager metadata.
+- Added `_plateFormatOptionsForKind(kind)` to filter the `Format` select.
+- The create/edit form now renders only formats valid for the selected `Kennzeichenart`.
+- Changing `Kennzeichenart` resets an incompatible selected `Format` to the first allowed value.
+- Local validation now reports incompatible Kennzeichenart/Format combinations before save.
+- Added `docs/REMINDER_R060_PLATE_FORMAT_BY_KIND_UI.md`.
+- Added `docs/COMPAT_CARD_B355_REMINDER_R060.md`.
+- Added `scripts/check_r060_plate_format_by_kind_ui.py`.
+
+## Preserved
+
+- r041 create form save.
+- r045 update form save.
+- r047 delete confirmation.
+- r048 duplicate guard.
+- r049 dirty guard.
+- r050/r053 responsive table behavior.
+- r054 integration-local brand assets.
+- r055 mobile action-sheet tap-race fix.
+- r056 row-action identity hardening.
+- r057 backend validation runtime fix.
+- r058 list focus/scroll preservation.
+- r059 interval/year/offset input parity.
+- No Card files, Card renderer imports, Dashboard management or duplicated Card actions.
+
+## HA test focus
+
+1. Open `Neues Fahrzeug` and switch Kennzeichenart.
+2. Verify `Format` options change according to the selected type.
+3. Select Wechselkennzeichen and confirm incompatible formats are not offered.
+4. Edit an existing vehicle whose stored format is incompatible after changing Kennzeichenart; the form should reset to a valid format.
+5. Create/Update/Delete and smartphone action sheet should still work.
+
+---
+
+# Handover – Reminder r060 Sidebar Form Validation Parity
 
 ## Base
 
@@ -16,7 +63,7 @@ After Create/Update/Delete, mobile action handling and list state preservation w
 - Added numeric min/max/step constraints to HU year and Erinnerungs-Vorlauf fields.
 - Renamed the form label from `Reminder-Vorlauf Tage` to `Erinnerungs-Vorlauf Tage`.
 - Added one-digit input constraints for Wechselkennzeichen vehicle digit.
-- Added `scripts/check_r059_sidebar_form_validation_parity.py`.
+- Added `scripts/check_r060_sidebar_form_validation_parity.py`.
 
 ## Preserved
 
