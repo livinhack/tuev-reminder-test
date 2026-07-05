@@ -1,3 +1,11 @@
+## r083 – Sidebar Meta Line Removal
+
+- Bumped Reminder version to `0.1.0-r083`.
+- Removed the vehicle meta/tag line below the vehicle name.
+- Kept the list free of duplicated status signals: Status badge remains the only status indicator, HU remains neutral.
+- Kept the right-side plate preview unchanged pending later Card-aware plate rendering.
+- No release or Card files changed.
+
 ## r081 – Sidebar List Visual Polish / Mobile Card Layout
 
 - Bumped Reminder version to `0.1.0-r081`.

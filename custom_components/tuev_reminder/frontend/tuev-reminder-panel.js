@@ -482,16 +482,6 @@ class TuevReminderPanel extends HTMLElement {
     return errors;
   }
 
-  _vehicleMeta(vehicle) {
-    const tags = [this._formatLabel(vehicle.plate_format), this._kindLabel(vehicle.plate_kind)];
-    if (vehicle.seasonal) {
-      tags.push(`Saison ${vehicle.season_start_month}–${vehicle.season_end_month}`);
-    }
-    if (vehicle.change_plate_enabled) {
-      tags.push("Wechselkennzeichen");
-    }
-    return tags.filter(Boolean).map((tag) => `<span class="tag">${this._escape(tag)}</span>`).join("");
-  }
 
   _formValidation() {
     const errors = [];
@@ -1017,14 +1007,13 @@ class TuevReminderPanel extends HTMLElement {
           </thead>
           <tbody>
             ${vehicles.map((vehicle, index) => `
-              <tr class="vehicle-row row-status-${this._escape(this._statusClass(vehicle.status))}" data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
+              <tr class="vehicle-row" data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
                 <td class="name-cell" data-label="Fahrzeug">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
                   <div class="mobile-plate-text">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</div>
-                  <div class="vehicle-meta-line">${this._vehicleMeta(vehicle)}</div>
                 </td>
                 <td class="hu-cell" data-label="HU">
-                  <div class="main-value hu-value status-text-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._monthYear(vehicle))}</div>
+                  <div class="main-value hu-value">${this._escape(this._monthYear(vehicle))}</div>
                 </td>
                 <td class="reminder-cell" data-label="Erinnerung">
                   <div class="main-value">${this._escape(this._dateLabel(vehicle.reminder_date))}</div>
@@ -1572,11 +1561,7 @@ class TuevReminderPanel extends HTMLElement {
         .col-preview .sort-header { justify-content: flex-end; }
         tbody tr { cursor: default; }
         tbody tr:hover { background: var(--secondary-background-color); }
-        tbody td:first-child { border-left: 3px solid transparent; }
-        tbody tr:hover td:first-child { border-left-color: var(--primary-color); }
-        .vehicle-row.row-status-expired td:first-child { border-left-color: var(--error-color); }
-        .vehicle-row.row-status-due td:first-child { border-left-color: var(--warning-color, var(--state-icon-active-color)); }
-        .vehicle-row.row-status-valid td:first-child { border-left-color: color-mix(in srgb, var(--success-color, var(--primary-color)) 70%, transparent); }
+        tbody td:first-child { border-left: 0; }
         .col-name { width: 38%; }
         .col-preview { width: 240px; text-align: right; }
         .col-menu { width: 48px; }
@@ -1658,13 +1643,9 @@ class TuevReminderPanel extends HTMLElement {
         .danger-text { color: var(--error-color); }
         .vehicle-title { font-weight: 600; line-height: 1.25; }
         .mobile-plate-text { display: none; margin-top: 2px; color: var(--secondary-text-color); font-size: 11px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .vehicle-meta-line { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
         .muted { color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         .main-value { font-weight: 500; line-height: 1.25; }
         .hu-value { font-weight: 700; }
-        .status-text-expired { color: var(--error-color); }
-        .status-text-due { color: var(--warning-color, var(--state-icon-active-color)); }
-        .status-text-valid { color: var(--success-color, var(--primary-color)); }
         .status-pill {
           display: inline-flex;
           align-items: center;
@@ -1698,18 +1679,6 @@ class TuevReminderPanel extends HTMLElement {
           color: var(--success-color, var(--primary-color));
           background: color-mix(in srgb, var(--success-color, var(--primary-color)) 10%, transparent);
           border-color: color-mix(in srgb, var(--success-color, var(--primary-color)) 28%, var(--divider-color));
-        }
-        .tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
-        .tag {
-          display: inline-flex;
-          align-items: center;
-          min-height: 20px;
-          border-radius: 999px;
-          padding: 1px 7px;
-          border: 1px solid var(--divider-color);
-          color: var(--secondary-text-color);
-          font-size: 11px;
-          white-space: nowrap;
         }
         .preview-cell { text-align: right; }
         .plate-preview {
@@ -1986,15 +1955,11 @@ class TuevReminderPanel extends HTMLElement {
             position: relative;
             margin: 0 0 10px;
             border: 1px solid var(--divider-color);
-            border-left: 4px solid transparent;
             border-radius: 12px;
             background: var(--card-background-color);
             overflow: visible;
             box-shadow: 0 1px 2px rgba(0,0,0,.08);
           }
-          .vehicle-row.row-status-expired { border-left-color: var(--error-color); }
-          .vehicle-row.row-status-due { border-left-color: var(--warning-color, var(--state-icon-active-color)); }
-          .vehicle-row.row-status-valid { border-left-color: var(--success-color, var(--primary-color)); }
           .vehicle-row:hover { background: var(--card-background-color); }
           th, td { border-bottom: 0; }
           .vehicle-row td:first-child { border-left: 0; }
@@ -2026,7 +1991,6 @@ class TuevReminderPanel extends HTMLElement {
             padding: 0;
           }
           .mobile-plate-text { display: block; font-size: 12px; margin-top: 3px; }
-          .vehicle-meta-line { margin-top: 8px; }
           .status-pill { justify-self: start; padding: 3px 8px; font-size: 12px; }
           .col-reminder, .reminder-cell { display: grid; }
           .col-hu, .col-status, .col-menu { width: auto; }

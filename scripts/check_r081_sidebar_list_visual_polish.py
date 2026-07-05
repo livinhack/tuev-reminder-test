@@ -13,21 +13,15 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r081":
-    fail("manifest version must be 0.1.0-r081")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r081":
-    fail("REMINDER_VERSION must be r081")
+if manifest.get("version") != "0.1.0-r083":
+    fail("manifest version must be 0.1.0-r083")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r083":
+    fail("REMINDER_VERSION must be r083")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
-    'class="vehicle-row row-status-${this._escape(this._statusClass(vehicle.status))}"',
-    'class="vehicle-meta-line">${this._vehicleMeta(vehicle)}</div>',
-    'class="main-value hu-value status-text-${this._escape(this._statusClass(vehicle.status))}"',
-    '.vehicle-row.row-status-expired',
-    '.vehicle-row.row-status-due',
-    '.vehicle-row.row-status-valid',
-    '.vehicle-meta-line { display: flex;',
-    '.status-text-expired { color: var(--error-color); }',
+    'class="vehicle-row" data-entry-id=',
+    'class="main-value hu-value">${this._escape(this._monthYear(vehicle))}</div>',
     '@media (max-width: 720px) {',
     '.manager-table thead { display: none; }',
     '.vehicle-row {',
@@ -43,6 +37,10 @@ for forbidden in [
     'id="refresh"',
     '>Aktualisieren<',
     'class="filter-reset-chip"',
+    '.vehicle-row.row-status-expired',
+    '.vehicle-row.row-status-due',
+    '.vehicle-row.row-status-valid',
+    '.status-text-expired',
 ]:
     if forbidden in panel:
         fail(f"obsolete control present in r081: {forbidden}")

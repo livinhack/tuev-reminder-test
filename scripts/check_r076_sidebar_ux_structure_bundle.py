@@ -26,8 +26,8 @@ changelog = read("CHANGELOG.md")
 doc = read("docs/REMINDER_R076_SIDEBAR_UX_STRUCTURE_BUNDLE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R076.md")
 
-require(manifest["version"] == "0.1.0-r081", "manifest version must be r081")
-require(version == "r081", "REMINDER_VERSION must be r081")
+require(manifest["version"] == "0.1.0-r083", "manifest version must be r083")
+require(version == "r083", "REMINDER_VERSION must be r083")
 
 for marker in [
     "form-stack fields-stack",
@@ -37,7 +37,6 @@ for marker in [
     "Saisonzeitraum",
     "summary-list",
     "Die Sidebar verwaltet nur Reminder-Daten",
-    "tbody tr:hover td:first-child",
     "color-mix(in srgb, var(--error-color)",
 ]:
     require(marker in frontend, f"missing r081 UI marker: {marker}")

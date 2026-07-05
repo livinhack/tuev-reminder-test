@@ -1,3 +1,33 @@
+# Handover – Reminder r083 Sidebar Meta Line Removal
+
+## Status
+
+r083 is a focused Sidebar list cleanup on top of r082. It removes the meta/tag line entirely from the vehicle-name cell. This follows the current design direction: the list should not expose plate-rendering configuration until Card-aware plate rendering/detection is implemented.
+
+## What changed in r083
+
+- Removed the `vehicle-meta-line` output below each vehicle name.
+- Removed the now-unused `_vehicleMeta()` frontend helper.
+- Removed unused CSS for `.vehicle-meta-line`, `.tag-row` and `.tag`.
+- Status stays visible through the Status badge only.
+- HU stays neutral.
+- Right-side plate preview remains unchanged for now.
+
+## Preserved
+
+- Search field clear `×` from r080.
+- Status chips/badges, including `Alle` as the status reset.
+- Create/Edit/Delete, mobile action sheet, dirty guard, duplicate preflight, validation and payload scrub.
+- Reminder/Card separation. No Card files changed.
+
+## HA test focus
+
+1. Desktop list: under each vehicle name there must be no second meta/tag line.
+2. Status must still be visible through the badge.
+3. HU must remain neutral.
+4. Right plate preview and three-dot menu must still work.
+5. Mobile/narrow layout must not show the removed meta line either.
+
 # Handover – Reminder r081 Sidebar List Visual Polish / Mobile Card Layout
 
 ## Purpose

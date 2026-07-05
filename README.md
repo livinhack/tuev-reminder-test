@@ -1,3 +1,17 @@
+# TÜV Reminder – r083
+
+Current working build: **Reminder r083**. r083 continues Sidebar function/UI work on top of r082 and removes the vehicle meta line completely from the list. The list now shows only the vehicle name, HU, reminder date, status badge, plate preview and row actions.
+
+## r083 highlights
+
+- Removes the meta/tag line below the vehicle name entirely.
+- Keeps status visible only through the existing Status badge.
+- Keeps HU neutral, with no status color duplication.
+- Keeps the right-side plate preview unchanged for now.
+- Avoids exposing plate-rendering configuration in the list until later Card-aware rendering/detection is implemented.
+
+No release packaging or public-release steps should be inferred from r083. Continue with function and UI improvements until release work is explicitly requested again.
+
 # TÜV Reminder – r081
 
 Current working build: **Reminder r081**. r081 continues function/UX development on top of r080. Release work remains parked; this build polishes the Sidebar vehicle list and adds a more robust mobile card layout.

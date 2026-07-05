@@ -13,10 +13,10 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r081":
-    fail("manifest version must be 0.1.0-r081")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r081":
-    fail("REMINDER_VERSION must be r081")
+if manifest.get("version") != "0.1.0-r083":
+    fail("manifest version must be 0.1.0-r083")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r083":
+    fail("REMINDER_VERSION must be r083")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
