@@ -14,9 +14,9 @@ def fail(message: str) -> None:
     raise SystemExit(f"r053 sidebar delete confirm check failed: {message}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r100":
-    fail("manifest version must be 0.1.0-r100")
-if read("REMINDER_VERSION.txt").strip() != "r100":
+if manifest.get("version") != "0.1.0-r105":
+    fail("manifest version must be 0.1.0-r105")
+if read("REMINDER_VERSION.txt").strip() != "r105":
     fail("REMINDER_VERSION.txt must be r053")
 
 manager = read("custom_components/tuev_reminder/manager.py")
@@ -38,6 +38,6 @@ require(panel, '_openDeleteConfirm(vehicle)', "delete confirm opener")
 require(panel, 'type: "tuev_reminder/manager/vehicles/delete"', "frontend delete websocket call")
 require(panel, 'id="confirm-delete"', "confirm delete button")
 require(panel, 'Fahrzeug löschen', "delete dialog title")
-require(panel, 'Die getrennte Card-Konfiguration wird nicht verändert.', "card separation delete note")
+require(panel, 'Löschen entfernt nur diesen TÜV-Reminder-Eintrag.', "card separation delete note")
 
 print("r053 sidebar delete confirm check OK")

@@ -1,3 +1,64 @@
+# TÜV Reminder – r105 Sidebar Validation Focus Fallback
+
+Current working package: `0.1.0-r105` / `r105`. Current working build: **Reminder r105**.
+
+r105 keeps the accepted r100/r097 form layout and the r089/r091 compact Kennzeichen fallback. It refines r104 validation navigation: clickable validation messages still jump to the related field, but now carry section metadata and fall back to the surrounding form card if a conditional target field is not currently rendered.
+
+## r105 highlights
+
+- Validation message buttons now include field and section targets.
+- Field focus still scrolls to the input/select and selects text inputs where useful.
+- If a conditional field is unavailable, the matching form card is focused instead.
+- Form cards have a visible focus outline for section fallback focus.
+- Keeps r102 inline invalid field markers and r103 section/card invalid feedback.
+- Keeps the accepted r100/r097 right overview + separate Saison card layout.
+- Keeps the r089/r091 compact dark Kennzeichen fallback.
+- No Card detection, no Card renderer, no release work.
+
+## HA smoke test focus
+
+Open create/edit, create validation errors, and click several messages in the right overview card. Visible fields should receive focus; section fallback should remain safe if a field is hidden by a conditional plate kind. Check Saison and Wechselkennzeichen paths briefly.
+
+---
+
+# TÜV Reminder – r104 Sidebar Form Validation Focus
+
+Current working package: `0.1.0-r104` / `r104`.
+
+r104 continues the Sidebar form UX work. The accepted r100/r097 layout remains unchanged: the right grey overview card stays as-is and the Saison fields remain in their own grey card below it. Validation messages in the right overview card can now jump to the related input field, while the existing inline and section invalid markers stay in place.
+
+## r104 highlights
+
+- Validation messages are clickable where a direct field mapping exists.
+- Clicking a validation message smooth-scrolls to the field and focuses it.
+- Keeps r102 inline invalid field markers.
+- Keeps r103 section/card invalid feedback.
+- Keeps the r089/r091 compact dark Kennzeichen fallback.
+- No Card detection, no Card renderer, no release work.
+
+## HA smoke test focus
+
+Open create/edit, produce invalid values, then click validation messages in the right overview card. The matching field should scroll into view and receive focus. Check Saison and Wechselkennzeichen fields as well.
+
+---
+
+# TÜV Reminder – r101 Sidebar Form Copy Cleanup
+
+Current working package: `0.1.0-r101` / `r101`. Current working build: **Reminder r101**.
+
+r101 keeps the accepted r100 form layout: the r097-style right overview card remains unchanged, and the Saison fields appear only as a separate grey card below it. This step only cleans visible wording in the create/edit/delete flow so normal users no longer see internal ConfigEntry/API/WebSocket language.
+
+## r101 highlights
+
+- User-facing copy in the vehicle form is simpler and less technical.
+- First-run, create/edit, validation-ready and delete texts now speak about TÜV-Reminder vehicle data instead of internal Home Assistant implementation details.
+- r089/r091 compact dark Kennzeichen fallback remains unchanged.
+- No Card detection, no Card renderer, no release work.
+
+## HA smoke test focus for r101
+
+Open create/edit/delete flows and check the visible text. The accepted r100 placement must remain: overview card first, separate grey Saison card underneath when Saisonkennzeichen is selected.
+
 # TÜV Reminder – r100 Sidebar Single Create Action
 
 Current working package: `0.1.0-r100` / `r100`.
@@ -1026,3 +1087,18 @@ Sidebar list polish: the right plate preview/action area is now more stable and 
 ## r100 Sidebar Season Card Placement Correction
 
 Die rechte Überblick-Karte bleibt optisch wie r097. Saisonfelder erscheinen bei Saisonkennzeichen als eigene hellgraue Karte darunter, nicht innerhalb des Überblicks und nicht mehr in der linken Spalte.
+
+## Current development checkpoint: r104
+
+- Sidebar form fields now show inline invalid state while the existing validation summary remains on the right.
+- The accepted r100/r097 right-side overview layout and separate seasonal card are preserved.
+- The list still uses the r089/r091 compact dark plate fallback until Card detection/renderer work is intentionally started.
+
+## Compatibility Marker
+
+Reminder r104 · Card b355 · calendar.tuev_reminder · reminder_offset_days
+
+
+## r104 Sidebar form section invalid feedback
+
+r104 keeps the accepted r100/r097 form layout and r102 inline field validation. Invalid form sections now also receive subtle card-level feedback, so the affected group is easier to spot without adding another visible status row.

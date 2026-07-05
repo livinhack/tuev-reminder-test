@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card; form fields expose inline invalid state for validation parity; validation messages can focus the related field; validation focus falls back to sections when conditional fields are hidden
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -566,6 +566,42 @@ class TuevReminderPanel extends HTMLElement {
     return errors;
   }
 
+  _fieldInvalid(name, clean = this._scrubFormForKind()) {
+    const duplicateName = this._formDuplicateErrors().some((error) => error.includes("Namen"));
+    const duplicatePlate = this._formDuplicateErrors().some((error) => error.includes("Kennzeichen"));
+    const kindValues = (this._metadata?.plate_kinds || []).map((option) => String(option.value));
+    const month = Number(clean.month);
+    const year = Number(clean.year);
+    const interval = Number(clean.interval);
+    const offset = Number(clean.reminder_offset_days);
+    const start = Number(clean.season_start_month);
+    const end = Number(clean.season_end_month);
+    const seasonal = ["seasonal", "green_seasonal"].includes(clean.plate_kind);
+
+    if (name === "vehicle_name") return !String(clean.vehicle_name || "").trim() || duplicateName;
+    if (name === "plate_kind") return kindValues.length > 0 && !kindValues.includes(String(clean.plate_kind));
+    if (name === "plate_format") return !this._allowedPlateFormatValues(clean.plate_kind).includes(String(clean.plate_format));
+    if (name === "plate") return clean.plate_kind !== "change" && (!String(clean.plate || "").trim() || duplicatePlate);
+    if (name === "change_plate_common_text") return clean.plate_kind === "change" && (!String(clean.change_plate_common_text || "").trim() || duplicatePlate);
+    if (name === "change_plate_vehicle_digit") return clean.plate_kind === "change" && (!String(clean.change_plate_vehicle_digit || "").trim() || duplicatePlate);
+    if (name === "month") return !Number.isInteger(month) || month < 1 || month > 12;
+    if (name === "year") return !Number.isInteger(year) || year < 1900 || year > 2100;
+    if (name === "interval") return !Number.isInteger(interval) || ![1, 2].includes(interval);
+    if (name === "reminder_offset_days") return !Number.isInteger(offset) || offset < 0 || offset > 365;
+    if (name === "season_start_month" || name === "season_end_month") {
+      return seasonal && (!Number.isInteger(start) || start < 1 || start > 12 || !Number.isInteger(end) || end < 1 || end > 12 || !this._isValidSeasonRange(start, end));
+    }
+    return false;
+  }
+
+  _invalidAttr(name, clean = this._scrubFormForKind()) {
+    return this._fieldInvalid(name, clean) ? ' aria-invalid="true" data-invalid="true"' : '';
+  }
+
+  _sectionInvalidClass(names, clean = this._scrubFormForKind()) {
+    return names.some((name) => this._fieldInvalid(name, clean)) ? " section-invalid" : "";
+  }
+
   _mobileActionMode() {
     return this._narrow || window.matchMedia?.("(max-width: 1100px)")?.matches === true;
   }
@@ -976,6 +1012,35 @@ class TuevReminderPanel extends HTMLElement {
       if (node) node.textContent = value;
     });
 
+    this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
+      });
+    });
+
+    this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
+      const invalid = this._fieldInvalid(field.dataset.field, clean);
+      if (invalid) {
+        field.setAttribute("aria-invalid", "true");
+        field.setAttribute("data-invalid", "true");
+      } else {
+        field.removeAttribute("aria-invalid");
+        field.removeAttribute("data-invalid");
+      }
+    });
+
+    const sectionFields = {
+      vehicle: ["vehicle_name"],
+      due: ["month", "year", "interval", "reminder_offset_days"],
+      plate: ["plate_kind", "plate_format", "plate", "change_plate_common_text", "change_plate_vehicle_digit"],
+      season: ["season_start_month", "season_end_month"],
+    };
+    Object.entries(sectionFields).forEach(([section, fields]) => {
+      const node = this.shadowRoot.querySelector(`[data-form-section="${section}"]`);
+      if (node) node.classList.toggle("section-invalid", fields.some((field) => this._fieldInvalid(field, clean)));
+    });
+
     const validation = this.shadowRoot.querySelector(".validation");
     if (validation) {
       validation.classList.toggle("has-errors", errors.length > 0);
@@ -991,19 +1056,75 @@ class TuevReminderPanel extends HTMLElement {
     }
   }
 
+  _validationTargetForError(error) {
+    const text = String(error || "");
+    const clean = this._scrubFormForKind();
+    if (text.includes("Fahrzeugname") || text.includes("Namen")) return "vehicle_name";
+    if (text.includes("HU-Monat")) return "month";
+    if (text.includes("HU-Jahr")) return "year";
+    if (text.includes("Prüfintervall")) return "interval";
+    if (text.includes("Erinnerungs-Vorlauf")) return "reminder_offset_days";
+    if (text.includes("Kennzeichenart")) return "plate_kind";
+    if (text.includes("Kennzeichenformat")) return "plate_format";
+    if (text.includes("Gemeinsamer Wechselkennzeichen") || text.includes("Gemeinsamer Text")) return "change_plate_common_text";
+    if (text.includes("Fahrzeugziffer")) return "change_plate_vehicle_digit";
+    if (text.includes("Kennzeichen")) return clean.plate_kind === "change" ? "change_plate_common_text" : "plate";
+    if (text.includes("Saison")) return "season_start_month";
+    return null;
+  }
+
+  _validationSectionForTarget(name) {
+    const target = String(name || "");
+    if (["vehicle_name"].includes(target)) return "vehicle";
+    if (["month", "year", "interval", "reminder_offset_days"].includes(target)) return "due";
+    if (["season_start_month", "season_end_month"].includes(target)) return "season";
+    if (["plate_kind", "plate_format", "plate", "change_plate_common_text", "change_plate_vehicle_digit"].includes(target)) return "plate";
+    return "";
+  }
+
+  _validationItemHtml(error) {
+    const target = this._validationTargetForError(error);
+    const label = this._escape(error);
+    if (!target) {
+      return `<li>${label}</li>`;
+    }
+    const section = this._validationSectionForTarget(target);
+    return `<li><button type="button" class="validation-link" data-validation-target="${this._escape(target)}" data-validation-section="${this._escape(section)}" aria-label="Zum Feld springen: ${label}" title="Zum passenden Feld springen">${label}</button></li>`;
+  }
+
+  _focusValidationTarget(name, sectionName = "") {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const fieldSelector = `[data-field="${this._cssEscape(String(name || ""))}"]`;
+    const section = sectionName || this._validationSectionForTarget(name);
+    const sectionSelector = section ? `[data-form-section="${this._cssEscape(section)}"]` : "";
+    const field = root.querySelector(fieldSelector);
+    const sectionNode = sectionSelector ? root.querySelector(sectionSelector) : null;
+    const target = field || sectionNode;
+    if (!target) return;
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+    window.setTimeout(() => {
+      const focusTarget = field || target;
+      focusTarget.focus?.({ preventScroll: true });
+      if (field && typeof field.select === "function" && field.tagName !== "SELECT") {
+        field.select();
+      }
+    }, 120);
+  }
+
   _validationHtml(errors) {
     const state = [];
     if (this._formError) state.push(`<p class="form-error">${this._escape(this._formError)}</p>`);
     if (this._formInfo) state.push(`<p>${this._escape(this._formInfo)}</p>`);
     if (errors.length) {
-      return `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => `<li>${this._escape(error)}</li>`).join("")}</ul>${state.join("")}`;
+      return `<strong>Noch nicht speicherbar</strong><ul>${errors.map((error) => this._validationItemHtml(error)).join("")}</ul>${state.join("")}`;
     }
     if (this._view === "detail" && !this._formDirty()) {
       return `<strong>Keine Änderungen</strong><p>Ändere ein Feld, um Speichern zu aktivieren.</p>${state.join("")}`;
     }
     const actionText = this._view === "detail"
-      ? "Die Änderungen können über die Reminder-Manager-API in der bestehenden ConfigEntry-Entität gespeichert werden."
-      : "Das Formular kann über die Reminder-Manager-API als normale ConfigEntry-Entität angelegt werden.";
+      ? "Die Änderungen können gespeichert werden."
+      : "Das Fahrzeug kann gespeichert werden.";
     return `<strong>Speicherbereit</strong><p>${this._escape(actionText)}</p>${state.join("")}`;
   }
 
@@ -1013,14 +1134,14 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     if (this._error) {
-      return `<p class="state error">Manager-API nicht erreichbar: ${this._escape(this._error)}</p>`;
+      return `<p class="state error">TÜV-Reminder-Daten nicht erreichbar: ${this._escape(this._error)}</p>`;
     }
 
     if (!this._vehicles.length) {
       return `
         <div class="state state-card first-run-state">
           <strong>Noch keine Fahrzeuge</strong>
-          <p>Lege dein erstes Fahrzeug an. Es wird als normale TÜV-Reminder-ConfigEntry/Entity in Home Assistant erstellt.</p>
+          <p>Lege dein erstes Fahrzeug für die TÜV-Erinnerung an.</p>
           <button type="button" class="empty-create" data-create-trigger="empty" title="Erstes Fahrzeug anlegen" aria-label="Erstes Fahrzeug anlegen">+</button>
         </div>
       `;
@@ -1133,13 +1254,13 @@ class TuevReminderPanel extends HTMLElement {
           <div class="form-head">
             <div>
               <h2>Fahrzeug löschen</h2>
-              <p>Diese Reminder-ConfigEntry/Entität wird aus Home Assistant entfernt.</p>
+              <p>Dieses Fahrzeug wird aus dem TÜV Reminder entfernt.</p>
             </div>
           </div>
           <div class="form-card delete-card">
             <p><strong>${this._escape(name)}</strong></p>
             <div class="delete-preview">${this._platePreview(vehicle)}</div>
-            <p class="note">Löschen entfernt nur den Reminder-Eintrag. Die getrennte Card-Konfiguration wird nicht verändert.</p>
+            <p class="note">Löschen entfernt nur diesen TÜV-Reminder-Eintrag.</p>
             ${this._formError ? `<p class="form-error">${this._escape(this._formError)}</p>` : ""}
             ${this._formInfo ? `<p class="muted">${this._escape(this._formInfo)}</p>` : ""}
             <div class="form-actions modal-bottom-actions">
@@ -1207,55 +1328,55 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-head">
           <div>
             <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
-            <p>${isDetail ? "Bestehende Reminder-Entität bearbeiten und über die Manager-API speichern." : "Legt ein neues Fahrzeug als normale TÜV-Reminder-ConfigEntry-Entität an."}</p>
+            <p>${isDetail ? "Fahrzeugdaten bearbeiten und speichern." : "Fahrzeugdaten eintragen und speichern."}</p>
           </div>
         </div>
 
         <div class="form-grid">
           <div class="form-stack fields-stack" aria-label="Fahrzeugdaten bearbeiten">
-            <section class="form-card form-section">
+            <section class="form-card form-section${this._sectionInvalidClass(["vehicle_name"], clean)}" data-form-section="vehicle" tabindex="-1">
               <div class="section-head">
                 <span class="section-kicker">Fahrzeug</span>
                 <h3>Basisdaten</h3>
-                <p>Name und Hauptdaten für die Reminder-Entität.</p>
+                <p>Name und Grunddaten für die Fahrzeugliste.</p>
               </div>
-              <label>Fahrzeugname<input data-field="vehicle_name" value="${this._escape(clean.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
+              <label>Fahrzeugname<input data-field="vehicle_name"${this._invalidAttr("vehicle_name", clean)} value="${this._escape(clean.vehicle_name)}" placeholder="z. B. Golf, Anhänger, Motorrad"></label>
             </section>
 
-            <section class="form-card form-section">
+            <section class="form-card form-section${this._sectionInvalidClass(["month", "year", "interval", "reminder_offset_days"], clean)}" data-form-section="due" tabindex="-1">
               <div class="section-head">
                 <span class="section-kicker">Termin</span>
                 <h3>HU & Erinnerung</h3>
                 <p>Fälligkeit, Prüfintervall und Vorlauf der Erinnerung.</p>
               </div>
               <div class="field-pair">
-                <label>HU-Monat<select data-field="month">${this._renderMonthOptions(clean.month)}</select></label>
-                <label>HU-Jahr<input data-field="year" type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(clean.year)}"></label>
+                <label>HU-Monat<select data-field="month"${this._invalidAttr("month", clean)}>${this._renderMonthOptions(clean.month)}</select></label>
+                <label>HU-Jahr<input data-field="year"${this._invalidAttr("year", clean)} type="number" inputmode="numeric" min="1900" max="2100" step="1" value="${this._escape(clean.year)}"></label>
               </div>
               <div class="field-pair">
-                <label>Intervall<select data-field="interval">${this._renderIntervalOptions(clean.interval)}</select></label>
-                <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days" type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(clean.reminder_offset_days)}"></label>
+                <label>Intervall<select data-field="interval"${this._invalidAttr("interval", clean)}>${this._renderIntervalOptions(clean.interval)}</select></label>
+                <label>Erinnerungs-Vorlauf Tage<input data-field="reminder_offset_days"${this._invalidAttr("reminder_offset_days", clean)} type="number" inputmode="numeric" min="0" max="365" step="1" value="${this._escape(clean.reminder_offset_days)}"></label>
               </div>
             </section>
 
-            <section class="form-card form-section">
+            <section class="form-card form-section${this._sectionInvalidClass(["plate_kind", "plate_format", "plate", "change_plate_common_text", "change_plate_vehicle_digit"], clean)}" data-form-section="plate" tabindex="-1">
               <div class="section-head">
                 <span class="section-kicker">Kennzeichen</span>
                 <h3>Art & Nummer</h3>
                 <p>Format und Kennzeichentext; Sonderfelder erscheinen nur bei passender Art.</p>
               </div>
               <div class="field-pair">
-                <label>Kennzeichenart<select data-field="plate_kind">${this._renderOptionList(plateKinds, clean.plate_kind)}</select></label>
-                <label>Format<select data-field="plate_format">${this._renderOptionList(plateFormats, clean.plate_format)}</select></label>
+                <label>Kennzeichenart<select data-field="plate_kind"${this._invalidAttr("plate_kind", clean)}>${this._renderOptionList(plateKinds, clean.plate_kind)}</select></label>
+                <label>Format<select data-field="plate_format"${this._invalidAttr("plate_format", clean)}>${this._renderOptionList(plateFormats, clean.plate_format)}</select></label>
               </div>
 
               ${change ? `
                 <div class="field-pair">
-                  <label>Gemeinsamer Text<input data-field="change_plate_common_text" value="${this._escape(clean.change_plate_common_text)}" placeholder="z. B. B AB"></label>
-                  <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit" inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(clean.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
+                  <label>Gemeinsamer Text<input data-field="change_plate_common_text"${this._invalidAttr("change_plate_common_text", clean)} value="${this._escape(clean.change_plate_common_text)}" placeholder="z. B. B AB"></label>
+                  <label>Fahrzeugziffer<input data-field="change_plate_vehicle_digit"${this._invalidAttr("change_plate_vehicle_digit", clean)} inputmode="numeric" maxlength="1" pattern="[0-9]" value="${this._escape(clean.change_plate_vehicle_digit)}" placeholder="z. B. 1"></label>
                 </div>
               ` : `
-                <label>Kennzeichen<input data-field="plate" value="${this._escape(clean.plate)}" placeholder="z. B. B AB 123"></label>
+                <label>Kennzeichen<input data-field="plate"${this._invalidAttr("plate", clean)} value="${this._escape(clean.plate)}" placeholder="z. B. B AB 123"></label>
                 <div class="check-row ${green ? "disabled-row" : ""}">
                   <label><input type="checkbox" data-field="plate_suffix_h" ${clean.plate_suffix_h ? "checked" : ""} ${green ? "disabled" : ""}> H-Kennzeichen</label>
                   <label><input type="checkbox" data-field="plate_suffix_e" ${clean.plate_suffix_e ? "checked" : ""} ${green ? "disabled" : ""}> E-Kennzeichen</label>
@@ -1285,7 +1406,7 @@ class TuevReminderPanel extends HTMLElement {
               <div class="validation ${errors.length ? "has-errors" : "ok"}">
                 ${this._validationHtml(errors)}
               </div>
-              <p class="note">Die Sidebar verwaltet nur Reminder-Daten. Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Dashboard-Card bleibt ein getrenntes Projekt und liest danach die aktualisierten Entities/Attribute.</p>
+              <p class="note">Änderungen werden in den TÜV-Reminder-Daten gespeichert und danach in Home Assistant aktualisiert.</p>
               <div class="form-actions modal-bottom-actions">
                 ${isDetail
                   ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
@@ -1294,15 +1415,15 @@ class TuevReminderPanel extends HTMLElement {
               </div>
             </aside>
             ${seasonal ? `
-              <section class="form-card form-section side-season-card" aria-label="Saisonzeitraum">
+              <section class="form-card form-section side-season-card${this._sectionInvalidClass(["season_start_month", "season_end_month"], clean)}" data-form-section="season" aria-label="Saisonzeitraum" tabindex="-1">
                 <div class="section-head">
                   <span class="section-kicker">Saison</span>
                   <h3>Saisonzeitraum</h3>
                   <p>Mindestens 2 und höchstens 11 Monate; Übergang über den Jahreswechsel ist möglich.</p>
                 </div>
                 <div class="field-pair">
-                  <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
-                  <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
+                  <label>Startmonat<select data-field="season_start_month"${this._invalidAttr("season_start_month", clean)}>${this._renderMonthOptions(clean.season_start_month)}</select></label>
+                  <label>Endmonat<select data-field="season_end_month"${this._invalidAttr("season_end_month", clean)}>${this._renderMonthOptions(clean.season_end_month)}</select></label>
                 </div>
               </section>
             ` : ""}
@@ -1964,6 +2085,14 @@ class TuevReminderPanel extends HTMLElement {
           padding: 16px;
           box-sizing: border-box;
         }
+        .form-card.section-invalid {
+          border-color: color-mix(in srgb, var(--error-color) 42%, var(--divider-color));
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--error-color) 22%, transparent);
+        }
+        .form-card:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 2px;
+        }
         .form-section { display: grid; gap: 12px; }
         .section-head, .preview-head { display: grid; gap: 3px; margin-bottom: 2px; }
         .section-head h3, .preview-head h3 { margin: 0; color: var(--primary-text-color); text-transform: none; letter-spacing: 0; font-size: 16px; }
@@ -1971,6 +2100,13 @@ class TuevReminderPanel extends HTMLElement {
         .section-kicker { color: var(--primary-color); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
         label { display: block; color: var(--secondary-text-color); font-size: 12px; font-weight: 500; }
         label input, label select { margin-top: 6px; color: var(--primary-text-color); font-size: 14px; }
+        label input[aria-invalid="true"], label select[aria-invalid="true"] {
+          border-color: var(--error-color);
+          box-shadow: 0 0 0 1px color-mix(in srgb, var(--error-color) 38%, transparent);
+        }
+        label input[aria-invalid="true"]:focus, label select[aria-invalid="true"]:focus {
+          outline-color: var(--error-color);
+        }
         .field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .check-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; }
         .check-row label { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-text-color); font-size: 13px; }
@@ -1986,6 +2122,20 @@ class TuevReminderPanel extends HTMLElement {
         .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }
         .validation ul { margin: 8px 0 0 18px; padding: 0; }
         .validation p { margin: 8px 0 0; }
+        .validation-link {
+          appearance: none;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          cursor: pointer;
+          font: inherit;
+          padding: 0;
+          text-align: left;
+          text-decoration: underline;
+          text-decoration-thickness: 1px;
+          text-underline-offset: 2px;
+        }
+        .validation-link:hover, .validation-link:focus-visible { color: var(--primary-color); }
         .form-error { color: var(--error-color); }
         .validation.has-errors { color: var(--error-color); }
         .validation.ok { color: var(--success-color, var(--primary-color)); }
@@ -2409,6 +2559,13 @@ class TuevReminderPanel extends HTMLElement {
         event.stopPropagation();
         const vehicle = this._actionSheetVehicle;
         if (vehicle) this._handleRowAction(button.dataset.actionSheetAction, vehicle);
+      });
+    });
+
+    this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
       });
     });
 

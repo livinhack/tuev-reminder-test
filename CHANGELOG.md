@@ -1,3 +1,53 @@
+# r105 – Sidebar Validation Focus Fallback
+
+- Kept r104 validation-message click-to-focus behavior.
+- Added section metadata to validation links.
+- Added fallback focus to the owning form card when a conditional target field is not currently rendered.
+- Added visible focus styling to form cards for fallback navigation.
+- Preserved the accepted r100/r097 form layout and r089/r091 Kennzeichen fallback.
+- No Card detection, no Card renderer, no release work.
+
+---
+
+# Changelog – r104 Sidebar Form Validation Focus
+
+## r104
+
+- Bumped Reminder version to `0.1.0-r104`.
+- Builds on r103 field and section invalid feedback.
+- Validation messages in the right overview card can now focus the related field.
+- Clickable messages smooth-scroll to the field and focus/select it for faster correction.
+- Kept the accepted r100/r097 form layout unchanged: right grey overview card plus separate grey Saison card below it.
+- Preserved the r089/r091 compact dark Kennzeichen fallback.
+- Added `scripts/check_r104_sidebar_form_validation_focus.py`.
+- No Card detection, no Card renderer integration and no release workflow changes.
+
+---
+
+# Changelog – r104 Sidebar Form Section Invalid Feedback
+
+## r104
+
+- Bumped Reminder version to `0.1.0-r104`.
+- Builds on r102 inline field validation.
+- Invalid form groups now get subtle card-level feedback in addition to field-level `aria-invalid` marking.
+- Covered groups: Basisdaten, HU & Erinnerung, Kennzeichen, and the separate Saison card.
+- The accepted r100/r097 form layout remains unchanged: right grey overview card plus separate grey Saison card below it.
+- Preserved the r089/r091 compact dark Kennzeichen fallback.
+- Added `scripts/check_r104_sidebar_form_section_invalid_feedback.py`.
+- No Card detection, no Card renderer integration and no release workflow changes.
+
+# Changelog – r101 Sidebar Form Copy Cleanup
+
+## r101
+
+- Bumped Reminder version to `0.1.0-r101`.
+- Cleaned visible Sidebar form copy so the create/edit/delete flow is less technical.
+- Replaced visible ConfigEntry/API/WebSocket wording with user-facing TÜV-Reminder wording.
+- Preserved the r097/r100 right-side grey overview card layout and separate grey Saison card below it.
+- Preserved the r089/r091 compact dark Kennzeichen fallback.
+- Added `scripts/check_r101_sidebar_form_copy_cleanup.py`.
+
 # Changelog – r100 Sidebar Season Card Placement Correction
 
 ## r100
@@ -204,6 +254,14 @@
 - Preserves r066 payload scrub, Create/Update/Delete, mobile action sheet and Reminder/Card separation.
 
 # Changelog
+
+## r104 – Sidebar Form Inline Invalid Feedback
+
+- Adds inline invalid state to create/edit form fields so incorrect values are visible at the field, not only in the overview validation box.
+- Marks required/invalid vehicle name, HU, reminder offset, plate type/format, plate text, change-plate fields and seasonal range fields with `aria-invalid`.
+- Keeps the accepted r100/r097 form layout: right overview card unchanged and the seasonal card as a separate grey card below it.
+- Preserves the r089/r091 compact dark plate fallback; no Card detection or renderer integration.
+- No release work.
 
 ## r067 – Sidebar Form Payload Scrub
 

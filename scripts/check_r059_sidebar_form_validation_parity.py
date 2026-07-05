@@ -23,15 +23,15 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r100":
-    fail("manifest version must be 0.1.0-r100")
-if VERSION.read_text(encoding="utf-8").strip() != "r100":
+if manifest.get("version") != "0.1.0-r105":
+    fail("manifest version must be 0.1.0-r105")
+if VERSION.read_text(encoding="utf-8").strip() != "r105":
     fail("REMINDER_VERSION.txt must be r060")
 
 panel = PANEL.read_text(encoding="utf-8")
 for needle, label in [
     ("_renderIntervalOptions(selected)", "interval select helper"),
-    ('<label>Intervall<select data-field="interval">', "interval select field"),
+    ('<label>Intervall<select data-field="interval"', "interval select field"),
     ("Prüfintervall muss 1 oder 2 Jahre betragen.", "local interval validation"),
     ("HU-Jahr muss zwischen 1900 und 2100 liegen.", "backend-aligned year validation"),
     ('type="number" inputmode="numeric" min="1900" max="2100" step="1"', "HU year input constraints"),

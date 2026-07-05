@@ -1,7 +1,7 @@
 {
   "domain": "tuev_reminder",
   "name": "TÜV Reminder",
-  "version": "0.1.0-r100",
+  "version": "0.1.0-r105",
   "documentation": "https://github.com/livinhack/tuev-reminder-test",
   "issue_tracker": "https://github.com/livinhack/tuev-reminder-test/issues",
   "dependencies": [

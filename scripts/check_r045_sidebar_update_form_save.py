@@ -15,9 +15,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r100":
-        fail("manifest version must be 0.1.0-r100")
-    if read("REMINDER_VERSION.txt").strip() != "r100":
+    if manifest.get("version") != "0.1.0-r105":
+        fail("manifest version must be 0.1.0-r105")
+    if read("REMINDER_VERSION.txt").strip() != "r105":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
@@ -32,8 +32,8 @@ def main() -> None:
         "vehicle: this._formPayload()",
         'id="save-update"',
         "this._applySaveResult(result)",
-        "Bestehende Reminder-Entität bearbeiten",
-        "Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API",
+        "Fahrzeugdaten bearbeiten und speichern.",
+        "Änderungen werden in den TÜV-Reminder-Daten gespeichert",
     ]:
         if marker not in panel:
             fail(f"panel JS missing {marker!r}")

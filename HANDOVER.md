@@ -1,3 +1,140 @@
+# Handover – r105 Sidebar Validation Focus Fallback
+
+Current working build: **Reminder r105**.
+
+Base: r104 (`tuev-reminder-r104-sidebar-form-validation-focus.zip`).
+
+Implemented in r105:
+
+- Kept the accepted r100/r097 form layout.
+- Kept the right grey overview card unchanged.
+- Kept Saison fields as a separate grey card below the right overview card.
+- Kept r102 inline field invalid markers.
+- Kept r103 card/section invalid markers.
+- Kept r104 clickable validation messages.
+- Added section metadata to validation message buttons.
+- Validation focus now falls back to the owning form card if a conditional target field is not rendered.
+- Added visible focus styling for form-card fallback focus.
+- Kept the r089/r091 compact dark Kennzeichen fallback unchanged.
+
+Validation:
+
+- `python3 scripts/run_all_checks.py`
+- `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+
+Next entry point: continue from **r105** for further Sidebar function/visual work. No release steps unless explicitly requested.
+
+---
+
+# Handover – r104 Sidebar Form Validation Focus
+
+Current working build: **Reminder r104**.
+
+Base: r103 (`tuev-reminder-r103-sidebar-form-section-invalid-feedback.zip`).
+
+Implemented in r104:
+
+- Kept the accepted r100/r097 form layout.
+- Kept the right grey overview card unchanged.
+- Kept Saison fields as a separate grey card below the right overview card.
+- Kept r102 inline field invalid markers.
+- Kept r103 card/section invalid markers.
+- Added clickable validation messages in the right overview card.
+- Clicking a mapped validation message scrolls to and focuses the related field.
+- Kept the r089/r091 compact dark Kennzeichen fallback unchanged.
+
+Validation:
+
+- `python3 scripts/run_all_checks.py`
+- `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+
+Next entry point: continue from **r104** for further Sidebar function/visual work. No release steps unless explicitly requested.
+
+---
+
+# Handover – r104 Sidebar Form Section Invalid Feedback
+
+Current working build: **Reminder r104**.
+
+Base: r104 (`tuev-reminder-r104-sidebar-form-inline-invalid-feedback.zip`).
+
+Implemented in r104:
+
+- Kept the accepted r100/r097 form layout.
+- Kept the right grey overview card unchanged.
+- Kept Saison fields as a separate grey card below the right overview card.
+- Kept r104 inline invalid marking on individual fields.
+- Added subtle invalid feedback on the surrounding form cards/sections:
+  - Basisdaten
+  - HU & Erinnerung
+  - Kennzeichen
+  - Saisonzeitraum
+- Kept the r089/r091 compact dark Kennzeichen fallback unchanged.
+
+Validation:
+
+- `python3 scripts/run_all_checks.py`
+- `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+
+Next entry point: continue from **r104** for further Sidebar function/visual work. No release steps unless explicitly requested.
+
+---
+
+# TÜV Reminder r104 – Sidebar Form Inline Invalid Feedback
+
+## Basis
+
+Built on r101 (`tuev-reminder-r101-sidebar-form-copy-cleanup.zip`).
+
+## Änderungen
+
+- Formularfelder im Anlegen-/Bearbeiten-Dialog bekommen jetzt direkten Invalid-State (`aria-invalid`) zusätzlich zur bestehenden Validierungsbox rechts.
+- Markiert werden unter anderem Fahrzeugname, HU-Monat/-Jahr, Intervall, Erinnerungs-Vorlauf, Kennzeichenart/-format, Kennzeichentext, Wechselkennzeichenfelder und Saisonmonate.
+- Die Invalid-Markierung wird bei normaler Eingabe ohne kompletten Formular-Rebuild nachgeführt.
+- Der akzeptierte r100/r097-Aufbau bleibt erhalten: rechte hellgraue Überblick-Karte unverändert, Saison als eigene hellgraue Karte darunter.
+- Der r089/r091-Kennzeichenfallback bleibt erhalten.
+
+## Nicht geändert
+
+- Keine Card-Erkennung.
+- Kein Card-Renderer.
+- Keine Release-Schritte.
+
+## Interne Checks
+
+- `python3 scripts/run_all_checks.py`
+- `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+
+## HA-Testfokus
+
+- Neues Fahrzeug öffnen: leere Pflichtfelder sollten direkt als ungültig erkennbar sein.
+- Eingabe korrigieren: Markierung muss verschwinden, Save-Button/Validierungsbox müssen synchron bleiben.
+- Saisonkennzeichen: ungültige Saisonbereiche markieren beide Saisonfelder in der separaten Karte.
+- Wechselkennzeichen: gemeinsamer Text/Fahrzeugziffer prüfen.
+- Überblick/Saisonkarte/Fallback-Look müssen wie r100/r091 bleiben.
+
+---
+
+# Handover – r101 Sidebar Form Copy Cleanup
+
+Current working build: **Reminder r101**.
+
+Base: r100 (`tuev-reminder-r100-sidebar-season-card-r097-layout.zip`) accepted by the user.
+
+Implemented in r101:
+
+- Kept the r100/r097 form layout.
+- Kept Saison fields as a separate grey card below the right overview card.
+- Cleaned visible form/list/delete copy away from internal ConfigEntry/API/WebSocket terms.
+- Kept r089/r091 Kennzeichen fallback unchanged.
+
+Validation:
+
+- `python3 scripts/run_all_checks.py`
+- `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+
+Next entry point: continue from r101 for further Sidebar function/visual work. No release steps unless explicitly requested.
+
 # Handover – Reminder r100 Sidebar Single Create Action
 
 r100 continues from r096 and cleans up the normal vehicle-list controls. The separate add rows above and below the list were removed. Vehicle creation is now available through one compact `+` action inside the existing list controls next to search and status chips.
@@ -2066,3 +2203,8 @@ Next work starts from r085. The Sidebar list right side was tightened: plate pre
 Basis: r097 als optische Referenz. Saisonfelder werden bei `seasonal` / `green_seasonal` nicht links und nicht innerhalb des Überblicks angezeigt, sondern darunter als separate hellgraue Karte `side-season-card`. Die rechte Überblick-Karte behält Validierung, Hinweistext und Formularaktionen wie in r097.
 
 Testfokus: Saisonkennzeichen auswählen; Überblick-Karte muss unverändert bleiben; darunter eigene hellgraue Saisonkarte.
+
+## Compatibility Marker
+
+Reminder r104 · Card b355 · calendar.tuev_reminder · reminder_offset_days
+

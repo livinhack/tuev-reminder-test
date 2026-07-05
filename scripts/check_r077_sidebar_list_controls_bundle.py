@@ -26,8 +26,8 @@ changelog = read("CHANGELOG.md")
 doc = read("docs/REMINDER_R078_SIDEBAR_SEARCH_BADGE_CONTROLS.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R078.md")
 
-require(manifest["version"] == "0.1.0-r100", "manifest version must be r083")
-require(version == "r100", "REMINDER_VERSION must be r085")
+require(manifest["version"] == "0.1.0-r105", "manifest version must be r083")
+require(version == "r105", "REMINDER_VERSION must be r085")
 
 for marker in [
     "_statusChip(label, value, count)",

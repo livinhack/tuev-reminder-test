@@ -14,8 +14,8 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert manifest["version"] == "0.1.0-r100"
-assert version == "r100"
+assert manifest["version"] == "0.1.0-r105"
+assert version == "r105"
 assert 'class="topbar-status${this._metadata?.write_api === true ? " sr-only" : " read-only"}"' in panel
 assert 'API v${this._escape(apiVersion)} · ${this._escape(writeApi)}' in panel
 assert ': "Nur lesen"}</div>' in panel

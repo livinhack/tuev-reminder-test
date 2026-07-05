@@ -11,15 +11,15 @@ def read(relative: str) -> str:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r100"
-assert read("REMINDER_VERSION.txt").strip() == "r100"
+assert manifest["version"] == "0.1.0-r105"
+assert read("REMINDER_VERSION.txt").strip() == "r105"
 
 panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 assert "Noch keine Fahrzeuge" in panel
 assert "first-run-state" in panel
 assert "empty-create" in panel
 assert 'data-create-trigger="empty"' in panel
-assert "Lege dein erstes Fahrzeug an" in panel
+assert "Lege dein erstes Fahrzeug für die TÜV-Erinnerung an" in panel
 assert "Keine Treffer" in panel
 assert "Suche leeren" in panel
 assert 'id="clear-empty-search"' in panel
