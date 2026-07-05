@@ -10,9 +10,9 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-if manifest.get("version") != "0.1.0-r097":
-    raise SystemExit("manifest version must be 0.1.0-r097")
-if version != "r097":
+if manifest.get("version") != "0.1.0-r098":
+    raise SystemExit("manifest version must be 0.1.0-r098")
+if version != "r098":
     raise SystemExit("REMINDER_VERSION must be r095")
 
 required = [

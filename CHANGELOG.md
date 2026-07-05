@@ -1,3 +1,12 @@
+## r098 – Sidebar Form Season Below Overview
+
+- Bumped Reminder version to `0.1.0-r098`.
+- Slightly increased the vehicle create/edit modal height budget to reduce unnecessary scrolling without adding a height slider.
+- Moved Saison Start/End fields below the Überblick/Kennzeichen summary in the right column.
+- Removed the separate left-column Saison card from the form stack.
+- Preserved the r089/r091 compact dark plate fallback for no-Card-renderer state.
+- Added `scripts/check_r098_sidebar_form_season_below_overview.py`.
+
 ## r097 – Sidebar Single Create Action
 
 - Bumped Reminder version to `0.1.0-r097`.

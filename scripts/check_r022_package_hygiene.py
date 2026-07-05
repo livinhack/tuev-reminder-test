@@ -29,7 +29,7 @@ init = read("custom_components/tuev_reminder/__init__.py")
 calendar = read("custom_components/tuev_reminder/calendar.py")
 services = read("custom_components/tuev_reminder/services.yaml")
 
-assert version in {"r022", "r023", "r024", "r025", "r026", "r027", "r028", "r075", "r081", "r083", "r097", "r097"}
+assert version in {"r022", "r023", "r024", "r025", "r026", "r027", "r028", "r075", "r081", "r083", "r098", "r098"}
 assert manifest["version"] == f"0.1.0-{version}"
 assert manifest["domain"] == "tuev_reminder"
 assert manifest["config_flow"] is True

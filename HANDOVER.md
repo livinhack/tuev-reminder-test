@@ -1,3 +1,38 @@
+# Handover – Reminder r098 Sidebar Form Season Below Overview
+
+Reminder r098 continues from r097 and adjusts the vehicle create/edit form. The modal is slightly taller, the seasonal Start/End fields are shown below the Überblick/Kennzeichen summary on the right, and the old left-column Saison block is removed. This keeps the form usable without adding a height slider.
+
+Compatibility context remains unchanged: Card b355 is still the current bridge reference, `calendar.tuev_reminder` remains the integration calendar entity, and `reminder_offset_days` remains the reminder lead-time field.
+
+## What changed in r098
+
+- Internal version bumped to `0.1.0-r098` / `r098`.
+- `vehicle-form-shell` modal uses a taller max-height budget: `min(920px, calc(100vh - 40px))`.
+- Saison Start/End controls now render in an inline section below the overview summary.
+- The left form stack no longer contains a separate Saison card.
+- r089/r091 compact dark plate fallback is preserved.
+- No Card detection, no Card renderer integration, no release work.
+
+## Files changed in r098
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `scripts/check_r098_sidebar_form_season_below_overview.py`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+
+## HA smoke test focus for r098
+
+1. Open create form and switch Kennzeichenart to Saisonkennzeichen.
+2. Verify Saison fields are below Überblick/Kennzeichen on the right.
+3. Verify no height slider exists and the modal feels slightly less cramped.
+4. Test invalid and valid season ranges.
+5. Check existing list controls, menu actions, and plate fallback.
+
+Continue functional/visual Sidebar work from r098. Do not start release work unless explicitly requested.
+
 # Handover – Reminder r097 Sidebar Single Create Action
 
 r097 continues from r096 and cleans up the normal vehicle-list controls. The separate add rows above and below the list were removed. Vehicle creation is now available through one compact `+` action inside the existing list controls next to search and status chips.

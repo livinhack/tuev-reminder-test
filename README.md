@@ -1,3 +1,26 @@
+# TÜV Reminder – r098 Sidebar Form Season Below Overview
+
+Current working build: **Reminder r098**. r098 continues functional/visual Sidebar work from r097. The vehicle create/edit form is slightly taller, the seasonal month fields move out of the left field stack and appear below the overview card instead, and the r089/r091 compact dark plate fallback remains preserved when no Card renderer is available.
+
+Compatibility context: Card b355 remains the current bridge reference. The integration still exposes `calendar.tuev_reminder` and uses `reminder_offset_days` for reminder lead time handling.
+
+## r098 highlights
+
+- Bumped Reminder version to `0.1.0-r098` / `r098`.
+- Slightly increased the vehicle form modal height budget to reduce cramped scrolling without reintroducing a height slider.
+- Moved Saison Start/End fields below the Überblick/Kennzeichen summary in the right form column.
+- Kept the left data-entry stack focused on Basisdaten, HU & Erinnerung, and Kennzeichen.
+- Preserved the compact dark r089/r091 plate fallback.
+- No Card detection, no Card renderer integration, no release work.
+
+## HA smoke test focus for r098
+
+- Open "Neues Fahrzeug anlegen" and select Saisonkennzeichen.
+- Confirm the Saison Start/End fields appear below the Überblick/Kennzeichen summary, not in the left field column.
+- Confirm the modal has a little more usable height but no height slider.
+- Save/create and edit flows should keep validating the 2–11 month season range.
+- Confirm search, badges, sort headers, menu actions, and the r089/r091 plate fallback still behave as before.
+
 # TÜV Reminder – r097 Sidebar Single Create Action
 
 Current working package: `0.1.0-r097` / `r097`.

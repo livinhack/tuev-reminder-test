@@ -1263,19 +1263,6 @@ class TuevReminderPanel extends HTMLElement {
               `}
             </section>
 
-            ${seasonal ? `
-              <section class="form-card form-section special-section">
-                <div class="section-head">
-                  <span class="section-kicker">Saison</span>
-                  <h3>Saisonzeitraum</h3>
-                  <p>Mindestens 2 und höchstens 11 Monate; Übergang über den Jahreswechsel ist möglich.</p>
-                </div>
-                <div class="field-pair">
-                  <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
-                  <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
-                </div>
-              </section>
-            ` : ""}
           </div>
 
           <aside class="form-card preview-card">
@@ -1295,6 +1282,19 @@ class TuevReminderPanel extends HTMLElement {
               <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
               <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
             </dl>
+            ${seasonal ? `
+              <section class="inline-season-section" aria-label="Saisonzeitraum">
+                <div class="section-head compact-section-head">
+                  <span class="section-kicker">Saison</span>
+                  <h3>Saisonzeitraum</h3>
+                </div>
+                <div class="field-pair compact-season-fields">
+                  <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
+                  <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
+                </div>
+                <p class="field-hint">Mindestens 2 und höchstens 11 Monate.</p>
+              </section>
+            ` : ""}
             <div class="validation ${errors.length ? "has-errors" : "ok"}">
               ${this._validationHtml(errors)}
             </div>
@@ -1930,7 +1930,7 @@ class TuevReminderPanel extends HTMLElement {
         .error { color: var(--error-color); }
         .form-shell {
           width: min(1120px, 100%);
-          max-height: min(860px, calc(100vh - 64px));
+          max-height: min(920px, calc(100vh - 40px));
           overflow: auto;
           padding: 18px 20px 24px;
           box-sizing: border-box;
@@ -1978,6 +1978,16 @@ class TuevReminderPanel extends HTMLElement {
         .preview-card { position: sticky; top: 16px; }
         .preview-card dl { margin: 18px 0; }
         .preview-card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--divider-color); }
+        .inline-season-section {
+          margin: 16px 0;
+          padding: 14px;
+          border: 1px solid var(--divider-color);
+          border-radius: 10px;
+          background: var(--secondary-background-color);
+        }
+        .compact-section-head { margin-bottom: 10px; }
+        .compact-season-fields { gap: 10px; }
+        .field-hint { margin: 10px 0 0; color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         dt { color: var(--secondary-text-color); }
         dd { margin: 0; text-align: right; }
         .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }

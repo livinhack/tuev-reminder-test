@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PANEL = ROOT / "custom_components" / "tuev_reminder" / "frontend" / "tuev-reminder-panel.js"
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-assert manifest.get("version") == "0.1.0-r097"
-assert (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() == "r097"
+assert manifest.get("version") == "0.1.0-r098"
+assert (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() == "r098"
 panel = PANEL.read_text(encoding="utf-8")
 for needle in [
     'table-layout: fixed;',
