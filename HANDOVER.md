@@ -1,47 +1,45 @@
-# Handover – Reminder r077 Sidebar List Controls Bundle
+# Handover – Reminder r078 Sidebar Search Badge Controls
 
 ## Purpose
 
-r077 bundles several list-control and readability improvements into one working build to reduce ZIP churn. It is not a release step. It continues from r076 and focuses on the vehicle list rather than the Create/Edit form.
+r078 is a bundled Sidebar UI cleanup step after r077. It removes redundant controls now that the status badges/chips provide the intended filtering interaction. It is not a release step.
 
-## What changed in r077
+## What changed in r078
 
-- Added clickable status summary chips:
+- Removed the status dropdown beside the search field.
+- Removed the manual refresh button beside the search field.
+- The search toolbar now contains only the search input.
+- Status filters are controlled by the badge/chip row only:
   - Alle
   - Abgelaufen
   - Fällig
   - Gültig
-- Chips and the existing status select share the same `_statusFilter` state.
-- Added compact Treffer/fällig summary text in the Manager strip.
-- Table headers are sticky while scrolling the list area.
-- Status pills now include a small colored dot for faster scanning.
-- Manual refresh button displays `Lädt …` while the Manager API is loading.
-- Rows remain non-clickable; only the three-dot action menu opens edit/delete.
+- Existing sorting via column headers remains unchanged.
 - Create/Edit/Delete, mobile action sheet, dirty guard, duplicate checks and payload scrub remain unchanged.
 - No Card code was imported or copied into the Reminder repo.
 
 ## Test focus for HA
 
-1. Open Sidebar page on desktop.
-2. Click each status chip and confirm the list filters correctly.
-3. Confirm the status dropdown stays consistent with chip-selected filters.
+1. Open the Sidebar page on desktop.
+2. Confirm only the search field remains in the toolbar.
+3. Click each status badge/chip and confirm the list filters correctly.
 4. Confirm sorting via headers still works after using chips.
 5. Confirm edit/delete still open only via the three-dot menu.
-6. On smartphone, confirm chips wrap cleanly and the mobile Action Sheet still opens.
+6. On smartphone, confirm the search field and chips wrap cleanly and the mobile Action Sheet still opens.
 
 ## Next likely bundled direction
 
-A useful next bundled step would be a create/edit form polish pass around field hints/defaults and a more compact preview summary, not release work.
+A useful next bundled step would be more table/list density polish or form field hints/defaults, not release work.
 
 ---
 
-# Handover – Reminder r077 Sidebar UX Structure Bundle
+# Handover – Reminder r078 Sidebar UX Structure Bundle
 
 ## Purpose
 
-r077 deliberately bundles several small UI/UX improvements into one working build to reduce ZIP churn. It is not a release step. It continues from the r075 Sidebar baseline and focuses on the Create/Edit modal structure and list readability.
+r078 deliberately bundles several small UI/UX improvements into one working build to reduce ZIP churn. It is not a release step. It continues from the r075 Sidebar baseline and focuses on the Create/Edit modal structure and list readability.
 
-## What changed in r077
+## What changed in r078
 
 - Create/Edit modal is split into clearer visual sections:
   - Fahrzeug / Basisdaten

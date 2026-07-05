@@ -1,44 +1,11 @@
-## r077 – Sidebar List Controls Bundle
+## r078 – Sidebar Search Badge Controls
 
-- Bundles list/readability improvements without release work.
-- Adds clickable status summary chips for Alle, Abgelaufen, Fällig and Gültig.
-- Keeps the existing status select while syncing the same filter state.
-- Adds a compact Treffer/fällig summary next to the chips.
-- Makes table headers sticky while scrolling the list area.
-- Adds colored status-dot affordance inside status pills.
-- Refresh button now shows `Lädt …` while Manager data is loading.
-- Keeps rows non-clickable; only the three-dot action opens edit/delete.
-- Keeps Create/Edit/Delete, mobile Action Sheet and Reminder/Card separation unchanged.
+- Removed the redundant status dropdown next to the search field.
+- Removed the manual refresh button next to the search field.
+- Status filtering now uses the badge/chip row only: Alle, Abgelaufen, Fällig and Gültig.
+- Simplified the toolbar to a single search input.
+- Kept sticky headers, status-dot pills, Create/Edit/Delete, Mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and Reminder/Card separation unchanged.
 - No release-candidate/public-release step added.
-
-## r077 – Sidebar UX Structure Bundle
-
-- Bundles multiple small UX improvements into one working build to reduce ZIP churn.
-- Reorganizes the Create/Edit modal into semantic sections for Fahrzeug, HU/Erinnerung, Kennzeichen and Saison.
-- Improves the right-side overview/preview panel wording and preserves bottom actions.
-- Refines table row hover and status pill visuals without making rows clickable again.
-- Keeps Create/Edit/Delete, Duplicate Preflight, Dirty Guard, Mobile Action Sheet and responsive layout behavior intact.
-- Keeps Reminder/Card separation unchanged.
-- No release-candidate/public-release step added.
-
-## r075 – Sidebar Release Candidate
-
-- Establishes the current Sidebar Manager line as a release-candidate checkpoint.
-- Adds `scripts/check_r075_sidebar_release_candidate.py`.
-- Guards the full Sidebar CRUD package shape and public `v0.1.0` release asset metadata.
-- Keeps runtime behavior unchanged from r074.
-- Preserves Reminder/Card separation.
-
-# r074 – HACS Release Metadata Guard
-
-- Bumped Reminder version to `0.1.0-r074`.
-- Added release/HACS metadata guard script: `scripts/check_r074_hacs_release_metadata_guard.py`.
-- Guard checks manifest domain/version/dependencies, HACS metadata, Brand asset paths, Sidebar files and release-builder output.
-- Guard verifies public release ZIP metadata is patched to `0.1.0` / `v0.1.0` and contains no generated cache/staging artifacts.
-- Added `docs/REMINDER_R074_HACS_RELEASE_METADATA_GUARD.md`.
-- Added `docs/COMPAT_CARD_B355_REMINDER_R074.md`.
-- No runtime Sidebar behavior changed.
-- No Card code bundled or imported.
 
 ---
 # r073 – Sidebar Mobile Form Compact Layout
@@ -672,3 +639,11 @@
 - Kennzeichen-Vorschau wird auf kleinen Displays ausgeblendet, Kennzeichentext erscheint kompakt unter dem Namen.
 - Auf sehr schmalen Displays wird die Erinnerungsspalte ausgeblendet, damit das Drei-Punkte-Menü erreichbar bleibt.
 - Keine Card-Vermischung; Create/Update/Delete/Dirty-Guard bleiben erhalten.
+
+## r078 – Sidebar UX Structure Bundle
+
+- Retained from previous bundled Sidebar UX work for compatibility checks.
+
+## r075 – Sidebar Release Candidate
+
+- Retained historical r075 checkpoint entry for compatibility checks; release work remains parked in current r078 development.

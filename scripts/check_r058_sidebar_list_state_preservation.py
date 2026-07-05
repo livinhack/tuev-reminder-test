@@ -23,9 +23,9 @@ def require(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r077":
-    fail("manifest version must be 0.1.0-r077")
-if VERSION.read_text(encoding="utf-8").strip() != "r077":
+if manifest.get("version") != "0.1.0-r078":
+    fail("manifest version must be 0.1.0-r078")
+if VERSION.read_text(encoding="utf-8").strip() != "r078":
     fail("REMINDER_VERSION.txt must be r058")
 
 panel = PANEL.read_text(encoding="utf-8")
@@ -37,7 +37,7 @@ for needle, label in [
     ("selectionStart", "caret preservation"),
     ("this._cssEscape", "selector escaping fallback"),
     ("this._filter = event.target.value", "search input handler"),
-    ("this._statusFilter = event.target.value", "status filter handler"),
+    ('this._statusFilter = button.dataset.statusChip || "all"', "status chip filter handler"),
 ]:
     require(panel, needle, label)
 

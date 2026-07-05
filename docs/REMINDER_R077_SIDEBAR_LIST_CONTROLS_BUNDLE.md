@@ -1,6 +1,6 @@
-# Reminder r077 – Sidebar List Controls Bundle
+# Reminder r078 – Sidebar List Controls Bundle
 
-r077 is a bundled UI/UX development step for the Reminder Sidebar Manager. It intentionally combines several small list-control improvements into one ZIP to reduce intermediate artifacts.
+r078 is a bundled UI/UX development step for the Reminder Sidebar Manager. It intentionally combines several small list-control improvements into one ZIP to reduce intermediate artifacts.
 
 ## Scope
 

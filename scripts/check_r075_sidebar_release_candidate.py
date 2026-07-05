@@ -34,8 +34,8 @@ doc = read("docs/REMINDER_R075_SIDEBAR_RELEASE_CANDIDATE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R075.md")
 
 require(manifest["domain"] == "tuev_reminder", "manifest domain must stay tuev_reminder")
-require(manifest["version"] == "0.1.0-r077", "manifest version must be r077")
-require(version == "r077", "REMINDER_VERSION must be r077")
+require(manifest["version"] == "0.1.0-r078", "manifest version must be r078")
+require(version == "r078", "REMINDER_VERSION must be r078")
 require(set(["http", "frontend", "panel_custom"]).issubset(set(manifest.get("dependencies", []))), "Sidebar dependencies missing")
 require(manifest.get("config_flow") is True, "config_flow must remain enabled")
 

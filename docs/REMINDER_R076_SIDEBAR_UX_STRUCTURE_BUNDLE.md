@@ -1,6 +1,6 @@
-# Reminder r077 – Sidebar UX Structure Bundle
+# Reminder r078 – Sidebar UX Structure Bundle
 
-r077 is a bundled UI/UX development step for the Reminder Sidebar Manager. It intentionally combines several small visual and structural improvements into one ZIP to reduce intermediate artifacts.
+r078 is a bundled UI/UX development step for the Reminder Sidebar Manager. It intentionally combines several small visual and structural improvements into one ZIP to reduce intermediate artifacts.
 
 ## Scope
 

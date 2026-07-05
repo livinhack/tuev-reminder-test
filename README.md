@@ -1,29 +1,27 @@
-# TÜV Reminder – r077
+# TÜV Reminder – r078
 
-Current working build: **Reminder r077**. r077 continues normal function/UX development. Release work remains parked; this build focuses on Sidebar list controls and readability.
+Current working build: **Reminder r078**. r078 continues normal function/UX development. Release work remains parked; this build removes redundant list controls now that the status badges/chips are the primary filter UI.
 
-## r077 highlights
+## r078 highlights
 
-- Adds status summary chips for quick filtering: Alle, Abgelaufen, Fällig and Gültig.
-- Keeps the existing status dropdown for explicit filtering, but the chips provide faster everyday navigation.
-- Adds a compact Treffer/fällig summary in the Manager status area.
-- Makes table headers sticky while scrolling.
-- Refines status pills with a small colored dot for quicker visual scanning.
-- Shows `Lädt …` during manual refresh.
-- Keeps Create/Edit/Delete, mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive behavior.
+- Removes the status dropdown next to the search field.
+- Removes the manual refresh button next to the search field.
+- Keeps status filtering via badges/chips: Alle, Abgelaufen, Fällig and Gültig.
+- Search row is reduced to the search field only, making the sidebar visually calmer and more Switch-Manager-like.
+- Keeps sticky table headers, status dots, Create/Edit/Delete, mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive behavior.
 - Keeps the Reminder/Card boundary strict: the Sidebar manages Reminder entities only; the Card remains a separate Lovelace/dashboard project.
 
 ## Current development note
 
-No release packaging or public-release steps should be inferred from r077. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r078. Continue with function and UI improvements until release work is explicitly requested again.
 
 ---
 
-# TÜV Reminder – r077
+# TÜV Reminder – r078
 
-Current working build: **Reminder r077**. r077 continues normal feature/UX development after the r075 checkpoint. Release work is intentionally parked; this build focuses on Sidebar form structure, visual polish, and day-to-day usability.
+Current working build: **Reminder r078**. r078 continues normal feature/UX development after the r075 checkpoint. Release work is intentionally parked; this build focuses on Sidebar form structure, visual polish, and day-to-day usability.
 
-## r077 highlights
+## r078 highlights
 
 - Reworks the Create/Edit modal into clearer sections:
   - Fahrzeug
@@ -37,7 +35,7 @@ Current working build: **Reminder r077**. r077 continues normal feature/UX devel
 
 ## Current development note
 
-No release packaging or public-release steps should be inferred from r077. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r078. Continue with function and UI improvements until release work is explicitly requested again.
 
 ---
 

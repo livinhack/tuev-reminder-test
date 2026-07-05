@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r077 Sidebar list controls bundle."""
+"""Validate r078 Sidebar list controls bundle."""
 from __future__ import annotations
 
 import json
@@ -23,11 +23,11 @@ frontend = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
 readme = read("README.md")
 handover = read("HANDOVER.md")
 changelog = read("CHANGELOG.md")
-doc = read("docs/REMINDER_R077_SIDEBAR_LIST_CONTROLS_BUNDLE.md")
-compat = read("docs/COMPAT_CARD_B355_REMINDER_R077.md")
+doc = read("docs/REMINDER_R078_SIDEBAR_SEARCH_BADGE_CONTROLS.md")
+compat = read("docs/COMPAT_CARD_B355_REMINDER_R078.md")
 
-require(manifest["version"] == "0.1.0-r077", "manifest version must be r077")
-require(version == "r077", "REMINDER_VERSION must be r077")
+require(manifest["version"] == "0.1.0-r078", "manifest version must be r078")
+require(version == "r078", "REMINDER_VERSION must be r078")
 
 for marker in [
     "_statusChip(label, value, count)",
@@ -39,9 +39,8 @@ for marker in [
     "summary-detail",
     "position: sticky",
     "status-pill::before",
-    "Lädt …",
-]:
-    require(marker in frontend, f"missing r077 list-control marker: {marker}")
+    ]:
+    require(marker in frontend, f"missing r078 list-control marker: {marker}")
 
 for preserved in [
     "data-action-sheet-action=\"edit\"",
@@ -62,10 +61,10 @@ for forbidden in [
 ]:
     require(forbidden not in frontend, f"Reminder frontend must not import/use Card code: {forbidden}")
 
-require("Reminder r077" in readme, "README must describe r077")
-require("Sidebar List Controls Bundle" in handover, "HANDOVER must describe r077")
-require("r077 – Sidebar List Controls Bundle" in changelog, "CHANGELOG must contain r077 entry")
-require("No release-candidate step" in doc, "r077 doc must explicitly avoid release scope")
+require("Reminder r078" in readme, "README must describe r078")
+require("Sidebar Search Badge Controls" in handover, "HANDOVER must describe r078")
+require("r078 – Sidebar Search Badge Controls" in changelog, "CHANGELOG must contain r078 entry")
+require("No release candidate" in doc or "No release-candidate" in doc, "r078 doc must explicitly avoid release scope")
 require("Card remains a separate" in compat, "compat doc must preserve Card separation")
 
-print("r077 Sidebar list controls bundle checks passed")
+print("r078 Sidebar list controls bundle checks passed")

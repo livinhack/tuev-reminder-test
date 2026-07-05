@@ -1337,7 +1337,7 @@ class TuevReminderPanel extends HTMLElement {
         .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
         .toolbar {
           display: ${listMode ? "grid" : "none"};
-          grid-template-columns: minmax(240px, 1fr) auto auto;
+          grid-template-columns: minmax(240px, 1fr);
           gap: 8px;
           padding: 10px 16px;
           border-bottom: 1px solid var(--divider-color);
@@ -1867,7 +1867,7 @@ class TuevReminderPanel extends HTMLElement {
         .note { color: var(--secondary-text-color); font-size: 12px; line-height: 1.45; }
         @media (max-width: 980px) {
           .toolbar { grid-template-columns: 1fr; }
-          select, button.action { width: 100%; }
+          select { width: 100%; }
           .summary-strip { gap: 8px; padding-left: 10px; padding-right: 10px; }
           .summary-chip-row { gap: 6px; }
           .status-filter-chip { min-height: 30px; padding: 0 8px; font-size: 12px; }
@@ -2066,13 +2066,6 @@ class TuevReminderPanel extends HTMLElement {
             <span class="search-icon">⌕</span>
             <input id="filter" type="search" placeholder="Suchen" value="${this._escape(this._filter)}">
           </div>
-          <select id="status-filter" aria-label="Statusfilter">
-            <option value="all" ${this._statusFilter === "all" ? "selected" : ""}>Alle Status</option>
-            <option value="expired" ${this._statusFilter === "expired" ? "selected" : ""}>Abgelaufen</option>
-            <option value="due" ${this._statusFilter === "due" ? "selected" : ""}>Fällig</option>
-            <option value="valid" ${this._statusFilter === "valid" ? "selected" : ""}>Gültig</option>
-          </select>
-          <button class="action" id="refresh" ${this._loading ? "disabled" : ""}>${this._loading ? "Lädt …" : "Aktualisieren"}</button>
         </section>
 
         <section class="summary-strip" aria-label="Manager Status">
@@ -2099,9 +2092,6 @@ class TuevReminderPanel extends HTMLElement {
       </main>
     `;
 
-    const refreshButton = this.shadowRoot.querySelector("#refresh");
-    if (refreshButton) refreshButton.addEventListener("click", () => this._refresh());
-
     this.shadowRoot.querySelectorAll("[data-create-trigger]").forEach((button) => {
       button.addEventListener("click", () => this._openCreateForm());
     });
@@ -2110,16 +2100,6 @@ class TuevReminderPanel extends HTMLElement {
     if (filterInput) {
       filterInput.addEventListener("input", (event) => {
         this._filter = event.target.value;
-        this._openMenuIndex = null;
-        this._openMenuEntryId = null;
-        this._renderPreservingListUiState();
-      });
-    }
-
-    const statusFilter = this.shadowRoot.querySelector("#status-filter");
-    if (statusFilter) {
-      statusFilter.addEventListener("change", (event) => {
-        this._statusFilter = event.target.value;
         this._openMenuIndex = null;
         this._openMenuEntryId = null;
         this._renderPreservingListUiState();
