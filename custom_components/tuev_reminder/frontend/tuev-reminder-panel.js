@@ -1028,7 +1028,7 @@ class TuevReminderPanel extends HTMLElement {
           </thead>
           <tbody>
             ${vehicles.map((vehicle, index) => `
-              <tr class="vehicle-row" data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
+              <tr class="vehicle-row ${this._openMenuEntryId === vehicle.entry_id ? "menu-open" : ""}" data-entry-id="${this._escape(vehicle.entry_id)}" data-row-index="${index}">
                 <td class="name-cell" data-label="Fahrzeug">
                   <div class="vehicle-title">${this._escape(vehicle.vehicle_name || vehicle.title || "Fahrzeug")}</div>
                   <div class="mobile-plate-slot" data-plate-render-slot="text" data-renderer-state="text" title="Kennzeichen">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</div>
@@ -1042,7 +1042,7 @@ class TuevReminderPanel extends HTMLElement {
                 <td class="status-cell" data-label="Status"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack"><div class="plate-render-slot" data-plate-render-slot="text" data-renderer-state="text" title="Kennzeichen"><span class="plate-text-slot">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</span></div></div></td>
                 <td class="menu-cell">
-                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>
+                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-haspopup="menu" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>
                   ${this._openMenuEntryId === vehicle.entry_id ? `
                     <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
                       <button type="button" data-row-action="edit" data-action-index="${index}" data-action-entry-id="${this._escape(vehicle.entry_id || "")}" role="menuitem">Bearbeiten</button>
@@ -1567,7 +1567,7 @@ class TuevReminderPanel extends HTMLElement {
           font-weight: 600;
           background: var(--primary-background-color);
         }
-        tbody tr { transition: background .12s ease; }
+        tbody tr { transition: background .12s ease, box-shadow .12s ease; }
         .sort-header {
           display: inline-flex;
           align-items: center;
@@ -1585,7 +1585,11 @@ class TuevReminderPanel extends HTMLElement {
         .sort-header:hover, .sort-header.active { color: var(--primary-text-color); }
         .col-preview .sort-header { justify-content: flex-end; }
         tbody tr { cursor: default; }
-        tbody tr:hover { background: var(--secondary-background-color); }
+        tbody tr:hover,
+        tbody tr.menu-open { background: var(--secondary-background-color); }
+        tbody tr.menu-open {
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-color) 22%, transparent);
+        }
         tbody td:first-child { border-left: 0; }
         .col-name { width: auto; }
         .col-hu { width: 112px; }
@@ -1602,9 +1606,10 @@ class TuevReminderPanel extends HTMLElement {
           min-width: 148px;
           padding: 6px 0;
           border: 1px solid var(--divider-color);
-          border-radius: 8px;
+          border-radius: 10px;
           background: var(--card-background-color);
-          box-shadow: 0 8px 24px rgba(0,0,0,.26);
+          box-shadow: 0 10px 28px rgba(0,0,0,.30);
+          overflow: hidden;
         }
         .row-action-menu button {
           display: block;
@@ -1618,7 +1623,14 @@ class TuevReminderPanel extends HTMLElement {
           font-size: 14px;
           cursor: pointer;
         }
-        .row-action-menu button:hover { background: var(--secondary-background-color); }
+        .row-action-menu button:hover,
+        .row-action-menu button:focus-visible {
+          background: var(--secondary-background-color);
+          outline: none;
+        }
+        .row-action-menu button[data-row-action="delete"] {
+          color: var(--error-color);
+        }
         .action-sheet-backdrop {
           position: fixed;
           inset: 0;
@@ -1823,7 +1835,8 @@ class TuevReminderPanel extends HTMLElement {
           z-index: 4;
         }
         .row-menu:hover,
-        .row-menu:focus-visible {
+        .row-menu:focus-visible,
+        .menu-open .row-menu {
           background: var(--secondary-background-color);
           color: var(--primary-text-color);
           outline: none;
@@ -2035,6 +2048,10 @@ class TuevReminderPanel extends HTMLElement {
             box-shadow: 0 1px 2px rgba(0,0,0,.08);
           }
           .vehicle-row:hover { background: var(--card-background-color); }
+          .vehicle-row.menu-open {
+            background: var(--secondary-background-color);
+            box-shadow: none;
+          }
           th, td { border-bottom: 0; }
           .vehicle-row td:first-child { border-left: 0; }
           .name-cell {

@@ -14,25 +14,34 @@ required = [
     'class="plate-render-slot"',
     'data-plate-render-slot="text"',
     'data-renderer-state="text"',
+    'class="plate-text-slot"',
     'class="mobile-plate-slot"',
-    '.plate-render-slot {',
-    '.plate-text-slot {',
+    '.plate-render-slot[data-renderer-state="text"] {',
+    'opacity: .92;',
 ]
 for needle in required:
     if needle not in text:
-        raise SystemExit(f"Missing expected r092 marker: {needle}")
+        raise SystemExit(f"Missing expected r092/r089 fallback marker: {needle}")
 
+block_start = text.find('.plate-render-slot[data-renderer-state="text"] {')
+if block_start == -1:
+    raise SystemExit('Missing renderer-state CSS block')
+block_end = text.find('}', block_start)
+block = text[block_start:block_end]
 forbidden = [
-    '<td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack">${this._platePreview(vehicle)}</div></td>',
-    'class="mobile-plate-text"',
+    'border-color: transparent;',
+    'background: transparent;',
+    'border-radius: 0;',
+    'min-height: 0;',
+    'padding: 0;',
 ]
 for needle in forbidden:
-    if needle in text:
-        raise SystemExit(f"Forbidden legacy marker still present: {needle}")
+    if needle in block:
+        raise SystemExit(f"r090 plain fallback simplification must not be present in plate fallback block: {needle}")
 
 if '0.1.0-r092' not in manifest:
     raise SystemExit('manifest version was not bumped to 0.1.0-r092')
 if version != 'r092':
     raise SystemExit(f'REMINDER_VERSION.txt should be r092, got {version!r}')
 
-print("r092 Sidebar renderer-ready plate slot check passed.")
+print("r092 Sidebar r089 fallback preservation check passed.")

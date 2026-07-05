@@ -1,17 +1,76 @@
-# Handover – Reminder r089 Sidebar Renderer-Ready Plate Slot
+# Handover – Reminder r092 Sidebar Row Menu Interaction Polish
 
-r089 is a focused Sidebar UI/internal-structure step on top of r088. The visible output remains intentionally conservative: license plates in the vehicle list are still shown as neutral text. Internally, the right-column area is now a dedicated slot that can later receive the real Card/license-plate renderer once Card detection and renderer reuse are implemented.
+r092 is a focused Sidebar interaction-polish step on top of r091. It does not change Card detection, renderer integration, vehicle payloads or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
 
-## What changed in r089
+## What changed in r092
 
-- Internal version bumped to `0.1.0-r089` / `r089`.
+- Internal version bumped to `0.1.0-r092` / `r092`.
+- Desktop row action menus now apply `menu-open` to the owning vehicle row.
+- Three-dot triggers now include `aria-haspopup="menu"`.
+- Open row/menu trigger, menu-item hover, and keyboard focus states are visually aligned.
+- The delete menu item uses the Home Assistant error color as a destructive hint.
+- r089/r091 plate fallback structure and styling remain preserved.
+
+## Files changed in r092
+
+- `custom_components/tuev_reminder/manifest.json`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `scripts/check_r092_sidebar_row_menu_interaction_polish.py`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `docs/REMINDER_R092_SIDEBAR_ROW_MENU_INTERACTION_POLISH.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R092.md`
+
+## HA smoke test focus
+
+1. Desktop list: open three-dot menu and confirm the row/trigger active state is visible.
+2. Keyboard: tab/focus inside the opened row menu and confirm focus is visible.
+3. Delete: click delete and confirm the existing delete confirmation still appears.
+4. Plate fallback: confirm r089/r091 compact dark text slot remains; do not continue r090 plain text direction.
+
+Continue functional/visual Sidebar work from r092. No release work unless explicitly requested.
+
+# Handover – Reminder r091 Sidebar r089 Plate Fallback Preserved
+
+r091 is a corrective UI direction checkpoint after r090. The desired no-Card-renderer state is the r089 compact dark license-plate text slot. The r090 plain/transparent simplification should not be continued.
+
+## What changed in r091
+
+- Internal version bumped to `0.1.0-r091` / `r091`.
+- Restored/preserved the r089 compact dark text-slot appearance for plate fallback.
+- Kept renderer-ready DOM markers for later Card-renderer mounting.
+- Added a guard check to prevent the r090 transparent/plain fallback CSS from returning accidentally.
+
+## Files changed in r091
+
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `scripts/check_r091_sidebar_r089_fallback_preserved.py`
+
+## Next direction
+
+Continue functional/visual Sidebar work from r091. Treat r089/r091 fallback as the intended no-Card-renderer look until Card detection and real Card renderer reuse are implemented.
+
+---
+
+# Handover – Reminder r091 Sidebar Renderer-Ready Plate Slot
+
+r091 is a focused Sidebar UI/internal-structure step on top of r088. The visible output remains intentionally conservative: license plates in the vehicle list are still shown as neutral text. Internally, the right-column area is now a dedicated slot that can later receive the real Card/license-plate renderer once Card detection and renderer reuse are implemented.
+
+## What changed in r091
+
+- Internal version bumped to `0.1.0-r091` / `r091`.
 - Desktop list now wraps the neutral plate text in `plate-render-slot`.
 - Slot exposes renderer-state attributes for future renderer handoff.
 - Mobile plate fallback is marked consistently as a text fallback slot.
 - No renderer logic was added; no Card detection was added.
 - No fake plate graphic was reintroduced.
 
-## Files changed in r089
+## Files changed in r091
 
 - `custom_components/tuev_reminder/manifest.json`
 - `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
@@ -21,7 +80,7 @@ r089 is a focused Sidebar UI/internal-structure step on top of r088. The visible
 - `HANDOVER.md`
 - `docs/REMINDER_R089_SIDEBAR_RENDERER_READY_PLATE_SLOT.md`
 - `docs/COMPAT_CARD_B355_REMINDER_R089.md`
-- `scripts/check_r089_sidebar_renderer_ready_plate_slot.py`
+- `scripts/check_r091_sidebar_renderer_ready_plate_slot.py`
 
 ## HA test focus
 

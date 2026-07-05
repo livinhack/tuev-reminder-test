@@ -1,24 +1,66 @@
-# TÜV Reminder – r089
+# TÜV Reminder – r092
 
-Current working build: **Reminder r089**. r089 continues Sidebar function/UI work on top of r088 and prepares the vehicle-list license-plate area as a renderer-ready slot. It still shows only neutral text today, but the DOM/CSS is now separated from the displayed text so the real Card renderer can later mount into the same right-column slot without another list-layout refactor.
+Current working build: **Reminder r092**. r092 continues Sidebar UI work from r091. The r089/r091 compact dark license-plate fallback is preserved. This step only polishes row/menu interaction states.
 
-## r089 highlights
+## r092 highlights
 
-- Bumped Reminder version to `0.1.0-r089` / `r089`.
+- Bumped Reminder version to `0.1.0-r092` / `r092`.
+- Open desktop row action menus now mark the owning row with a subtle active state.
+- Three-dot row menu advertises `aria-haspopup="menu"` and remains visually active while its menu is open.
+- Row action menu hover/focus states are aligned; the delete action is visually marked as destructive.
+- The r089/r091 compact dark plate text fallback is intentionally unchanged.
+
+## HA smoke test focus for r092
+
+- Open a desktop three-dot menu: the row and menu trigger should show the open state.
+- Move keyboard focus through the menu: focused menu items should be visible.
+- Delete action should be visually distinguishable but still only open the existing confirmation flow.
+- Confirm that the right license-plate fallback still looks like r089/r091, not the r090 plain text variant.
+
+No release packaging or public-release steps should be inferred from r092. Continue with function and UI improvements until release work is explicitly requested again.
+
+# TÜV Reminder – r091
+
+Current working build: **Reminder r091**. r091 intentionally preserves the r089 compact dark license-plate text fallback for the Sidebar list. The r090 plain/transparent fallback was too reduced and is not the desired direction. If no Card renderer is available, the plate may look exactly like the r089 compact text slot.
+
+## r091 highlights
+
+- Bumped Reminder version to `0.1.0-r091` / `r091`.
+- Preserved the r089 no-renderer fallback look: compact dark plate text slot.
+- Kept the renderer-ready slot structure for later Card-renderer integration.
+- Explicitly did not keep the r090 plain/transparent fallback simplification.
+- No Card detection, no Card renderer, no release work.
+
+## HA smoke test focus for r091
+
+1. Desktop list: right-side license plate should look like the r089 compact dark text slot.
+2. It must not look like a transparent/plain unboxed text-only value.
+3. Mobile list: neutral fallback should remain readable and compact.
+4. Search, status chips, sorting and three-dot actions should remain unchanged.
+
+---
+
+# TÜV Reminder – r091
+
+Current working build: **Reminder r091**. r091 continues Sidebar function/UI work on top of r088 and prepares the vehicle-list license-plate area as a renderer-ready slot. It still shows only neutral text today, but the DOM/CSS is now separated from the displayed text so the real Card renderer can later mount into the same right-column slot without another list-layout refactor.
+
+## r091 highlights
+
+- Bumped Reminder version to `0.1.0-r091` / `r091`.
 - Replaced the plain right-column wrapper with a semantic `plate-render-slot`.
 - Kept the visible fallback neutral: no pseudo-rendered plate, no EU field, no fake Card renderer.
 - Added renderer-state attributes for the later Card-renderer handoff.
 - Mobile list keeps the neutral plate text under the vehicle name, also marked as a text fallback slot.
 - No release work and no Card files changed.
 
-## HA smoke test focus for r089
+## HA smoke test focus for r091
 
 1. Desktop list: right column still shows only neutral plate text, not a fake plate graphic.
 2. Right column alignment: plate text and three-dot menu should still sit consistently.
 3. Mobile list: plate text still appears under the vehicle name.
 4. Search, status chips, sort headers and the mobile action sheet should behave as in r088.
 
-No release packaging or public-release steps should be inferred from r089. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r091. Continue with function and UI improvements until release work is explicitly requested again.
 
 ---
 

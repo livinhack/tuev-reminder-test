@@ -14,8 +14,8 @@ def assert_contains(text: str, needle: str, label: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] in {"0.1.0-r010", "0.1.0-r012", "0.1.0-r014", "0.1.0-r017", "0.1.0-r020", "0.1.0-r028", "0.1.0-r032", "0.1.0-r089"}
-assert read("REMINDER_VERSION.txt").strip() in {"r010", "r012", "r014", "r017", "r020", "r028", "r032", "r075", "r081", "r083", "r089", "r089"}
+assert manifest["version"] in {"0.1.0-r010", "0.1.0-r012", "0.1.0-r014", "0.1.0-r017", "0.1.0-r020", "0.1.0-r028", "0.1.0-r032", "0.1.0-r092"}
+assert read("REMINDER_VERSION.txt").strip() in {"r010", "r012", "r014", "r017", "r020", "r028", "r032", "r075", "r081", "r083", "r092", "r092"}
 
 readme = read("README.md")
 handover = read("HANDOVER.md")

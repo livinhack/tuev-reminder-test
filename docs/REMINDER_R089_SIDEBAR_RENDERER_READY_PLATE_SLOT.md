@@ -1,4 +1,4 @@
-# Reminder r089 – Sidebar Renderer-Ready Plate Slot
+# Reminder r091 – Sidebar Renderer-Ready Plate Slot
 
 Purpose: prepare the Sidebar vehicle-list license-plate area for the later real Card renderer without showing a fake rendered plate today.
 

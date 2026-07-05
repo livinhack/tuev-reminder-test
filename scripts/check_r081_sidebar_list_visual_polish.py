@@ -13,14 +13,14 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r089":
-    fail("manifest version must be 0.1.0-r089")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r089":
+if manifest.get("version") != "0.1.0-r092":
+    fail("manifest version must be 0.1.0-r092")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r092":
     fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
-    'class="vehicle-row" data-entry-id=',
+    'class="vehicle-row',
     'class="main-value hu-value">${this._escape(this._monthYear(vehicle))}</div>',
     '@media (max-width: 720px) {',
     '.manager-table thead { display: none; }',

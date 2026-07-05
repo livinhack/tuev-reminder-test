@@ -1,6 +1,22 @@
-## r089 – Sidebar Renderer-Ready Plate Slot
+## r092 – Sidebar Row Menu Interaction Polish
 
-- Bumped Reminder version to `0.1.0-r089`.
+- Bumped Reminder version to `0.1.0-r092`.
+- Added a subtle open-row state for desktop row action menus.
+- Added `aria-haspopup="menu"` to the three-dot row action trigger.
+- Aligned hover/focus styling for row action menu items.
+- Marked the delete menu item as destructive via existing theme error color.
+- Preserved the r089/r091 compact dark license-plate fallback; r090 plain fallback is still not continued.
+
+## r091 – Sidebar r089 Plate Fallback Preserved
+
+- Bumped Reminder version to `0.1.0-r091`.
+- Rejected the r090 plain/transparent license-plate text fallback and preserved the r089 compact dark text slot as the intended no-Card-renderer state.
+- Kept the renderer-ready slot markers (`plate-render-slot`, `data-plate-render-slot="text"`, `data-renderer-state="text"`) for the later Card-renderer handoff.
+- Did not add Card detection, Card renderer reuse, release workflow changes or public-release work.
+
+## r091 – Sidebar Renderer-Ready Plate Slot
+
+- Bumped Reminder version to `0.1.0-r091`.
 - Changed the list right-column license-plate area from a plain text wrapper to a renderer-ready slot.
 - Added `data-plate-render-slot="text"` and `data-renderer-state="text"` markers for the future Card-renderer integration path.
 - Kept the current UI deliberately neutral: no pseudo-rendered license plate and no Card-rendering logic yet.
