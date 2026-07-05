@@ -1,9 +1,12 @@
-## r080 – Sidebar Search Clear Button
+## r081 – Sidebar List Visual Polish / Mobile Card Layout
 
-- Removed the extra badge-row reset chip again because `Alle` already resets the status filter.
-- Changed the badge-row hit summary to show visible/total matches, making active filtering easier to read.
-- Kept the search toolbar clean: no status dropdown and no manual refresh button were reintroduced.
-- Preserved badge filtering, sortable headers, sticky headers, Create/Edit/Delete, Mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and Reminder/Card separation.
+- Bumped Reminder version to `0.1.0-r081`.
+- Polished the Sidebar vehicle list without reintroducing toolbar clutter.
+- Added colored row accents for expired, due and valid vehicles.
+- Added compact metadata tags under the vehicle name for plate format, plate kind, season and change-plate state.
+- Highlighted the HU month/year value with the matching status tone.
+- Added a mobile card layout below 720px so vehicle rows no longer behave like a compressed desktop table.
+- Kept the r080 search clear **×**, badge filters, sortable headers, Create/Edit/Delete, Mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and Reminder/Card separation.
 - No release-candidate/public-release step added.
 
 ---

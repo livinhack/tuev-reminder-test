@@ -1,19 +1,21 @@
-# TÜV Reminder – r080
+# TÜV Reminder – r081
 
-Current working build: **Reminder r080**. r080 continues normal function/UX development. Release work remains parked; this build refines the status-badge filter row after the redundant toolbar controls were removed in r078.
+Current working build: **Reminder r081**. r081 continues function/UX development on top of r080. Release work remains parked; this build polishes the Sidebar vehicle list and adds a more robust mobile card layout.
 
-## r080 highlights
+## r081 highlights
 
-- Keeps the toolbar reduced to the search field only.
+- Keeps the toolbar reduced to the search field only, including the r080 clear **×** inside the search input.
 - Keeps status filtering on the badges/chips: Alle, Abgelaufen, Fällig and Gültig.
-- Removes the extra badge-row reset chip again; the **Alle** badge remains the status-filter reset.
-- Shows visible/total matches as `Treffer/gesamt`, so filtering feedback is clearer.
-- Keeps sticky table headers, sortable columns, Create/Edit/Delete, mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive behavior.
-- Keeps the Reminder/Card boundary strict: the Sidebar manages Reminder entities only; the Card remains a separate Lovelace/dashboard project.
+- Adds visual row status accents for expired, due and valid vehicles.
+- Shows plate-format/kind/season/change-plate metadata as compact tags under the vehicle name.
+- Makes the HU value more prominent and status-colored.
+- Converts the narrow/mobile list into card-like rows instead of a squeezed table.
+- Shortens the long technical status line while preserving the important Sidebar capability markers.
+- Keeps Create/Edit/Delete, Mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and Reminder/Card separation unchanged.
 
 ## Current development note
 
-No release packaging or public-release steps should be inferred from r080. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r081. Continue with function and UI improvements until release work is explicitly requested again.
 
 ---
 

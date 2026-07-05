@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r080 sidebar search/badge control cleanup."""
+"""Validate r081 sidebar search/badge control cleanup."""
 from __future__ import annotations
 
 import json
@@ -14,10 +14,10 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r080":
-    fail("manifest version must be 0.1.0-r080")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r080":
-    fail("REMINDER_VERSION must be r080")
+if manifest.get("version") != "0.1.0-r081":
+    fail("manifest version must be 0.1.0-r081")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r081":
+    fail("REMINDER_VERSION must be r081")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
@@ -30,7 +30,7 @@ required = [
 ]
 for needle in required:
     if needle not in panel:
-        fail(f"missing r080 sidebar control marker: {needle}")
+        fail(f"missing r081 sidebar control marker: {needle}")
 
 for forbidden in [
     'id="status-filter"',
@@ -45,6 +45,6 @@ for forbidden in [
         fail(f"obsolete toolbar control still present: {forbidden}")
 
 if 'grid-template-columns: minmax(240px, 1fr);' not in panel:
-    fail("toolbar must be a single search-column grid in r080")
+    fail("toolbar must be a single search-column grid in r081")
 
-print("r080 sidebar search/badge controls check passed")
+print("r081 sidebar search/badge controls check passed")

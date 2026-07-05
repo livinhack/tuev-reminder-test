@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r080 Sidebar UX structure bundle."""
+"""Validate r081 Sidebar UX structure bundle."""
 from __future__ import annotations
 
 import json
@@ -26,8 +26,8 @@ changelog = read("CHANGELOG.md")
 doc = read("docs/REMINDER_R076_SIDEBAR_UX_STRUCTURE_BUNDLE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R076.md")
 
-require(manifest["version"] == "0.1.0-r080", "manifest version must be r080")
-require(version == "r080", "REMINDER_VERSION must be r080")
+require(manifest["version"] == "0.1.0-r081", "manifest version must be r081")
+require(version == "r081", "REMINDER_VERSION must be r081")
 
 for marker in [
     "form-stack fields-stack",
@@ -40,7 +40,7 @@ for marker in [
     "tbody tr:hover td:first-child",
     "color-mix(in srgb, var(--error-color)",
 ]:
-    require(marker in frontend, f"missing r080 UI marker: {marker}")
+    require(marker in frontend, f"missing r081 UI marker: {marker}")
 
 for preserved in [
     "tuev_reminder/manager/vehicles/create",
@@ -59,10 +59,10 @@ for forbidden in [
 ]:
     require(forbidden not in frontend, f"Reminder frontend must not import/use Card code: {forbidden}")
 
-require("Reminder r080" in readme, "README must describe r080")
-require("Sidebar UX Structure Bundle" in handover, "HANDOVER must describe r080")
+require("Reminder r081" in readme, "README must describe r081")
+require("Sidebar UX Structure Bundle" in handover, "HANDOVER must describe r081")
 require("Sidebar UX Structure Bundle" in changelog, "CHANGELOG must retain Sidebar UX Structure Bundle entry")
-require("No release flow" in doc, "r080 doc must explicitly avoid release scope")
+require("No release flow" in doc, "r081 doc must explicitly avoid release scope")
 require("Card remains a separate" in compat, "compat doc must preserve Card separation")
 
-print("r080 Sidebar UX structure bundle checks passed")
+print("r081 Sidebar UX structure bundle checks passed")

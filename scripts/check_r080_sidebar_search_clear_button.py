@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r080 sidebar search clear button and badge-row reset cleanup."""
+"""Validate r081 sidebar search clear button and badge-row reset cleanup."""
 from __future__ import annotations
 
 import json
@@ -13,10 +13,10 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r080":
-    fail("manifest version must be 0.1.0-r080")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r080":
-    fail("REMINDER_VERSION must be r080")
+if manifest.get("version") != "0.1.0-r081":
+    fail("manifest version must be 0.1.0-r081")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r081":
+    fail("REMINDER_VERSION must be r081")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
@@ -29,7 +29,7 @@ required = [
 ]
 for needle in required:
     if needle not in panel:
-        fail(f"missing r080 search clear marker: {needle}")
+        fail(f"missing r081 search clear marker: {needle}")
 
 for forbidden in [
     'class="filter-reset-chip"',
@@ -45,4 +45,4 @@ for forbidden in [
     if forbidden in panel:
         fail(f"obsolete toolbar/reset control present: {forbidden}")
 
-print("r080 sidebar search clear button check passed")
+print("r081 sidebar search clear button check passed")

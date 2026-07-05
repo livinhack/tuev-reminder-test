@@ -1,36 +1,39 @@
-# Handover – Reminder r080 Sidebar Search Clear Button
+# Handover – Reminder r081 Sidebar List Visual Polish / Mobile Card Layout
 
 ## Purpose
 
-r080 is a bundled Sidebar UI refinement after r078. It keeps the cleaned search toolbar and improves the badge/chip filter area so users can see and clear active filters without adding controls back beside the search field. It is not a release step.
+r081 is a bundled Sidebar UI polish step after r080. It keeps the cleaned search/badge controls and improves the actual vehicle list: clearer status hierarchy, compact metadata, and a proper card-like layout on narrow screens. It is not a release step.
 
-## What changed in r080
+## What changed in r081
 
 - The toolbar still contains only the search input.
+- The search input keeps the right-side **×** clear button from r080.
 - Status filtering remains badge/chip based:
   - Alle
   - Abgelaufen
   - Fällig
   - Gültig
 - No extra `Filter zurücksetzen` chip is shown in the badge row; the `Alle` badge remains the status-filter reset.
-- The badge-row summary now shows visible/total matches, for example `2/5 Treffer`.
-- Existing sorting via table headers remains unchanged.
+- Vehicle rows now get status-colored left accents.
+- HU month/year is visually emphasized and status-colored.
+- Vehicle metadata is shown as compact tags below the name.
+- Below 720px width, the list becomes card-like rows instead of a squeezed table.
 - Create/Edit/Delete, mobile action sheet, dirty guard, duplicate checks and payload scrub remain unchanged.
 - No Card code was imported or copied into the Reminder repo.
 
 ## Test focus for HA
 
 1. Open the Sidebar page on desktop.
-2. Confirm the toolbar still has only the search field.
-3. Enter search text and confirm `Filter zurücksetzen` appears in the badge row.
-4. Click a status badge and confirm the visible/total hit count changes.
-5. Click `Filter zurücksetzen` and confirm search text and status return to default.
-6. Confirm sorting via headers still works after using and resetting filters.
-7. On smartphone, confirm the badge row wraps cleanly and the mobile Action Sheet still opens.
+2. Confirm the toolbar still has only the search field and the search **×** appears only when search text exists.
+3. Confirm status badges still filter correctly and `Alle` resets the status filter.
+4. Confirm expired/due/valid rows show distinct left status accents.
+5. Confirm the vehicle metadata tags appear below the vehicle name.
+6. Confirm sorting via headers still works after using search and badges.
+7. On smartphone/narrow viewport, confirm the vehicle list appears as card-like rows and the three-dot Mobile Action Sheet still opens.
 
 ## Next likely bundled direction
 
-A useful next bundled step would be table/list density polish or form field hints/defaults, not release work.
+A useful next bundled step would be list interaction polish, form-field guidance/defaults, or sidebar detail density—not release work.
 
 ---
 
