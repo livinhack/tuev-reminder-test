@@ -1,4 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -257,7 +258,7 @@ class TuevReminderPanel extends HTMLElement {
         ${this._statusChip("Abgelaufen", "expired", counts.expired || 0)}
         ${this._statusChip("Fällig", "due", counts.due || 0)}
         ${this._statusChip("Gültig", "valid", counts.valid || 0)}
-        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer · <strong>${this._escape(urgent)}</strong> fällig/abgelaufen</span>
+        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer</span>
       </div>
     `;
   }
@@ -409,6 +410,32 @@ class TuevReminderPanel extends HTMLElement {
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._renderPreservingListUiState();
+  }
+
+  _clearSearchFilter() {
+    this._filter = "";
+    this._openMenuIndex = null;
+    this._openMenuEntryId = null;
+    this._renderPreservingListUiState();
+  }
+
+  _emptyFilterStateHtml() {
+    const rawFilter = String(this._filter || "").trim();
+    const statusActive = this._statusFilter !== "all";
+    const statusLabel = statusActive ? this._statusLabel(this._statusFilter) : "";
+    const title = rawFilter ? `Keine Treffer für „${this._escape(rawFilter)}“` : `Keine Fahrzeuge mit Status „${this._escape(statusLabel)}“`;
+    const hint = rawFilter && statusActive
+      ? "Suche und Statusfilter schränken die Liste gemeinsam ein. Lösche die Suche oder wähle oben den Chip „Alle“."
+      : rawFilter
+        ? "Lösche die Suche oder passe den Suchbegriff an."
+        : "Wähle oben den Chip „Alle“, um wieder alle Fahrzeuge zu sehen.";
+    return `
+      <div class="state state-card filter-empty-state">
+        <strong>${title}</strong>
+        <p>${this._escape(hint)}</p>
+        ${rawFilter ? `<button type="button" class="ghost" id="clear-empty-search">Suche leeren</button>` : ""}
+      </div>
+    `;
   }
 
   _platePreviewFromText(text, options = {}) {
@@ -983,13 +1010,7 @@ class TuevReminderPanel extends HTMLElement {
 
     const vehicles = this._visibleVehicles();
     if (!vehicles.length) {
-      return `
-        <div class="state state-card muted">
-          <strong>Keine Treffer</strong>
-          <p>Keine Fahrzeuge passen zur aktuellen Suche oder zum Statusfilter.</p>
-          ${this._filtersActive() ? `<button type="button" class="ghost" id="clear-filters">Filter zurücksetzen</button>` : ""}
-        </div>
-      `;
+      return this._emptyFilterStateHtml();
     }
 
     return `
@@ -1283,6 +1304,7 @@ class TuevReminderPanel extends HTMLElement {
     const counts = this._statusCounts();
     const visibleCount = this._visibleVehicles().length;
     const listMode = true;
+    const showListAddRows = listMode && vehicleCount > 0;
     const formOpen = this._view !== "list";
     const actionSheetOpen = this._view === "list" && Boolean(this._actionSheetVehicle);
 
@@ -1325,13 +1347,18 @@ class TuevReminderPanel extends HTMLElement {
         h3 { margin: 18px 0 10px; font-size: 14px; font-weight: 600; color: var(--secondary-text-color); text-transform: uppercase; letter-spacing: .04em; }
         h3:first-child { margin-top: 0; }
         .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
-        .toolbar {
+        .list-controls {
           display: ${listMode ? "grid" : "none"};
-          grid-template-columns: minmax(240px, 1fr);
-          gap: 8px;
+          grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+          align-items: center;
+          gap: 10px 14px;
           padding: 10px 16px;
           border-bottom: 1px solid var(--divider-color);
           background: var(--secondary-background-color);
+        }
+        .toolbar {
+          display: block;
+          min-width: 0;
         }
         .search-wrap { position: relative; min-width: 0; }
         .search-icon {
@@ -1415,7 +1442,7 @@ class TuevReminderPanel extends HTMLElement {
           box-shadow: none;
         }
         .list-add-row {
-          display: ${listMode ? "flex" : "none"};
+          display: ${showListAddRows ? "flex" : "none"};
           align-items: center;
           justify-content: flex-end;
           padding: 10px 16px;
@@ -1435,31 +1462,29 @@ class TuevReminderPanel extends HTMLElement {
           white-space: nowrap;
         }
         .summary-strip {
-          display: ${listMode ? "grid" : "none"};
-          gap: 8px;
-          padding: 10px 16px;
+          display: block;
+          min-width: 0;
           color: var(--secondary-text-color);
           font-size: 13px;
-          border-bottom: 1px solid var(--divider-color);
         }
         .summary-strip strong { color: var(--primary-text-color); font-weight: 600; }
         .summary-chip-row {
           display: flex;
           align-items: center;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 6px;
           min-width: 0;
         }
         .status-filter-chip {
-          min-height: 32px;
+          min-height: 30px;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 7px;
           border: 1px solid var(--divider-color);
           border-radius: 999px;
           background: var(--card-background-color);
           color: var(--primary-text-color);
-          padding: 0 10px;
+          padding: 0 9px;
           font: inherit;
           cursor: pointer;
         }
@@ -1799,6 +1824,17 @@ class TuevReminderPanel extends HTMLElement {
           max-width: 560px;
           line-height: 1.45;
         }
+        .filter-empty-state {
+          margin: 18px 16px;
+          padding: 18px;
+          border: 1px dashed var(--divider-color);
+          border-radius: 12px;
+          background: var(--card-background-color);
+        }
+        .filter-empty-state p {
+          max-width: 640px;
+          line-height: 1.45;
+        }
         button.empty-create {
           width: 48px;
           height: 48px;
@@ -1878,18 +1914,16 @@ class TuevReminderPanel extends HTMLElement {
         .validation.ok { color: var(--success-color, var(--primary-color)); }
         .note { color: var(--secondary-text-color); font-size: 12px; line-height: 1.45; }
         @media (max-width: 980px) {
-          .toolbar { grid-template-columns: 1fr; }
+          .list-controls { grid-template-columns: 1fr; gap: 8px; padding-left: 10px; padding-right: 10px; }
           select { width: 100%; }
-          .summary-strip { gap: 8px; padding-left: 10px; padding-right: 10px; }
           .summary-chip-row { gap: 6px; }
           .status-filter-chip { min-height: 30px; padding: 0 8px; font-size: 12px; }
-          .summary-info { flex-basis: 100%; }
+          .summary-info { margin-left: 0; flex-basis: 100%; }
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 1100px) {
-          .toolbar { padding: 8px 10px; }
-          .summary-strip { padding: 8px 10px; }
+          .list-controls { padding: 8px 10px; }
           .list-add-row { padding: 8px 10px; }
           .list-shell { overflow-x: hidden; width: 100%; }
           .manager-table {
@@ -2131,17 +2165,17 @@ class TuevReminderPanel extends HTMLElement {
           <div class="version">API v${this._escape(apiVersion)} · ${this._escape(writeApi)}</div>
         </header>
 
-        <section class="toolbar" aria-label="Fahrzeugliste filtern und sortieren">
-          <div class="search-wrap">
-            <span class="search-icon">⌕</span>
-            <input id="filter" type="search" placeholder="Suchen" value="${this._escape(this._filter)}">
-            <button type="button" class="search-clear" id="clear-search" title="Suche leeren" aria-label="Suche leeren" ${String(this._filter || "").trim() ? "" : "hidden"}>×</button>
+        <section class="list-controls" aria-label="Fahrzeugliste filtern und sortieren">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">⌕</span>
+              <input id="filter" type="search" placeholder="Suchen" value="${this._escape(this._filter)}">
+              <button type="button" class="search-clear" id="clear-search" title="Suche leeren" aria-label="Suche leeren" ${String(this._filter || "").trim() ? "" : "hidden"}>×</button>
+            </div>
           </div>
-        </section>
-
-        <section class="summary-strip" aria-label="Manager Status">
-          ${this._summaryChips(counts, visibleCount)}
-          <span class="summary-detail">Sidebar-Manager · Create/Edit/Delete aktiv · Duplicate-Schutz · lokale Duplicate-Prüfung · frische Edit/Delete-Daten · Dirty-Guard · Responsive Tabelle · lokale Formularvalidierung auf Backend-Regeln abgestimmt · Mobile-Action-Sheet · nur Drei-Punkte-Menü öffnet Aktionen · sortierbare Spalten · First-Run-Leerzustand · mobile Kartenansicht · keine Card-Funktionen</span>
+          <div class="summary-strip" aria-label="Status Schnellfilter">
+            ${this._summaryChips(counts, visibleCount)}
+          </div>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -2179,16 +2213,11 @@ class TuevReminderPanel extends HTMLElement {
 
     const clearSearchButton = this.shadowRoot.querySelector("#clear-search");
     if (clearSearchButton) {
-      clearSearchButton.addEventListener("click", () => {
-        this._filter = "";
-        this._openMenuIndex = null;
-        this._openMenuEntryId = null;
-        this._renderPreservingListUiState();
-      });
+      clearSearchButton.addEventListener("click", () => this._clearSearchFilter());
     }
 
-    this.shadowRoot.querySelectorAll("#clear-filters").forEach((button) => {
-      button.addEventListener("click", () => this._resetListFilters());
+    this.shadowRoot.querySelectorAll("#clear-empty-search").forEach((button) => {
+      button.addEventListener("click", () => this._clearSearchFilter());
     });
 
     this.shadowRoot.querySelectorAll("button[data-status-chip]").forEach((button) => {

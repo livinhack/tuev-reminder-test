@@ -22,7 +22,7 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r085"', "manifest r014 version")
+assert_contains(manifest, '"version": "0.1.0-r087"', "manifest r014 version")
 
 for needle in [
     'PLATE_FORMAT_SINGLE_LINE = "single_line"',

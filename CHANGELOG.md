@@ -1,3 +1,21 @@
+## r087 – Sidebar Empty/Search State Polish
+
+- Bumped Reminder version to `0.1.0-r087`.
+- Added a dedicated filtered-empty renderer that explains search misses and status-only empty filters separately.
+- Added **Suche leeren** only inside the filtered-empty search state; status reset remains the existing **Alle** chip.
+- Hid top/bottom add rows while there are no vehicles so the first-run empty card has a single create action.
+- Kept r086 compact controls, search clear X, status chips, row menu and mobile action sheet behavior.
+- No Card files and no release workflow changes.
+
+## r086 – Sidebar Compact List Controls
+
+- Bumped Reminder version to `0.1.0-r086`.
+- Consolidated search field, status chips and hit counter into one compact list-controls band.
+- Kept chip-only status filtering and the in-field search clear `×`.
+- Removed the visible verbose Sidebar capability summary from the normal list UI.
+- Preserved the deduplicated list model: no meta line, no left status stripe, no HU status coloring.
+- No release or Card files changed.
+
 ## r085 – Sidebar Right Column Alignment
 
 - Aligns the desktop right side of the Sidebar vehicle list.

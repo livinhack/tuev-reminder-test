@@ -1,3 +1,42 @@
+# TÜV Reminder – r087
+
+Current working build: **Reminder r087**. r087 continues Sidebar function/UI work on top of r086 and focuses on empty/search states: the first-run view no longer competes with extra add rows, filtered-empty states explain the active constraint, and search can be cleared directly from that empty state without introducing another global reset chip.
+
+## r087 highlights
+
+- Bumped Reminder version to `0.1.0-r087` / `r087`.
+- First-run empty state keeps the centered plus button as the single create affordance when no vehicles exist.
+- Top/bottom plus rows are hidden while the vehicle list is truly empty.
+- Filtered-empty state now distinguishes search misses from status-only empty filters.
+- Search-empty state offers **Suche leeren**; status reset remains intentionally handled by the existing **Alle** status chip.
+- No Card files and no release workflow changes.
+
+## HA smoke test focus for r087
+
+1. Empty installation/no vehicles: only the centered first-run plus should be visible, not additional top/bottom plus rows.
+2. Search with no matches: empty state should mention the search term and offer **Suche leeren**.
+3. Status filter with no matches: empty state should point to the **Alle** chip instead of adding a second reset control.
+4. Search + status filter with no matches: clearing search must keep the active status chip unchanged.
+5. Existing list controls, row menu and mobile action sheet should behave as in r086.
+
+No release packaging or public-release steps should be inferred from r087. Continue with function and UI improvements until release work is explicitly requested again.
+
+
+Current working build: **Reminder r086**. r086 continues Sidebar function/UI work on top of r085 and consolidates the list controls into one compact control band. The search field, status chips and hit counter now belong together visually; the verbose technical manager detail line is hidden from the normal list view.
+
+## r086 highlights
+
+- Search field and status chips now share one compact control strip.
+- Status filtering remains on the chips only: Alle, Abgelaufen, Fällig and Gültig.
+- The search clear **×** remains inside the search field.
+- The hit counter is reduced to the essential visible/total count.
+- The verbose internal Sidebar capability text is no longer shown in the normal UI.
+- No dropdown, no refresh button, no extra reset chip, no release work.
+
+Compatibility baseline remains Card b355 for the Reminder bridge line. The detached calendar entity `calendar.tuev_reminder` and `reminder_offset_days` behavior are preserved.
+
+No release packaging or public-release steps should be inferred from r086. Continue with function and UI improvements until release work is explicitly requested again.
+
 # TÜV Reminder – r085
 
 Current working build: **Reminder r085**. r085 continues Sidebar function/UI work on top of r083 and compacts the vehicle list after the meta line removal. The list keeps the reduced information model and tightens row spacing/vertical alignment for desktop, tablet and mobile layouts.

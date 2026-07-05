@@ -11,8 +11,8 @@ def read(relative: str) -> str:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r085"
-assert read("REMINDER_VERSION.txt").strip() == "r085"
+assert manifest["version"] == "0.1.0-r087"
+assert read("REMINDER_VERSION.txt").strip() == "r087"
 
 panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 assert "Noch keine Fahrzeuge" in panel
@@ -21,17 +21,17 @@ assert "empty-create" in panel
 assert 'data-create-trigger="empty"' in panel
 assert "Lege dein erstes Fahrzeug an" in panel
 assert "Keine Treffer" in panel
-assert "Filter zurücksetzen" in panel
-assert 'id="clear-filters"' in panel
-assert "sortierbare Spalten · First-Run-Leerzustand" in panel
+assert "Suche leeren" in panel
+assert 'id="clear-empty-search"' in panel
+assert "filter-empty-state" in panel
 
 readme = read("README.md")
 handover = read("HANDOVER.md")
 doc = read("docs/REMINDER_R072_SIDEBAR_FIRST_RUN_EMPTY_STATE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R072.md")
 
-assert "Reminder r073" in readme
-assert "Sidebar First-Run Empty State" in handover
+assert "Reminder r087" in readme
+assert "Sidebar Empty/Search State Polish" in handover
 assert "Noch keine Fahrzeuge" in doc
 assert "Card remains a separate" in compat
 

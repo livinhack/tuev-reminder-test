@@ -18,8 +18,8 @@ def assert_not_contains(text: str, needle: str, label: str) -> None:
         raise AssertionError(f"Unexpected {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r085"
-assert read("REMINDER_VERSION.txt").strip() == "r085"
+assert manifest["version"] == "0.1.0-r087"
+assert read("REMINDER_VERSION.txt").strip() == "r087"
 
 calendar = read("custom_components/tuev_reminder/calendar.py")
 readme = read("README.md")

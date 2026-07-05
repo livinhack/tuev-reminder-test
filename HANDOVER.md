@@ -1,3 +1,72 @@
+# Handover – Reminder r087 Sidebar Empty/Search State Polish
+
+r087 is a focused Sidebar UI step on top of r086. It does not change the data model, Manager API or Card bridge. The purpose is to make empty and no-result states more precise without reintroducing duplicate reset controls.
+
+## What changed in r087
+
+- Internal version bumped to `0.1.0-r087` / `r087`.
+- First-run/no-vehicle state now owns the create action; top/bottom list add rows are hidden while the list is truly empty.
+- Filtered-empty rendering now distinguishes:
+  - search text with no results,
+  - status filter with no vehicles in that bucket,
+  - combined search + status constraints.
+- The filtered-empty state offers **Suche leeren** only when search text is active.
+- Status reset remains intentionally handled by the existing **Alle** status chip, not by an additional reset chip/button.
+- r086 compact list controls, search X, status chips, table alignment and mobile action sheet remain in place.
+
+## Files changed in r087
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `docs/REMINDER_R087_SIDEBAR_EMPTY_SEARCH_STATE_POLISH.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R087.md`
+- `scripts/check_r087_sidebar_empty_search_state_polish.py`
+
+## HA test focus
+
+1. With no vehicles configured, only the centered empty card plus should be visible.
+2. With vehicles present, search for a non-existing term and use **Suche leeren** in the empty state.
+3. Select a status chip whose count is zero; the hint should refer to **Alle** rather than showing a duplicate reset control.
+4. Use search + status together; clearing search must not reset the active status chip.
+5. Confirm row menus and mobile action sheet still work.
+
+# Handover – Reminder r086 Sidebar Compact List Controls
+
+r086 is a focused Sidebar layout step on top of r085. It does not add data model changes or release work. The purpose is to make the upper list controls quieter: search, status chips and hit counter are one control group instead of separate stacked UI areas.
+
+## What changed in r086
+
+- Internal version bumped to `0.1.0-r086` / `r086`.
+- Introduced one `.list-controls` band for the search field and status quick filters.
+- Kept the r080 search clear `×` inside the search field.
+- Kept status reset through the `Alle` chip.
+- Reduced the hit counter text to `sichtbar/gesamt Treffer`.
+- Hid the verbose technical Sidebar capability summary from the normal UI.
+
+## Preserved behavior
+
+- No status dropdown and no refresh button.
+- No extra reset chip.
+- No meta/tag line under the vehicle name.
+- No left status stripe and no HU status color.
+- Status remains only in the status badge.
+- Existing create/edit/delete, duplicate checks, dirty guard, mobile action sheet and sortable columns remain unchanged.
+- Card b355 bridge compatibility, `calendar.tuev_reminder` and `reminder_offset_days` remain unchanged.
+- No Card files changed.
+- No release steps.
+
+## HA test focus
+
+- Desktop: search field and chips should read as one compact control row.
+- Narrow/tablet: controls should stack cleanly without horizontal overflow.
+- Search: entering text should show the `×`; clicking it should clear only the search text.
+- Status chips: `Alle` should reset status, other chips should filter normally.
+- Confirm the verbose technical summary line is not visible in the normal list view.
+
 # Handover – Reminder r085 Sidebar List Compact Alignment
 
 r085 is a focused Sidebar layout polish step on top of r083. It does not add new data, controls or release work. The purpose is to make the list visually match the r083 information model: once the meta/tag line is gone, desktop rows and mobile cards should be tighter and more consistently aligned.
