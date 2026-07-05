@@ -1,3 +1,34 @@
+# Handover – Reminder r085 Sidebar List Compact Alignment
+
+r085 is a focused Sidebar layout polish step on top of r083. It does not add new data, controls or release work. The purpose is to make the list visually match the r083 information model: once the meta/tag line is gone, desktop rows and mobile cards should be tighter and more consistently aligned.
+
+## What changed in r085
+
+- Internal version bumped to `0.1.0-r085` / `r085`.
+- Default table cell padding reduced.
+- Vehicle titles are single-line with ellipsis to avoid accidental taller rows.
+- Narrow/tablet table spacing tightened.
+- Mobile card spacing tightened; mobile plate fallback line reduced slightly.
+
+## Preserved behavior
+
+- Status remains only in the status badge.
+- HU remains neutral.
+- No left status stripe.
+- No meta/tag line under the vehicle name.
+- Search clear `×` from r080 remains.
+- Badge filters remain.
+- Existing create/edit/delete and mobile action-sheet behavior remains unchanged.
+- No Card files changed.
+- No release steps.
+
+## HA test focus
+
+- Desktop list should now feel more compact after the removed second line.
+- Long vehicle names should truncate rather than increase row height.
+- Smartphone cards should be slightly tighter while the three-dot action remains tappable.
+- Confirm no meta/tag line, status stripe or HU color came back.
+
 # Handover – Reminder r083 Sidebar Meta Line Removal
 
 ## Status
@@ -1761,3 +1792,8 @@ Reminder r054
 # Preserved r066 – Sidebar Form Payload Scrub
 
 - Hidden or inactive fields remain scrubbed before validation, dirty checks and save payload creation.
+
+
+## r085 – Sidebar Right Column Alignment
+
+Next work starts from r085. The Sidebar list right side was tightened: plate preview is wrapped/aligned to the right, its column is narrower, and the three-dot action column is centered. No Card renderer detection was added.

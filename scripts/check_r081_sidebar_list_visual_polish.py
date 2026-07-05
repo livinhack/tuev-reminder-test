@@ -13,10 +13,10 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r083":
-    fail("manifest version must be 0.1.0-r083")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r083":
-    fail("REMINDER_VERSION must be r083")
+if manifest.get("version") != "0.1.0-r085":
+    fail("manifest version must be 0.1.0-r085")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r085":
+    fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
@@ -25,7 +25,7 @@ required = [
     '@media (max-width: 720px) {',
     '.manager-table thead { display: none; }',
     '.vehicle-row {',
-    'grid-template-columns: 96px minmax(0, 1fr);',
+    'grid-template-columns: 82px minmax(0, 1fr);',
     'mobile Kartenansicht',
 ]
 for needle in required:

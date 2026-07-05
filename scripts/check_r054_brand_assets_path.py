@@ -21,8 +21,8 @@ def assert_file(relative: str) -> None:
 
 manifest = read_json("custom_components/tuev_reminder/manifest.json")
 assert manifest["domain"] == DOMAIN
-assert manifest["version"] == "0.1.0-r083"
-assert (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() == "r083"
+assert manifest["version"] == "0.1.0-r085"
+assert (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() == "r085"
 
 # HA 2026.3+ local brands proxy expects brand assets inside the integration directory:
 # custom_components/<domain>/brand/icon.png and logo.png

@@ -13,16 +13,17 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r083":
-    fail("manifest version must be 0.1.0-r083")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r083":
-    fail("REMINDER_VERSION must be r083")
+if manifest.get("version") != "0.1.0-r085":
+    fail("manifest version must be 0.1.0-r085")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r085":
+    fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
     'class="main-value hu-value">${this._escape(this._monthYear(vehicle))}</div>',
     'class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span>',
-    'class="preview-cell" data-label="Kennzeichen">${this._platePreview(vehicle)}</td>',
+    'class="preview-cell" data-label="Kennzeichen">',
+    '${this._platePreview(vehicle)}',
     'class="vehicle-row" data-entry-id=',
 ]
 for needle in required:

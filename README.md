@@ -1,3 +1,16 @@
+# TÜV Reminder – r085
+
+Current working build: **Reminder r085**. r085 continues Sidebar function/UI work on top of r083 and compacts the vehicle list after the meta line removal. The list keeps the reduced information model and tightens row spacing/vertical alignment for desktop, tablet and mobile layouts.
+
+## r085 highlights
+
+- Vehicle rows are more compact after the meta/tag line removal.
+- Vehicle names stay one-line with ellipsis instead of increasing row height.
+- Narrow/tablet and mobile card spacing is tightened.
+- Status remains only in the status badge; HU remains neutral; no meta/tag line is shown.
+
+No release packaging or public-release steps should be inferred from r085. Continue with function and UI improvements until release work is explicitly requested again.
+
 # TÜV Reminder – r083
 
 Current working build: **Reminder r083**. r083 continues Sidebar function/UI work on top of r082 and removes the vehicle meta line completely from the list. The list now shows only the vehicle name, HU, reminder date, status badge, plate preview and row actions.
@@ -822,3 +835,8 @@ Reminder r054
 - Kennzeichen-Vorschau wird auf kleinen Displays ausgeblendet, Kennzeichentext erscheint kompakt unter dem Namen.
 - Auf sehr schmalen Displays wird die Erinnerungsspalte ausgeblendet, damit das Drei-Punkte-Menü erreichbar bleibt.
 - Keine Card-Vermischung; Create/Update/Delete/Dirty-Guard bleiben erhalten.
+
+
+### Reminder r085 – Sidebar Right Column Alignment
+
+Sidebar list polish: the right plate preview/action area is now more stable and compact. The list still avoids duplicated meta/status information. Card-aware renderer detection remains future work.

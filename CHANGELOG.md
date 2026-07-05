@@ -1,3 +1,17 @@
+## r085 – Sidebar Right Column Alignment
+
+- Aligns the desktop right side of the Sidebar vehicle list.
+- Uses fixed table layout, a narrower temporary plate preview column and a centered action column.
+- Keeps prior deduplication: no meta line, no left status line, no HU status coloring.
+
+## r085 – Sidebar List Compact Alignment
+
+- Bumped Reminder version to `0.1.0-r085`.
+- Compacted Sidebar vehicle rows after the r083 meta-line removal.
+- Kept vehicle names single-line with ellipsis to prevent row-height jumps.
+- Tightened narrow/tablet and mobile card spacing.
+- Preserved the reduced information model: no left status stripe, no HU status color, no meta/tag line.
+
 ## r083 – Sidebar Meta Line Removal
 
 - Bumped Reminder version to `0.1.0-r083`.
