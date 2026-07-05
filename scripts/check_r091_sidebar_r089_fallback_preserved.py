@@ -39,9 +39,9 @@ for needle in forbidden:
     if needle in block:
         raise SystemExit(f"r090 plain fallback simplification must not be present in plate fallback block: {needle}")
 
-if '0.1.0-r099' not in manifest:
-    raise SystemExit('manifest version was not bumped to 0.1.0-r099')
-if version != 'r099':
+if '0.1.0-r100' not in manifest:
+    raise SystemExit('manifest version was not bumped to 0.1.0-r100')
+if version != 'r100':
     raise SystemExit(f'REMINDER_VERSION.txt should be r095, got {version!r}')
 
 print("r093 Sidebar r089 fallback preservation check passed.")

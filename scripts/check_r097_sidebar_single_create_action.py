@@ -12,14 +12,14 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r099 sidebar single create action check failed: {message}")
+    raise SystemExit(f"r097 sidebar single create action check failed: {message}")
 
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r099":
-        fail("manifest version must be 0.1.0-r099")
-    if VERSION.read_text(encoding="utf-8").strip() != "r099":
+    if manifest.get("version") != "0.1.0-r100":
+        fail("manifest version must be 0.1.0-r100")
+    if VERSION.read_text(encoding="utf-8").strip() != "r100":
         fail("REMINDER_VERSION.txt must be r097")
 
     panel = PANEL.read_text(encoding="utf-8")
@@ -49,7 +49,7 @@ def main() -> None:
         if needle in panel:
             fail(f"must not contain {needle!r}")
 
-    print("r099 sidebar single create action check OK")
+    print("r097 sidebar single create action check OK")
 
 
 if __name__ == "__main__":

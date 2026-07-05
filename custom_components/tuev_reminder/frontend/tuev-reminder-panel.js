@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -1262,7 +1262,6 @@ class TuevReminderPanel extends HTMLElement {
                 </div>
               `}
             </section>
-
           </div>
 
           <div class="form-side-stack">
@@ -1283,30 +1282,30 @@ class TuevReminderPanel extends HTMLElement {
                 <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
                 <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
               </dl>
+              <div class="validation ${errors.length ? "has-errors" : "ok"}">
+                ${this._validationHtml(errors)}
+              </div>
+              <p class="note">Die Sidebar verwaltet nur Reminder-Daten. Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Dashboard-Card bleibt ein getrenntes Projekt und liest danach die aktualisierten Entities/Attribute.</p>
+              <div class="form-actions modal-bottom-actions">
+                ${isDetail
+                  ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
+                  : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
+                <button class="ghost" id="back-to-list">Schließen</button>
+              </div>
             </aside>
             ${seasonal ? `
-              <section class="form-card inline-season-section season-below-overview" aria-label="Saisonzeitraum">
-                <div class="section-head compact-section-head">
+              <section class="form-card form-section side-season-card" aria-label="Saisonzeitraum">
+                <div class="section-head">
                   <span class="section-kicker">Saison</span>
                   <h3>Saisonzeitraum</h3>
+                  <p>Mindestens 2 und höchstens 11 Monate; Übergang über den Jahreswechsel ist möglich.</p>
                 </div>
-                <div class="field-pair compact-season-fields">
+                <div class="field-pair">
                   <label>Startmonat<select data-field="season_start_month">${this._renderMonthOptions(clean.season_start_month)}</select></label>
                   <label>Endmonat<select data-field="season_end_month">${this._renderMonthOptions(clean.season_end_month)}</select></label>
                 </div>
-                <p class="field-hint">Mindestens 2 und höchstens 11 Monate.</p>
               </section>
             ` : ""}
-            <div class="validation ${errors.length ? "has-errors" : "ok"}">
-              ${this._validationHtml(errors)}
-            </div>
-            <p class="note">Die Sidebar verwaltet nur Reminder-Daten. Erstellen und Bearbeiten laufen über die Reminder-eigene WebSocket-API. Die Dashboard-Card bleibt ein getrenntes Projekt und liest danach die aktualisierten Entities/Attribute.</p>
-            <div class="form-actions modal-bottom-actions">
-              ${isDetail
-                ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
-                : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
-              <button class="ghost" id="back-to-list">Schließen</button>
-            </div>
           </div>        </div>
         </div>
       </section>
@@ -1978,16 +1977,10 @@ class TuevReminderPanel extends HTMLElement {
         .check-row input { width: auto; height: auto; margin: 0; }
         .disabled-row { opacity: .55; }
         .form-side-stack { display: grid; gap: 12px; position: sticky; top: 16px; }
-        .preview-card { position: static; }
+        .form-side-stack .preview-card { position: static; }
+        .side-season-card { background: var(--card-background-color); }
         .preview-card dl { margin: 18px 0; }
         .preview-card dl div { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--divider-color); }
-        .inline-season-section {
-          padding: 14px;
-          background: var(--secondary-background-color);
-        }
-        .compact-section-head { margin-bottom: 10px; }
-        .compact-season-fields { gap: 10px; }
-        .field-hint { margin: 10px 0 0; color: var(--secondary-text-color); font-size: 12px; line-height: 1.35; }
         dt { color: var(--secondary-text-color); }
         dd { margin: 0; text-align: right; }
         .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }
@@ -2172,6 +2165,9 @@ class TuevReminderPanel extends HTMLElement {
           .vehicle-form-shell .form-side-stack {
             position: static;
             gap: 10px;
+          }
+          .vehicle-form-shell .preview-card {
+            position: static;
           }
           .vehicle-form-shell .field-pair {
             gap: 10px;

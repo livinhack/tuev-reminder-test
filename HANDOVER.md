@@ -1,45 +1,10 @@
-# Handover – Reminder r099 Sidebar Season Block Below Overview Card
+# Handover – Reminder r100 Sidebar Single Create Action
 
-Reminder r099 continues from r097 and adjusts the vehicle create/edit form. The modal is slightly taller, the seasonal Start/End fields are shown below the Überblick/Kennzeichen card on the right, and the old left-column Saison block is removed. This keeps the form usable without adding a height slider.
+r100 continues from r096 and cleans up the normal vehicle-list controls. The separate add rows above and below the list were removed. Vehicle creation is now available through one compact `+` action inside the existing list controls next to search and status chips.
 
-Compatibility context remains unchanged: Card b355 is still the current bridge reference, `calendar.tuev_reminder` remains the integration calendar entity, and `reminder_offset_days` remains the reminder lead-time field.
+## What changed in r100
 
-## What changed in r099
-
-- Internal version bumped to `0.1.0-r099` / `r099`.
-- `vehicle-form-shell` modal uses a taller max-height budget: `min(920px, calc(100vh - 40px))`.
-- Saison Start/End controls now render in an separate section below the overview card.
-- The left form stack no longer contains a separate Saison card.
-- r089/r091 compact dark plate fallback is preserved.
-- No Card detection, no Card renderer integration, no release work.
-
-## Files changed in r099
-
-- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
-- `custom_components/tuev_reminder/manifest.json`
-- `REMINDER_VERSION.txt`
-- `scripts/check_r099_sidebar_form_season_below_overview.py`
-- `README.md`
-- `CHANGELOG.md`
-- `HANDOVER.md`
-
-## HA smoke test focus for r099
-
-1. Open create form and switch Kennzeichenart to Saisonkennzeichen.
-2. Verify Saison fields are below the Überblick/Kennzeichen card on the right.
-3. Verify no height slider exists and the modal feels slightly less cramped.
-4. Test invalid and valid season ranges.
-5. Check existing list controls, menu actions, and plate fallback.
-
-Continue functional/visual Sidebar work from r099. Do not start release work unless explicitly requested.
-
-# Handover – Reminder r097 Sidebar Single Create Action
-
-r097 continues from r096 and cleans up the normal vehicle-list controls. The separate add rows above and below the list were removed. Vehicle creation is now available through one compact `+` action inside the existing list controls next to search and status chips.
-
-## What changed in r097
-
-- Internal version bumped to `0.1.0-r097` / `r097`.
+- Internal version bumped to `0.1.0-r100` / `r100`.
 - Removed normal-list `list-add-row top` and `list-add-row bottom` markup/CSS.
 - Added `list-create-control` with `data-create-trigger="controls"`.
 - Kept the no-vehicle first-run empty-state plus button unchanged.
@@ -47,7 +12,7 @@ r097 continues from r096 and cleans up the normal vehicle-list controls. The sep
 - Kept r096 topbar cleanup.
 - Kept r089/r091 compact dark license-plate fallback exactly as intended for the no-Card-renderer state.
 
-## HA smoke test focus for r097
+## HA smoke test focus for r100
 
 1. Normal list with existing vehicles: only one compact `+` create action should be visible in the top controls.
 2. No separate add rows should appear above or below the list.
@@ -57,35 +22,35 @@ r097 continues from r096 and cleans up the normal vehicle-list controls. The sep
 
 ---
 
-# Handover – Reminder r097 Sidebar Topbar Technical Status Cleanup
+# Handover – Reminder r100 Sidebar Topbar Technical Status Cleanup
 
-r097 is a focused Sidebar UI cleanup step on top of r095. It removes the always-visible technical `API v… · aktiv` text from the topbar in normal writable mode. A visible compact `Nur lesen` warning remains for non-writable Manager API state. r095 no-visible-hit-counter behavior and r089/r091 plate fallback are preserved.
+r100 is a focused Sidebar UI cleanup step on top of r095. It removes the always-visible technical `API v… · aktiv` text from the topbar in normal writable mode. A visible compact `Nur lesen` warning remains for non-writable Manager API state. r095 no-visible-hit-counter behavior and r089/r091 plate fallback are preserved.
 
-## Files changed in r097
+## Files changed in r100
 
 - `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
 - `custom_components/tuev_reminder/manifest.json`
 - `REMINDER_VERSION.txt`
-- `scripts/check_r097_sidebar_topbar_technical_status_cleanup.py`
+- `scripts/check_r100_sidebar_topbar_technical_status_cleanup.py`
 
 ---
 
 
-r097 is a focused Sidebar UI cleanup step on top of r094. It removes the visible `X/X Treffer` counter from the top controls because the Status chips already carry the counts. It does not change Card detection, renderer integration, vehicle payloads, Manager API behavior or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
+r100 is a focused Sidebar UI cleanup step on top of r094. It removes the visible `X/X Treffer` counter from the top controls because the Status chips already carry the counts. It does not change Card detection, renderer integration, vehicle payloads, Manager API behavior or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
 
-## What changed in r097
+## What changed in r100
 
-- Internal version bumped to `0.1.0-r097` / `r097`.
+- Internal version bumped to `0.1.0-r100` / `r100`.
 - Removed visible hit counter markup and CSS from `tuev-reminder-panel.js`.
 - `_summaryChips()` now renders only the four Status chips with counts.
 - The control strip remains limited to search, search clear `×`, Status chips and invisible screen-reader sort state.
 - Added a local guard to prevent the visible hit counter from returning.
 
-## Files changed in r097
+## Files changed in r100
 
 - `custom_components/tuev_reminder/manifest.json`
 - `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
-- `scripts/check_r097_sidebar_no_visible_hit_counter.py`
+- `scripts/check_r100_sidebar_no_visible_hit_counter.py`
 - `CHANGELOG.md`
 - `README.md`
 - `HANDOVER.md`
@@ -110,7 +75,7 @@ node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
 
 ## Next step
 
-Continue functional/visual Sidebar work from r097. No release work unless explicitly requested.
+Continue functional/visual Sidebar work from r100. No release work unless explicitly requested.
 
 ---
 
@@ -2094,3 +2059,10 @@ Reminder r054
 ## r085 – Sidebar Right Column Alignment
 
 Next work starts from r085. The Sidebar list right side was tightened: plate preview is wrapped/aligned to the right, its column is narrower, and the three-dot action column is centered. No Card renderer detection was added.
+
+
+## r100 Sidebar Season Card Placement Correction
+
+Basis: r097 als optische Referenz. Saisonfelder werden bei `seasonal` / `green_seasonal` nicht links und nicht innerhalb des Überblicks angezeigt, sondern darunter als separate hellgraue Karte `side-season-card`. Die rechte Überblick-Karte behält Validierung, Hinweistext und Formularaktionen wie in r097.
+
+Testfokus: Saisonkennzeichen auswählen; Überblick-Karte muss unverändert bleiben; darunter eigene hellgraue Saisonkarte.

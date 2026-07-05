@@ -1,37 +1,40 @@
-## r099 – Sidebar Season Block Below Overview Card
+# Changelog – r100 Sidebar Season Card Placement Correction
 
-- Bumped Reminder version to `0.1.0-r099`.
-- Slightly increased the vehicle create/edit modal height budget to reduce unnecessary scrolling without adding a height slider.
-- Moved Saison Start/End fields below the Überblick/Kennzeichen card in the right column.
-- Removed the separate left-column Saison card from the form stack.
-- Preserved the r089/r091 compact dark plate fallback for no-Card-renderer state.
-- Added `scripts/check_r099_sidebar_form_season_below_overview.py`.
+## r100
 
-## r097 – Sidebar Single Create Action
+- Korrigiert die Saisonfeld-Platzierung aus r098/r099.
+- r097 bleibt optische Referenz für die rechte hellgraue Überblick-Karte.
+- Saisonfelder erscheinen nur bei Saisonkennzeichen als eigene hellgraue Karte direkt unter der rechten Überblick-Karte.
+- Kein Inhalt der Überblick-Karte wird in die Saisonkarte verschoben.
+- Die rechte Überblick-Karte behält Validierung, Hinweis und Aktionen wie in r097.
+- Modal bleibt etwas höher nutzbar, ohne Höhenslider.
+- Kein Card-Renderer, keine Card-Erkennung, keine Release-Schritte.
 
-- Bumped Reminder version to `0.1.0-r097`.
+## r100 – Sidebar Single Create Action
+
+- Bumped Reminder version to `0.1.0-r100`.
 - Removed the separate top and bottom list add rows from the normal vehicle list.
 - Added one compact `+` create action inside the existing list controls next to search/status chips.
 - Kept the first-run empty-state create action unchanged when no vehicles exist.
 - Preserved r096 topbar cleanup, r095 no-visible-hit-counter behavior and r089/r091 compact dark plate fallback.
 - No Card detection, no Card renderer integration and no release workflow changes.
 
-## r097 – Sidebar Topbar Technical Status Cleanup
+## r100 – Sidebar Topbar Technical Status Cleanup
 
-- Bumped Reminder version to `0.1.0-r097`.
+- Bumped Reminder version to `0.1.0-r100`.
 - Removed always-visible `API v… · aktiv` topbar text in normal writable mode.
 - Kept visible compact `Nur lesen` warning for non-writable Manager API state.
 - Preserved r095 no-visible-hit-counter behavior.
 - Preserved r089/r091 compact dark plate fallback.
-- Added `scripts/check_r097_sidebar_topbar_technical_status_cleanup.py`.
+- Added `scripts/check_r100_sidebar_topbar_technical_status_cleanup.py`.
 
-## r097 – Sidebar No Visible Hit Counter
+## r100 – Sidebar No Visible Hit Counter
 
-- Bumped Reminder version to `0.1.0-r097`.
+- Bumped Reminder version to `0.1.0-r100`.
 - Removed the visible `X/X Treffer` counter from the Sidebar control strip.
 - Kept the status chip counts as the only visible count source (`Alle`, `Abgelaufen`, `Fällig`, `Gültig`).
 - Kept the r089/r091 compact dark license-plate fallback unchanged.
-- Added `scripts/check_r097_sidebar_no_visible_hit_counter.py`.
+- Added `scripts/check_r100_sidebar_no_visible_hit_counter.py`.
 - No Card detection, renderer integration or release work.
 
 ## r094 – Sidebar Sort Summary Silent

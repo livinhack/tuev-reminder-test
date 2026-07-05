@@ -19,9 +19,9 @@ def main() -> None:
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
     handover = read("HANDOVER.md")
 
-    if '"version": "0.1.0-r099"' not in manifest:
-        fail("manifest version must be 0.1.0-r099")
-    if version != "r099":
+    if '"version": "0.1.0-r100"' not in manifest:
+        fail("manifest version must be 0.1.0-r100")
+    if version != "r100":
         fail("REMINDER_VERSION.txt must be r053")
 
     head_start = panel.index('<div class="form-head">')
@@ -30,14 +30,14 @@ def main() -> None:
     if "save-create" in head_block or "back-to-list" in head_block or "save-placeholder" in head_block:
         fail("modal header must not contain save/close action buttons")
 
-    side_start = panel.index('<div class="form-side-stack">')
-    side_end = panel.index('</div>        </div>', side_start)
-    side_block = panel[side_start:side_end]
+    preview_start = panel.index('<aside class="form-card preview-card">')
+    preview_end = panel.index('</aside>', preview_start)
+    preview_block = panel[preview_start:preview_end]
     for needle in ["modal-bottom-actions", "save-create", "back-to-list"]:
-        if needle not in side_block:
-            fail(f"right form stack must contain {needle}")
-    if "save-update" not in side_block:
-        fail("right form stack should contain edit save action in newer versions")
+        if needle not in preview_block:
+            fail(f"preview card must contain {needle}")
+    if "save-update" not in preview_block:
+        fail("preview card should contain edit save action in newer versions")
 
     if ".modal-bottom-actions" not in panel:
         fail("missing modal-bottom-actions CSS")

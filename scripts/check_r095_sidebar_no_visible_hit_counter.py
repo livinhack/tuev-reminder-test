@@ -9,7 +9,7 @@ MANIFEST = ROOT / "custom_components/tuev_reminder/manifest.json"
 source = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 
-assert '"version": "0.1.0-r099"' in manifest, "manifest version must be bumped to r095"
+assert '"version": "0.1.0-r100"' in manifest, "manifest version must be bumped to r095"
 assert 'class="summary-info"' not in source, "visible hit counter markup must be removed"
 assert '.summary-info' not in source, "visible hit counter CSS must be removed"
 assert '_summaryChips(counts)' in source, "summary chips must no longer require visibleCount"

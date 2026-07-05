@@ -1,29 +1,6 @@
-# TÜV Reminder – r099 Sidebar Season Block Below Overview Card
+# TÜV Reminder – r100 Sidebar Single Create Action
 
-Current working build: **Reminder r099**. r099 continues functional/visual Sidebar work from r097. The vehicle create/edit form is slightly taller, the seasonal month fields move out of the left field stack and appear below the overview card as a separate block instead, and the r089/r091 compact dark plate fallback remains preserved when no Card renderer is available.
-
-Compatibility context: Card b355 remains the current bridge reference. The integration still exposes `calendar.tuev_reminder` and uses `reminder_offset_days` for reminder lead time handling.
-
-## r099 highlights
-
-- Bumped Reminder version to `0.1.0-r099` / `r099`.
-- Slightly increased the vehicle form modal height budget to reduce cramped scrolling without reintroducing a height slider.
-- Moved Saison Start/End fields below the Überblick/Kennzeichen card in the right form column.
-- Kept the left data-entry stack focused on Basisdaten, HU & Erinnerung, and Kennzeichen.
-- Preserved the compact dark r089/r091 plate fallback.
-- No Card detection, no Card renderer integration, no release work.
-
-## HA smoke test focus for r099
-
-- Open "Neues Fahrzeug anlegen" and select Saisonkennzeichen.
-- Confirm the Saison Start/End fields appear below the Überblick/Kennzeichen card, not in the left field column.
-- Confirm the modal has a little more usable height but no height slider.
-- Save/create and edit flows should keep validating the 2–11 month season range.
-- Confirm search, badges, sort headers, menu actions, and the r089/r091 plate fallback still behave as before.
-
-# TÜV Reminder – r097 Sidebar Single Create Action
-
-Current working package: `0.1.0-r097` / `r097`.
+Current working package: `0.1.0-r100` / `r100`.
 
 This is a functional/visual Sidebar continuation, not a release step. The normal vehicle list now uses a single compact create `+` in the top control strip instead of separate add rows above and below the list. Search, search clear `×`, status chips with counts, sort headers, row action menu and the r089/r091 compact dark plate fallback remain intact.
 
@@ -31,13 +8,13 @@ No Card detection or Card renderer integration is included in this package.
 
 ---
 
-# TÜV Reminder – r097
+# TÜV Reminder – r100
 
-Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from r095: the always-visible technical `API v… · aktiv` topbar text is hidden in normal writable mode, while a compact `Nur lesen` warning remains visible if the Manager API is not writable. The r089/r091 compact dark license-plate fallback and the r095 no-visible-hit-counter state remain preserved.
+Current working build: **Reminder r100**. r100 continues Sidebar UI cleanup from r095: the always-visible technical `API v… · aktiv` topbar text is hidden in normal writable mode, while a compact `Nur lesen` warning remains visible if the Manager API is not writable. The r089/r091 compact dark license-plate fallback and the r095 no-visible-hit-counter state remain preserved.
 
-## r097 highlights
+## r100 highlights
 
-- Bumped Reminder version to `0.1.0-r097` / `r097`.
+- Bumped Reminder version to `0.1.0-r100` / `r100`.
 - Visible `API v… · aktiv` topbar text removed from the normal UI.
 - Read-only state remains visibly signaled as `Nur lesen`.
 - Search field, search clear `×`, Status chips and badge counts remain unchanged.
@@ -47,18 +24,18 @@ Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from
 ---
 
 
-Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from r094. It removes the visible `X/X Treffer` counter because the Status chips already show the relevant totals. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
+Current working build: **Reminder r100**. r100 continues Sidebar UI cleanup from r094. It removes the visible `X/X Treffer` counter because the Status chips already show the relevant totals. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
 
-## r097 highlights
+## r100 highlights
 
-- Bumped Reminder version to `0.1.0-r097` / `r097`.
+- Bumped Reminder version to `0.1.0-r100` / `r100`.
 - Removed the visible hit counter from the top controls.
 - Kept count display inside the existing chips only: **Alle**, **Abgelaufen**, **Fällig**, **Gültig**.
 - Kept search, search clear `×`, status filters, sorting headers and empty states unchanged.
 - Kept the compact dark license-plate fallback unchanged.
 - No Card detection, no Card renderer, no release work.
 
-## HA smoke test focus for r097
+## HA smoke test focus for r100
 
 1. Confirm the top controls no longer show an extra `X/X Treffer` text.
 2. Confirm the Status chips still show counts.
@@ -66,7 +43,7 @@ Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from
 4. Confirm the r089/r091 compact dark plate fallback still appears on the right.
 5. Confirm sort headers and the three-dot action menu still work.
 
-No release packaging or public-release steps should be inferred from r097. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r100. Continue with function and UI improvements until release work is explicitly requested again.
 
 ---
 
@@ -1044,3 +1021,8 @@ Reminder r054
 ### Reminder r085 – Sidebar Right Column Alignment
 
 Sidebar list polish: the right plate preview/action area is now more stable and compact. The list still avoids duplicated meta/status information. Card-aware renderer detection remains future work.
+
+
+## r100 Sidebar Season Card Placement Correction
+
+Die rechte Überblick-Karte bleibt optisch wie r097. Saisonfelder erscheinen bei Saisonkennzeichen als eigene hellgraue Karte darunter, nicht innerhalb des Überblicks und nicht mehr in der linken Spalte.

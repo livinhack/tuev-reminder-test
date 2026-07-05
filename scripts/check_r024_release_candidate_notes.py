@@ -21,8 +21,8 @@ changelog = read("CHANGELOG.md")
 notes = read("docs/REMINDER_R024_RELEASE_CANDIDATE_NOTES.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R024.md")
 
-assert version == "r099"
-assert manifest["version"] == "0.1.0-r099"
+assert version == "r100"
+assert manifest["version"] == "0.1.0-r100"
 
 for text, label, current_label in [
     (readme, "README", "Reminder r028"),
