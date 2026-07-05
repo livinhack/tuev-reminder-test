@@ -20,7 +20,7 @@ required = [
 ]
 for needle in required:
     if needle not in text:
-        raise SystemExit(f"Missing expected r092 marker: {needle}")
+        raise SystemExit(f"Missing expected r093 marker: {needle}")
 
 forbidden = [
     '<td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack">${this._platePreview(vehicle)}</div></td>',
@@ -30,9 +30,9 @@ for needle in forbidden:
     if needle in text:
         raise SystemExit(f"Forbidden legacy marker still present: {needle}")
 
-if '0.1.0-r092' not in manifest:
-    raise SystemExit('manifest version was not bumped to 0.1.0-r092')
-if version != 'r092':
-    raise SystemExit(f'REMINDER_VERSION.txt should be r092, got {version!r}')
+if '0.1.0-r094' not in manifest:
+    raise SystemExit('manifest version was not bumped to 0.1.0-r094')
+if version != 'r094':
+    raise SystemExit(f'REMINDER_VERSION.txt should be r094, got {version!r}')
 
-print("r092 Sidebar renderer-ready plate slot check passed.")
+print("r093 Sidebar renderer-ready plate slot check passed.")

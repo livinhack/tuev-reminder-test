@@ -1,11 +1,20 @@
-## r092 – Sidebar Row Menu Interaction Polish
+## r094 – Sidebar Sort Summary Silent
 
-- Bumped Reminder version to `0.1.0-r092`.
-- Added a subtle open-row state for desktop row action menus.
-- Added `aria-haspopup="menu"` to the three-dot row action trigger.
-- Aligned hover/focus styling for row action menu items.
-- Marked the delete menu item as destructive via existing theme error color.
-- Preserved the r089/r091 compact dark license-plate fallback; r090 plain fallback is still not continued.
+- Bumped Reminder version to `0.1.0-r094`.
+- Removed the visible compact sort summary from the list controls to avoid another technical UI line.
+- Kept sort state in the table headers via active header, arrow, focus styling and `aria-sort`.
+- Kept an invisible live sort summary for screen readers only.
+- Preserved the r089/r091 compact dark license-plate fallback.
+- No Card detection, no Card renderer integration and no release steps.
+
+## r093 – Sidebar Sort Header Feedback
+
+- Bumped Reminder version to `0.1.0-r093`.
+- Added explicit `aria-sort` state to sortable Sidebar table headers.
+- Added a compact sort summary next to the status chips.
+- Improved active sort indicator and keyboard focus styling for sort headers.
+- Preserved existing sort behavior and the r089/r091 compact dark plate fallback.
+- Did not add Card detection, Card renderer logic, release workflow changes or r090 plain fallback styling.
 
 ## r091 – Sidebar r089 Plate Fallback Preserved
 

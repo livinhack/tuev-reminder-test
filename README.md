@@ -1,23 +1,27 @@
-# TÜV Reminder – r092
+# TÜV Reminder – r094
 
-Current working build: **Reminder r092**. r092 continues Sidebar UI work from r091. The r089/r091 compact dark license-plate fallback is preserved. This step only polishes row/menu interaction states.
+Current working build: **Reminder r094**. r094 continues Sidebar UI work from r093. The r089/r091 compact dark license-plate fallback is preserved. This step removes the visible sort-summary text from the top controls while keeping sort state in table headers.
 
-## r092 highlights
+## r094 highlights
 
-- Bumped Reminder version to `0.1.0-r092` / `r092`.
-- Open desktop row action menus now mark the owning row with a subtle active state.
-- Three-dot row menu advertises `aria-haspopup="menu"` and remains visually active while its menu is open.
-- Row action menu hover/focus states are aligned; the delete action is visually marked as destructive.
+- Bumped Reminder version to `0.1.0-r094` / `r094`.
+- Removed visible sort-summary text from the top controls.
+- Kept active sort feedback in the table header: active column, arrow, focus styling and `aria-sort`.
+- Kept the sort summary as screen-reader-only live text.
+- Sortable table headers now expose explicit `aria-sort` state.
+- Active sort header has a clearer indicator and stronger keyboard focus state.
+- The controls area shows a compact sort summary next to the status chips.
+- Existing sort behavior is unchanged: same header toggles direction, another header switches to ascending.
 - The r089/r091 compact dark plate text fallback is intentionally unchanged.
 
-## HA smoke test focus for r092
+## HA smoke test focus for r094
 
-- Open a desktop three-dot menu: the row and menu trigger should show the open state.
-- Move keyboard focus through the menu: focused menu items should be visible.
-- Delete action should be visually distinguishable but still only open the existing confirmation flow.
+- Click table headers and confirm indicator + sort summary update.
+- Click the same header twice and confirm direction toggles.
+- Tab to headers and confirm focus is visible.
 - Confirm that the right license-plate fallback still looks like r089/r091, not the r090 plain text variant.
 
-No release packaging or public-release steps should be inferred from r092. Continue with function and UI improvements until release work is explicitly requested again.
+No release packaging or public-release steps should be inferred from r094. Continue with function and UI improvements until release work is explicitly requested again.
 
 # TÜV Reminder – r091
 

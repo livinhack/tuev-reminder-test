@@ -13,7 +13,7 @@ required = [
 ]
 for needle in required:
     if needle not in text:
-        raise SystemExit(f"Missing expected r092 marker: {needle}")
+        raise SystemExit(f"Missing expected r093 marker: {needle}")
 
 forbidden = [
     '<td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack">${this._platePreview(vehicle)}</div></td>',
@@ -22,4 +22,4 @@ for needle in forbidden:
     if needle in text:
         raise SystemExit(f"Forbidden legacy list pseudo-plate still present: {needle}")
 
-print("r092 Sidebar neutral plate slot check passed.")
+print("r093 Sidebar neutral plate slot check passed.")

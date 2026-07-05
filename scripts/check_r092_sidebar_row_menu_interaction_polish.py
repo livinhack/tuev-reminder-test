@@ -8,7 +8,7 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 
 required = [
-    '"version": "0.1.0-r092"',
+    '"version": "0.1.0-r094"',
 ]
 for marker in required:
     if marker not in manifest:
@@ -28,7 +28,7 @@ markers = [
 ]
 for marker in markers:
     if marker not in panel:
-        raise SystemExit(f"Missing r092 UI marker: {marker}")
+        raise SystemExit(f"Missing r093 UI marker: {marker}")
 
 for forbidden in [
     'data-renderer-state="plain"',

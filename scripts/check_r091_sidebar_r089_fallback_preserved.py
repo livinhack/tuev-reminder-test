@@ -21,7 +21,7 @@ required = [
 ]
 for needle in required:
     if needle not in text:
-        raise SystemExit(f"Missing expected r092/r089 fallback marker: {needle}")
+        raise SystemExit(f"Missing expected r093/r089 fallback marker: {needle}")
 
 block_start = text.find('.plate-render-slot[data-renderer-state="text"] {')
 if block_start == -1:
@@ -39,9 +39,9 @@ for needle in forbidden:
     if needle in block:
         raise SystemExit(f"r090 plain fallback simplification must not be present in plate fallback block: {needle}")
 
-if '0.1.0-r092' not in manifest:
-    raise SystemExit('manifest version was not bumped to 0.1.0-r092')
-if version != 'r092':
-    raise SystemExit(f'REMINDER_VERSION.txt should be r092, got {version!r}')
+if '0.1.0-r094' not in manifest:
+    raise SystemExit('manifest version was not bumped to 0.1.0-r094')
+if version != 'r094':
+    raise SystemExit(f'REMINDER_VERSION.txt should be r094, got {version!r}')
 
-print("r092 Sidebar r089 fallback preservation check passed.")
+print("r093 Sidebar r089 fallback preservation check passed.")

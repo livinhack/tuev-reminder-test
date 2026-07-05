@@ -1,59 +1,37 @@
-# Handover – Reminder r092 Sidebar Row Menu Interaction Polish
+# Handover – Reminder r094 Sidebar Sort Summary Silent
 
-r092 is a focused Sidebar interaction-polish step on top of r091. It does not change Card detection, renderer integration, vehicle payloads or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
+r094 is a focused Sidebar polish step on top of r093. It removes the visible sort-summary text from the top control strip because the sort state is already represented by the active table header and arrow. It does not change Card detection, renderer integration, vehicle payloads, Manager API behavior or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
 
-## What changed in r092
+## What changed in r094
 
-- Internal version bumped to `0.1.0-r092` / `r092`.
-- Desktop row action menus now apply `menu-open` to the owning vehicle row.
-- Three-dot triggers now include `aria-haspopup="menu"`.
-- Open row/menu trigger, menu-item hover, and keyboard focus states are visually aligned.
-- The delete menu item uses the Home Assistant error color as a destructive hint.
+- Internal version bumped to `0.1.0-r094` / `r094`.
+- Sortable table headers now expose `aria-sort` state.
+- Active sort headers have a clearer indicator and visible keyboard focus styling.
+- Controls area now includes a compact sort summary.
+- Existing header-click behavior remains unchanged.
 - r089/r091 plate fallback structure and styling remain preserved.
 
-## Files changed in r092
+## Files changed in r094
 
 - `custom_components/tuev_reminder/manifest.json`
 - `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
-- `scripts/check_r092_sidebar_row_menu_interaction_polish.py`
+- `REMINDER_VERSION.txt`
+- `scripts/check_r093_sidebar_sort_header_feedback.py`
+- `scripts/check_r094_sidebar_sort_summary_silent.py`
 - `README.md`
 - `CHANGELOG.md`
 - `HANDOVER.md`
-- `docs/REMINDER_R092_SIDEBAR_ROW_MENU_INTERACTION_POLISH.md`
-- `docs/COMPAT_CARD_B355_REMINDER_R092.md`
+- `docs/REMINDER_R093_SIDEBAR_SORT_HEADER_FEEDBACK.md`
+- `docs/COMPAT_CARD_B355_REMINDER_R093.md`
 
 ## HA smoke test focus
 
-1. Desktop list: open three-dot menu and confirm the row/trigger active state is visible.
-2. Keyboard: tab/focus inside the opened row menu and confirm focus is visible.
-3. Delete: click delete and confirm the existing delete confirmation still appears.
+1. Desktop list: click each sortable header and confirm indicator + sort summary update.
+2. Click the same header twice and confirm direction toggles.
+3. Keyboard: tab to sort headers and confirm focus is visible.
 4. Plate fallback: confirm r089/r091 compact dark text slot remains; do not continue r090 plain text direction.
 
-Continue functional/visual Sidebar work from r092. No release work unless explicitly requested.
-
-# Handover – Reminder r091 Sidebar r089 Plate Fallback Preserved
-
-r091 is a corrective UI direction checkpoint after r090. The desired no-Card-renderer state is the r089 compact dark license-plate text slot. The r090 plain/transparent simplification should not be continued.
-
-## What changed in r091
-
-- Internal version bumped to `0.1.0-r091` / `r091`.
-- Restored/preserved the r089 compact dark text-slot appearance for plate fallback.
-- Kept renderer-ready DOM markers for later Card-renderer mounting.
-- Added a guard check to prevent the r090 transparent/plain fallback CSS from returning accidentally.
-
-## Files changed in r091
-
-- `custom_components/tuev_reminder/manifest.json`
-- `REMINDER_VERSION.txt`
-- `README.md`
-- `CHANGELOG.md`
-- `HANDOVER.md`
-- `scripts/check_r091_sidebar_r089_fallback_preserved.py`
-
-## Next direction
-
-Continue functional/visual Sidebar work from r091. Treat r089/r091 fallback as the intended no-Card-renderer look until Card detection and real Card renderer reuse are implemented.
+Continue functional/visual Sidebar work from r094. No release work unless explicitly requested.
 
 ---
 

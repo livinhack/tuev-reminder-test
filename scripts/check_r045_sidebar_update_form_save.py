@@ -15,9 +15,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r092":
-        fail("manifest version must be 0.1.0-r092")
-    if read("REMINDER_VERSION.txt").strip() != "r092":
+    if manifest.get("version") != "0.1.0-r094":
+        fail("manifest version must be 0.1.0-r094")
+    if read("REMINDER_VERSION.txt").strip() != "r094":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")

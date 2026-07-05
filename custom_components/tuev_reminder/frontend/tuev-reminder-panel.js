@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -294,12 +294,32 @@ class TuevReminderPanel extends HTMLElement {
 
   _sortIndicator(key) {
     if (this._sortKey !== key) return "";
-    return this._sortDirection === "desc" ? " ↓" : " ↑";
+    return this._sortDirection === "desc" ? "↓" : "↑";
+  }
+
+  _sortDirectionLabel(key = this._sortKey) {
+    if (key === "status") {
+      return this._sortDirection === "desc" ? "gültig zuerst" : "kritisch zuerst";
+    }
+    return this._sortDirection === "desc" ? "absteigend" : "aufsteigend";
+  }
+
+  _sortAriaSort(key) {
+    if (this._sortKey !== key) return "none";
+    return this._sortDirection === "desc" ? "descending" : "ascending";
+  }
+
+  _sortSummaryLabel() {
+    const labels = { name: "Name", hu: "HU", reminder: "Erinnerung", status: "Status", plate: "Kennzeichen" };
+    const label = labels[this._sortKey] || "HU";
+    return `Sortiert nach ${label}, ${this._sortDirectionLabel()}`;
   }
 
   _sortHeader(label, key, extraClass = "") {
-    const active = this._sortKey === key ? " active" : "";
-    return `<th class="${this._escape(extraClass)}"><button class="sort-header${active}" type="button" data-sort-key="${this._escape(key)}" aria-label="Nach ${this._escape(label)} sortieren">${this._escape(label)}<span>${this._escape(this._sortIndicator(key))}</span></button></th>`;
+    const directionClass = this._sortKey === key ? ` active ${this._sortDirection === "desc" ? "desc" : "asc"}` : "";
+    const nextDirection = this._sortKey === key && this._sortDirection === "asc" ? "absteigend" : "aufsteigend";
+    const indicator = this._sortIndicator(key);
+    return `<th class="${this._escape(extraClass)}" aria-sort="${this._escape(this._sortAriaSort(key))}"><button class="sort-header${this._escape(directionClass)}" type="button" data-sort-key="${this._escape(key)}" title="Nach ${this._escape(label)} sortieren" aria-label="Nach ${this._escape(label)} sortieren, nächster Klick ${this._escape(nextDirection)}">${this._escape(label)}<span class="sort-indicator" aria-hidden="true">${this._escape(indicator)}</span><span class="sr-only">${this._sortKey === key ? this._escape(` aktuell ${this._sortDirectionLabel(key)}`) : ""}</span></button></th>`;
   }
 
   _cssEscape(value) {
@@ -1462,7 +1482,9 @@ class TuevReminderPanel extends HTMLElement {
           white-space: nowrap;
         }
         .summary-strip {
-          display: block;
+          display: flex;
+          align-items: center;
+          gap: 10px;
           min-width: 0;
           color: var(--secondary-text-color);
           font-size: 13px;
@@ -1582,7 +1604,22 @@ class TuevReminderPanel extends HTMLElement {
           text-align: inherit;
           cursor: pointer;
         }
-        .sort-header:hover, .sort-header.active { color: var(--primary-text-color); }
+        .sort-header:hover, .sort-header:focus-visible, .sort-header.active { color: var(--primary-text-color); }
+        .sort-header:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 6px; }
+        .sort-header.active { font-weight: 700; }
+        .sort-indicator { min-width: 12px; text-align: center; }
+        .sort-header:not(.active) .sort-indicator { opacity: 0; }
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
         .col-preview .sort-header { justify-content: flex-end; }
         tbody tr { cursor: default; }
         tbody tr:hover,
@@ -1959,6 +1996,7 @@ class TuevReminderPanel extends HTMLElement {
         @media (max-width: 980px) {
           .list-controls { grid-template-columns: 1fr; gap: 8px; padding-left: 10px; padding-right: 10px; }
           select { width: 100%; }
+          .summary-strip { flex-wrap: wrap; }
           .summary-chip-row { gap: 6px; }
           .status-filter-chip { min-height: 30px; padding: 0 8px; font-size: 12px; }
           .summary-info { margin-left: 0; flex-basis: 100%; }
@@ -2222,6 +2260,7 @@ class TuevReminderPanel extends HTMLElement {
           </div>
           <div class="summary-strip" aria-label="Status Schnellfilter">
             ${this._summaryChips(counts, visibleCount)}
+            <span class="sr-only" aria-live="polite">${this._escape(this._sortSummaryLabel())}</span>
           </div>
         </section>
 
