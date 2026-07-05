@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r053 Sidebar modal form and input focus fix."""
+"""Validate r097 Sidebar single create action cleanup."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,7 @@ VERSION = ROOT / "REMINDER_VERSION.txt"
 
 
 def fail(message: str) -> None:
-    raise SystemExit(f"r053 modal form focus fix check failed: {message}")
+    raise SystemExit(f"r097 sidebar single create action check failed: {message}")
 
 
 def main() -> None:
@@ -20,33 +20,36 @@ def main() -> None:
     if manifest.get("version") != "0.1.0-r097":
         fail("manifest version must be 0.1.0-r097")
     if VERSION.read_text(encoding="utf-8").strip() != "r097":
-        fail("REMINDER_VERSION.txt must be r053")
+        fail("REMINDER_VERSION.txt must be r097")
 
     panel = PANEL.read_text(encoding="utf-8")
     required = [
-        "modal-backdrop",
-        "role=\"dialog\"",
-        "aria-modal=\"true\"",
-        "_syncFormSummary()",
-        "{ render: false }",
-        "if (event.target === modalBackdrop) this._closeForm();",
-        "${formOpen ? (this._view === \"delete\" ? this._renderDeleteConfirm() : this._renderCreateForm()) : \"\"}",
-        "${this._renderVehicles()}",
+        'grid-template-columns: minmax(260px, 420px) minmax(0, 1fr) auto;',
+        'class="list-create-control"',
+        'data-create-trigger="controls"',
+        'title="Neues Fahrzeug anlegen"',
+        'aria-label="Neues Fahrzeug anlegen"',
+        'this.shadowRoot.querySelectorAll("[data-create-trigger]")',
+        'plate-text-slot',
+        'data-renderer-state="text"',
     ]
     for needle in required:
         if needle not in panel:
             fail(f"missing {needle!r}")
 
     forbidden = [
-        "tuev-card",
-        "confirm_passed",
-        "set_due_date",
+        'list-add-row top',
+        'list-add-row bottom',
+        'data-create-trigger="top"',
+        'data-create-trigger="bottom"',
+        'API v${this._escape(apiVersion)} · ${this._escape(writeApi)}</div>',
+        'r090-plain',
     ]
     for needle in forbidden:
         if needle in panel:
-            fail(f"Sidebar panel must not include {needle!r}")
+            fail(f"must not contain {needle!r}")
 
-    print("r053 modal form focus fix check OK")
+    print("r097 sidebar single create action check OK")
 
 
 if __name__ == "__main__":

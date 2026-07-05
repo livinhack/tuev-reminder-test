@@ -14,9 +14,9 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r094":
-    fail("manifest version must be 0.1.0-r094")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r094":
+if manifest.get("version") != "0.1.0-r097":
+    fail("manifest version must be 0.1.0-r097")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r097":
     fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
@@ -44,7 +44,7 @@ for forbidden in [
     if forbidden in panel:
         fail(f"obsolete toolbar control still present: {forbidden}")
 
-if 'class="list-controls"' not in panel or 'grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);' not in panel:
+if 'class="list-controls"' not in panel or 'grid-template-columns: minmax(260px, 420px) minmax(0, 1fr) auto;' not in panel:
     fail("r087 list controls must consolidate search and status chips")
 
 print("r087 sidebar search/badge controls check passed")

@@ -9,10 +9,10 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 version = VERSION.read_text(encoding="utf-8").strip()
 
-if '"version": "0.1.0-r094"' not in manifest:
-    raise SystemExit("manifest version must be 0.1.0-r094")
-if version != "r094":
-    raise SystemExit("REMINDER_VERSION must be r094")
+if '"version": "0.1.0-r097"' not in manifest:
+    raise SystemExit("manifest version must be 0.1.0-r097")
+if version != "r097":
+    raise SystemExit("REMINDER_VERSION must be r095")
 
 markers = [
     '_sortDirectionLabel(key = this._sortKey)',

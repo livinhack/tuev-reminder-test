@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -249,16 +249,14 @@ class TuevReminderPanel extends HTMLElement {
     return `<button type="button" class="status-filter-chip${active}${disabled}" data-status-chip="${this._escape(value)}" aria-pressed="${active ? "true" : "false"}"><span>${this._escape(label)}</span><strong>${this._escape(count)}</strong></button>`;
   }
 
-  _summaryChips(counts, visibleCount) {
+  _summaryChips(counts) {
     const total = this._vehicles.length;
-    const urgent = (counts.due || 0) + (counts.expired || 0);
     return `
       <div class="summary-chip-row" aria-label="Status Schnellfilter">
         ${this._statusChip("Alle", "all", total)}
         ${this._statusChip("Abgelaufen", "expired", counts.expired || 0)}
         ${this._statusChip("Fällig", "due", counts.due || 0)}
         ${this._statusChip("Gültig", "valid", counts.valid || 0)}
-        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer</span>
       </div>
     `;
   }
@@ -1322,7 +1320,6 @@ class TuevReminderPanel extends HTMLElement {
     const writeApi = this._metadata?.write_api === true ? "aktiv" : "read-only";
     const vehicleCount = this._vehicles.length;
     const counts = this._statusCounts();
-    const visibleCount = this._visibleVehicles().length;
     const listMode = true;
     const showListAddRows = listMode && vehicleCount > 0;
     const formOpen = this._view !== "list";
@@ -1366,10 +1363,11 @@ class TuevReminderPanel extends HTMLElement {
         h2 { margin: 0 0 4px; font-size: 22px; font-weight: 500; }
         h3 { margin: 18px 0 10px; font-size: 14px; font-weight: 600; color: var(--secondary-text-color); text-transform: uppercase; letter-spacing: .04em; }
         h3:first-child { margin-top: 0; }
-        .version { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
+        .topbar-status { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
+        .topbar-status.read-only { color: var(--error-color, #db4437); font-weight: 600; }
         .list-controls {
           display: ${listMode ? "grid" : "none"};
-          grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+          grid-template-columns: minmax(260px, 420px) minmax(0, 1fr) auto;
           align-items: center;
           gap: 10px 14px;
           padding: 10px 16px;
@@ -1448,30 +1446,30 @@ class TuevReminderPanel extends HTMLElement {
           white-space: nowrap;
         }
         button.icon-action {
-          width: auto;
-          min-width: 0;
-          height: auto;
+          width: 40px;
+          min-width: 40px;
+          height: 40px;
           padding: 0;
-          border: 0;
-          border-radius: 0;
-          background: transparent;
+          border: 1px solid var(--divider-color);
+          border-radius: 50%;
+          background: var(--card-background-color);
           color: var(--primary-text-color);
-          font-size: 30px;
+          font-size: 24px;
           font-weight: 300;
           line-height: 1;
           box-shadow: none;
+          cursor: pointer;
         }
-        .list-add-row {
+        button.icon-action:hover, button.icon-action:focus-visible {
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+          outline: none;
+        }
+        .list-create-control {
           display: ${showListAddRows ? "flex" : "none"};
           align-items: center;
           justify-content: flex-end;
-          padding: 10px 16px;
-          border-bottom: 1px solid var(--divider-color);
-          background: var(--primary-background-color);
-        }
-        .list-add-row.bottom {
-          border-top: 1px solid var(--divider-color);
-          border-bottom: 0;
+          min-width: 40px;
         }
         button.ghost {
           border: 1px solid var(--divider-color);
@@ -1529,10 +1527,6 @@ class TuevReminderPanel extends HTMLElement {
         .status-filter-chip:hover, .status-filter-chip:focus-visible {
           border-color: var(--primary-color);
           outline: none;
-        }
-        .summary-info {
-          color: var(--secondary-text-color);
-          white-space: nowrap;
         }
         .summary-detail {
           color: var(--secondary-text-color);
@@ -1994,18 +1988,19 @@ class TuevReminderPanel extends HTMLElement {
         .validation.ok { color: var(--success-color, var(--primary-color)); }
         .note { color: var(--secondary-text-color); font-size: 12px; line-height: 1.45; }
         @media (max-width: 980px) {
-          .list-controls { grid-template-columns: 1fr; gap: 8px; padding-left: 10px; padding-right: 10px; }
+          .list-controls { grid-template-columns: 1fr auto; gap: 8px; padding-left: 10px; padding-right: 10px; }
+          .toolbar { grid-column: 1; }
+          .summary-strip { grid-column: 1 / -1; }
+          .list-create-control { grid-column: 2; grid-row: 1; align-self: start; }
           select { width: 100%; }
           .summary-strip { flex-wrap: wrap; }
           .summary-chip-row { gap: 6px; }
           .status-filter-chip { min-height: 30px; padding: 0 8px; font-size: 12px; }
-          .summary-info { margin-left: 0; flex-basis: 100%; }
           .form-head { grid-template-columns: 1fr; }
           .form-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 1100px) {
           .list-controls { padding: 8px 10px; }
-          .list-add-row { padding: 8px 10px; }
           .list-shell { overflow-x: hidden; width: 100%; }
           .manager-table {
             width: 100%;
@@ -2058,7 +2053,7 @@ class TuevReminderPanel extends HTMLElement {
           .col-status { width: 66px; }
           .col-menu { width: 50px; }
           h1 { font-size: 18px; }
-          .version { display: none; }
+          .topbar-status { display: none; }
         }
         @media (max-width: 720px) {
           .list-shell {
@@ -2247,7 +2242,7 @@ class TuevReminderPanel extends HTMLElement {
             <button class="menu" title="Menü öffnen" aria-label="Menü öffnen">☰</button>
             <h1>TÜV Reminder</h1>
           </div>
-          <div class="version">API v${this._escape(apiVersion)} · ${this._escape(writeApi)}</div>
+          <div class="topbar-status${this._metadata?.write_api === true ? " sr-only" : " read-only"}" aria-live="polite">${this._metadata?.write_api === true ? `API v${this._escape(apiVersion)} · ${this._escape(writeApi)}` : "Nur lesen"}</div>
         </header>
 
         <section class="list-controls" aria-label="Fahrzeugliste filtern und sortieren">
@@ -2259,23 +2254,18 @@ class TuevReminderPanel extends HTMLElement {
             </div>
           </div>
           <div class="summary-strip" aria-label="Status Schnellfilter">
-            ${this._summaryChips(counts, visibleCount)}
+            ${this._summaryChips(counts)}
             <span class="sr-only" aria-live="polite">${this._escape(this._sortSummaryLabel())}</span>
+          </div>
+          <div class="list-create-control" aria-label="Fahrzeug hinzufügen">
+            <button class="action icon-action" data-create-trigger="controls" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
           </div>
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
 
-        <section class="list-add-row top" aria-label="Fahrzeug oben hinzufügen">
-          <button class="action icon-action" data-create-trigger="top" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
-        </section>
-
         <section class="content">
           ${this._renderVehicles()}
-        </section>
-
-        <section class="list-add-row bottom" aria-label="Fahrzeug unten hinzufügen">
-          <button class="action icon-action" data-create-trigger="bottom" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
         </section>
         ${formOpen ? (this._view === "delete" ? this._renderDeleteConfirm() : this._renderCreateForm()) : ""}
         ${this._discardPromptOpen ? this._renderDiscardConfirm() : ""}

@@ -13,9 +13,9 @@ def fail(message: str) -> None:
     raise SystemExit(message)
 
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
-if manifest.get("version") != "0.1.0-r094":
-    fail("manifest version must be 0.1.0-r094")
-if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r094":
+if manifest.get("version") != "0.1.0-r097":
+    fail("manifest version must be 0.1.0-r097")
+if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r097":
     fail("REMINDER_VERSION must be r085")
 
 panel = PANEL.read_text(encoding="utf-8")
@@ -24,8 +24,8 @@ required = [
     'id="clear-search"',
     'title="Suche leeren"',
     'aria-label="Suche leeren"',
-    '<strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer',
     '.search-clear[hidden] { display: none; }',
+    'class="status-filter-chip',
 ]
 for needle in required:
     if needle not in panel:

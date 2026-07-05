@@ -1,3 +1,84 @@
+# Handover – Reminder r097 Sidebar Single Create Action
+
+r097 continues from r096 and cleans up the normal vehicle-list controls. The separate add rows above and below the list were removed. Vehicle creation is now available through one compact `+` action inside the existing list controls next to search and status chips.
+
+## What changed in r097
+
+- Internal version bumped to `0.1.0-r097` / `r097`.
+- Removed normal-list `list-add-row top` and `list-add-row bottom` markup/CSS.
+- Added `list-create-control` with `data-create-trigger="controls"`.
+- Kept the no-vehicle first-run empty-state plus button unchanged.
+- Kept search, search clear `×`, status chips, chip counts, sort headers and row action menu behavior.
+- Kept r096 topbar cleanup.
+- Kept r089/r091 compact dark license-plate fallback exactly as intended for the no-Card-renderer state.
+
+## HA smoke test focus for r097
+
+1. Normal list with existing vehicles: only one compact `+` create action should be visible in the top controls.
+2. No separate add rows should appear above or below the list.
+3. Empty first-run state with no vehicles should still show its central create `+`.
+4. Search, search clear `×`, status chips, sorting and row action menu should behave unchanged.
+5. The right-side compact dark plate fallback must still match the r089/r091 look.
+
+---
+
+# Handover – Reminder r097 Sidebar Topbar Technical Status Cleanup
+
+r097 is a focused Sidebar UI cleanup step on top of r095. It removes the always-visible technical `API v… · aktiv` text from the topbar in normal writable mode. A visible compact `Nur lesen` warning remains for non-writable Manager API state. r095 no-visible-hit-counter behavior and r089/r091 plate fallback are preserved.
+
+## Files changed in r097
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `scripts/check_r097_sidebar_topbar_technical_status_cleanup.py`
+
+---
+
+
+r097 is a focused Sidebar UI cleanup step on top of r094. It removes the visible `X/X Treffer` counter from the top controls because the Status chips already carry the counts. It does not change Card detection, renderer integration, vehicle payloads, Manager API behavior or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
+
+## What changed in r097
+
+- Internal version bumped to `0.1.0-r097` / `r097`.
+- Removed visible hit counter markup and CSS from `tuev-reminder-panel.js`.
+- `_summaryChips()` now renders only the four Status chips with counts.
+- The control strip remains limited to search, search clear `×`, Status chips and invisible screen-reader sort state.
+- Added a local guard to prevent the visible hit counter from returning.
+
+## Files changed in r097
+
+- `custom_components/tuev_reminder/manifest.json`
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `scripts/check_r097_sidebar_no_visible_hit_counter.py`
+- `CHANGELOG.md`
+- `README.md`
+- `HANDOVER.md`
+
+## Internal checks
+
+Run from repository root:
+
+```bash
+python3 scripts/run_all_checks.py
+node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
+```
+
+## HA smoke test focus
+
+1. Top controls must not show `X/X Treffer`.
+2. Status chip counts must remain visible.
+3. Search and search clear `×` must still work.
+4. Status chips must still filter correctly.
+5. r089/r091 compact dark plate fallback must remain unchanged.
+6. Sort headers and row action menu must still work.
+
+## Next step
+
+Continue functional/visual Sidebar work from r097. No release work unless explicitly requested.
+
+---
+
 # Handover – Reminder r094 Sidebar Sort Summary Silent
 
 r094 is a focused Sidebar polish step on top of r093. It removes the visible sort-summary text from the top control strip because the sort state is already represented by the active table header and arrow. It does not change Card detection, renderer integration, vehicle payloads, Manager API behavior or release packaging. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.

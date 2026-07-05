@@ -10,10 +10,10 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-if manifest.get("version") != "0.1.0-r094":
-    raise SystemExit("manifest version must be 0.1.0-r094")
-if version != "r094":
-    raise SystemExit("REMINDER_VERSION must be r094")
+if manifest.get("version") != "0.1.0-r097":
+    raise SystemExit("manifest version must be 0.1.0-r097")
+if version != "r097":
+    raise SystemExit("REMINDER_VERSION must be r095")
 
 required = [
     '_sortSummaryLabel()',
@@ -26,7 +26,7 @@ required = [
 ]
 for marker in required:
     if marker not in panel:
-        raise SystemExit(f"Missing r094 marker: {marker}")
+        raise SystemExit(f"Missing r095 marker: {marker}")
 
 for forbidden in [
     'class="sort-summary"',
@@ -35,4 +35,4 @@ for forbidden in [
     'class="plate-text-slot plain"',
 ]:
     if forbidden in panel:
-        raise SystemExit(f"Forbidden r094 marker present: {forbidden}")
+        raise SystemExit(f"Forbidden r095 marker present: {forbidden}")

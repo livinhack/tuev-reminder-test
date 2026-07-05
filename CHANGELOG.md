@@ -1,3 +1,30 @@
+## r097 – Sidebar Single Create Action
+
+- Bumped Reminder version to `0.1.0-r097`.
+- Removed the separate top and bottom list add rows from the normal vehicle list.
+- Added one compact `+` create action inside the existing list controls next to search/status chips.
+- Kept the first-run empty-state create action unchanged when no vehicles exist.
+- Preserved r096 topbar cleanup, r095 no-visible-hit-counter behavior and r089/r091 compact dark plate fallback.
+- No Card detection, no Card renderer integration and no release workflow changes.
+
+## r097 – Sidebar Topbar Technical Status Cleanup
+
+- Bumped Reminder version to `0.1.0-r097`.
+- Removed always-visible `API v… · aktiv` topbar text in normal writable mode.
+- Kept visible compact `Nur lesen` warning for non-writable Manager API state.
+- Preserved r095 no-visible-hit-counter behavior.
+- Preserved r089/r091 compact dark plate fallback.
+- Added `scripts/check_r097_sidebar_topbar_technical_status_cleanup.py`.
+
+## r097 – Sidebar No Visible Hit Counter
+
+- Bumped Reminder version to `0.1.0-r097`.
+- Removed the visible `X/X Treffer` counter from the Sidebar control strip.
+- Kept the status chip counts as the only visible count source (`Alle`, `Abgelaufen`, `Fällig`, `Gültig`).
+- Kept the r089/r091 compact dark license-plate fallback unchanged.
+- Added `scripts/check_r097_sidebar_no_visible_hit_counter.py`.
+- No Card detection, renderer integration or release work.
+
 ## r094 – Sidebar Sort Summary Silent
 
 - Bumped Reminder version to `0.1.0-r094`.

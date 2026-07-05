@@ -1,3 +1,52 @@
+# TÜV Reminder – r097 Sidebar Single Create Action
+
+Current working package: `0.1.0-r097` / `r097`.
+
+This is a functional/visual Sidebar continuation, not a release step. The normal vehicle list now uses a single compact create `+` in the top control strip instead of separate add rows above and below the list. Search, search clear `×`, status chips with counts, sort headers, row action menu and the r089/r091 compact dark plate fallback remain intact.
+
+No Card detection or Card renderer integration is included in this package.
+
+---
+
+# TÜV Reminder – r097
+
+Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from r095: the always-visible technical `API v… · aktiv` topbar text is hidden in normal writable mode, while a compact `Nur lesen` warning remains visible if the Manager API is not writable. The r089/r091 compact dark license-plate fallback and the r095 no-visible-hit-counter state remain preserved.
+
+## r097 highlights
+
+- Bumped Reminder version to `0.1.0-r097` / `r097`.
+- Visible `API v… · aktiv` topbar text removed from the normal UI.
+- Read-only state remains visibly signaled as `Nur lesen`.
+- Search field, search clear `×`, Status chips and badge counts remain unchanged.
+- No visible `X/X Treffer` counter.
+- r089/r091 plate fallback remains the intended no-Card-renderer state.
+
+---
+
+
+Current working build: **Reminder r097**. r097 continues Sidebar UI cleanup from r094. It removes the visible `X/X Treffer` counter because the Status chips already show the relevant totals. The r089/r091 compact dark license-plate fallback remains the intended no-Card-renderer state.
+
+## r097 highlights
+
+- Bumped Reminder version to `0.1.0-r097` / `r097`.
+- Removed the visible hit counter from the top controls.
+- Kept count display inside the existing chips only: **Alle**, **Abgelaufen**, **Fällig**, **Gültig**.
+- Kept search, search clear `×`, status filters, sorting headers and empty states unchanged.
+- Kept the compact dark license-plate fallback unchanged.
+- No Card detection, no Card renderer, no release work.
+
+## HA smoke test focus for r097
+
+1. Confirm the top controls no longer show an extra `X/X Treffer` text.
+2. Confirm the Status chips still show counts.
+3. Test search, search clear `×`, and each Status chip.
+4. Confirm the r089/r091 compact dark plate fallback still appears on the right.
+5. Confirm sort headers and the three-dot action menu still work.
+
+No release packaging or public-release steps should be inferred from r097. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
 # TÜV Reminder – r094
 
 Current working build: **Reminder r094**. r094 continues Sidebar UI work from r093. The r089/r091 compact dark license-plate fallback is preserved. This step removes the visible sort-summary text from the top controls while keeping sort state in table headers.

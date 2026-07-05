@@ -18,9 +18,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r094":
-        fail("manifest version must be 0.1.0-r094")
-    if read("REMINDER_VERSION.txt").strip() != "r094":
+    if manifest.get("version") != "0.1.0-r097":
+        fail("manifest version must be 0.1.0-r097")
+    if read("REMINDER_VERSION.txt").strip() != "r097":
         fail("REMINDER_VERSION.txt must be r053")
 
     manager = read("custom_components/tuev_reminder/manager.py")
@@ -69,10 +69,9 @@ def main() -> None:
     if '<span class="add-label">Neues Fahrzeug</span>' in panel:
         fail("plain plus controls must not render the Neues Fahrzeug label beside add buttons")
     for marker in [
-        'data-create-trigger="top"',
-        'data-create-trigger="bottom"',
+        'data-create-trigger="controls"',
+        "list-create-control",
         "button.icon-action",
-        "background: transparent;",
         "#save-create",
     ]:
         if marker not in panel:
