@@ -1,3 +1,22 @@
+# TÜV Reminder – r080
+
+Current working build: **Reminder r080**. r080 continues normal function/UX development. Release work remains parked; this build refines the status-badge filter row after the redundant toolbar controls were removed in r078.
+
+## r080 highlights
+
+- Keeps the toolbar reduced to the search field only.
+- Keeps status filtering on the badges/chips: Alle, Abgelaufen, Fällig and Gültig.
+- Removes the extra badge-row reset chip again; the **Alle** badge remains the status-filter reset.
+- Shows visible/total matches as `Treffer/gesamt`, so filtering feedback is clearer.
+- Keeps sticky table headers, sortable columns, Create/Edit/Delete, mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and responsive behavior.
+- Keeps the Reminder/Card boundary strict: the Sidebar manages Reminder entities only; the Card remains a separate Lovelace/dashboard project.
+
+## Current development note
+
+No release packaging or public-release steps should be inferred from r080. Continue with function and UI improvements until release work is explicitly requested again.
+
+---
+
 # TÜV Reminder – r078
 
 Current working build: **Reminder r078**. r078 continues normal function/UX development. Release work remains parked; this build removes redundant list controls now that the status badges/chips are the primary filter UI.

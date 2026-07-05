@@ -1,3 +1,39 @@
+# Handover – Reminder r080 Sidebar Search Clear Button
+
+## Purpose
+
+r080 is a bundled Sidebar UI refinement after r078. It keeps the cleaned search toolbar and improves the badge/chip filter area so users can see and clear active filters without adding controls back beside the search field. It is not a release step.
+
+## What changed in r080
+
+- The toolbar still contains only the search input.
+- Status filtering remains badge/chip based:
+  - Alle
+  - Abgelaufen
+  - Fällig
+  - Gültig
+- No extra `Filter zurücksetzen` chip is shown in the badge row; the `Alle` badge remains the status-filter reset.
+- The badge-row summary now shows visible/total matches, for example `2/5 Treffer`.
+- Existing sorting via table headers remains unchanged.
+- Create/Edit/Delete, mobile action sheet, dirty guard, duplicate checks and payload scrub remain unchanged.
+- No Card code was imported or copied into the Reminder repo.
+
+## Test focus for HA
+
+1. Open the Sidebar page on desktop.
+2. Confirm the toolbar still has only the search field.
+3. Enter search text and confirm `Filter zurücksetzen` appears in the badge row.
+4. Click a status badge and confirm the visible/total hit count changes.
+5. Click `Filter zurücksetzen` and confirm search text and status return to default.
+6. Confirm sorting via headers still works after using and resetting filters.
+7. On smartphone, confirm the badge row wraps cleanly and the mobile Action Sheet still opens.
+
+## Next likely bundled direction
+
+A useful next bundled step would be table/list density polish or form field hints/defaults, not release work.
+
+---
+
 # Handover – Reminder r078 Sidebar Search Badge Controls
 
 ## Purpose

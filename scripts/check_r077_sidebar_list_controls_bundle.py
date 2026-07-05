@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r078 Sidebar list controls bundle."""
+"""Validate r080 Sidebar list controls bundle."""
 from __future__ import annotations
 
 import json
@@ -26,8 +26,8 @@ changelog = read("CHANGELOG.md")
 doc = read("docs/REMINDER_R078_SIDEBAR_SEARCH_BADGE_CONTROLS.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R078.md")
 
-require(manifest["version"] == "0.1.0-r078", "manifest version must be r078")
-require(version == "r078", "REMINDER_VERSION must be r078")
+require(manifest["version"] == "0.1.0-r080", "manifest version must be r080")
+require(version == "r080", "REMINDER_VERSION must be r080")
 
 for marker in [
     "_statusChip(label, value, count)",
@@ -40,7 +40,7 @@ for marker in [
     "position: sticky",
     "status-pill::before",
     ]:
-    require(marker in frontend, f"missing r078 list-control marker: {marker}")
+    require(marker in frontend, f"missing r080 list-control marker: {marker}")
 
 for preserved in [
     "data-action-sheet-action=\"edit\"",
@@ -61,10 +61,10 @@ for forbidden in [
 ]:
     require(forbidden not in frontend, f"Reminder frontend must not import/use Card code: {forbidden}")
 
-require("Reminder r078" in readme, "README must describe r078")
-require("Sidebar Search Badge Controls" in handover, "HANDOVER must describe r078")
-require("r078 – Sidebar Search Badge Controls" in changelog, "CHANGELOG must contain r078 entry")
-require("No release candidate" in doc or "No release-candidate" in doc, "r078 doc must explicitly avoid release scope")
+require("Reminder r080" in readme, "README must describe r080")
+require("Sidebar Search Badge Controls" in handover, "HANDOVER must describe r080")
+require("Sidebar Search Badge Controls" in changelog, "CHANGELOG must retain Sidebar Search Badge Controls entry")
+require("No release candidate" in doc or "No release-candidate" in doc, "r080 doc must explicitly avoid release scope")
 require("Card remains a separate" in compat, "compat doc must preserve Card separation")
 
-print("r078 Sidebar list controls bundle checks passed")
+print("r080 Sidebar list controls bundle checks passed")

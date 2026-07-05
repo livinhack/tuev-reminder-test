@@ -1,3 +1,12 @@
+## r080 – Sidebar Search Clear Button
+
+- Removed the extra badge-row reset chip again because `Alle` already resets the status filter.
+- Changed the badge-row hit summary to show visible/total matches, making active filtering easier to read.
+- Kept the search toolbar clean: no status dropdown and no manual refresh button were reintroduced.
+- Preserved badge filtering, sortable headers, sticky headers, Create/Edit/Delete, Mobile Action Sheet, Dirty Guard, Duplicate Preflight, payload scrub and Reminder/Card separation.
+- No release-candidate/public-release step added.
+
+---
 ## r078 – Sidebar Search Badge Controls
 
 - Removed the redundant status dropdown next to the search field.

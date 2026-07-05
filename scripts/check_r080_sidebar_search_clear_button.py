@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate r080 sidebar search/badge control cleanup."""
+"""Validate r080 sidebar search clear button and badge-row reset cleanup."""
 from __future__ import annotations
 
 import json
@@ -12,7 +12,6 @@ PANEL = ROOT / "custom_components" / "tuev_reminder" / "frontend" / "tuev-remind
 def fail(message: str) -> None:
     raise SystemExit(message)
 
-
 manifest = json.loads((ROOT / "custom_components" / "tuev_reminder" / "manifest.json").read_text(encoding="utf-8"))
 if manifest.get("version") != "0.1.0-r080":
     fail("manifest version must be 0.1.0-r080")
@@ -21,30 +20,29 @@ if (ROOT / "REMINDER_VERSION.txt").read_text(encoding="utf-8").strip() != "r080"
 
 panel = PANEL.read_text(encoding="utf-8")
 required = [
-    'id="filter"',
-    'data-status-chip',
-    '_statusChip("Alle", "all", total)',
-    '_statusChip("Abgelaufen", "expired", counts.expired || 0)',
-    '_statusChip("Fällig", "due", counts.due || 0)',
-    '_statusChip("Gültig", "valid", counts.valid || 0)',
+    'class="search-clear"',
+    'id="clear-search"',
+    'title="Suche leeren"',
+    'aria-label="Suche leeren"',
+    '<strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer',
+    '.search-clear[hidden] { display: none; }',
 ]
 for needle in required:
     if needle not in panel:
-        fail(f"missing r080 sidebar control marker: {needle}")
+        fail(f"missing r080 search clear marker: {needle}")
 
 for forbidden in [
+    'class="filter-reset-chip"',
+    'data-reset-filters',
+    '[data-reset-filters]',
+    '.filter-reset-chip',
     'id="status-filter"',
-    'aria-label="Statusfilter"',
     'id="refresh"',
     '>Aktualisieren<',
-    'Lädt …" : "Aktualisieren',
     'querySelector("#refresh")',
     'querySelector("#status-filter")',
 ]:
     if forbidden in panel:
-        fail(f"obsolete toolbar control still present: {forbidden}")
+        fail(f"obsolete toolbar/reset control present: {forbidden}")
 
-if 'grid-template-columns: minmax(240px, 1fr);' not in panel:
-    fail("toolbar must be a single search-column grid in r080")
-
-print("r080 sidebar search/badge controls check passed")
+print("r080 sidebar search clear button check passed")

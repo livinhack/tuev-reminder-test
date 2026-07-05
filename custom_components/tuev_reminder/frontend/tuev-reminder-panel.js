@@ -257,7 +257,7 @@ class TuevReminderPanel extends HTMLElement {
         ${this._statusChip("Abgelaufen", "expired", counts.expired || 0)}
         ${this._statusChip("Fällig", "due", counts.due || 0)}
         ${this._statusChip("Gültig", "valid", counts.valid || 0)}
-        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong> Treffer · <strong>${this._escape(urgent)}</strong> fällig/abgelaufen</span>
+        <span class="summary-info"><strong>${this._escape(visibleCount)}</strong>/${this._escape(total)} Treffer · <strong>${this._escape(urgent)}</strong> fällig/abgelaufen</span>
       </div>
     `;
   }
@@ -1364,7 +1364,31 @@ class TuevReminderPanel extends HTMLElement {
           background: var(--card-background-color);
           color: var(--primary-text-color);
         }
-        input[type="search"] { padding: 0 12px 0 40px; }
+        input[type="search"] { padding: 0 44px 0 40px; }
+        .search-clear {
+          position: absolute;
+          right: 6px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 32px;
+          height: 32px;
+          border: 0;
+          border-radius: 50%;
+          background: transparent;
+          color: var(--secondary-text-color);
+          cursor: pointer;
+          font-size: 18px;
+          line-height: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .search-clear:hover, .search-clear:focus-visible {
+          background: var(--secondary-background-color);
+          color: var(--primary-text-color);
+          outline: none;
+        }
+        .search-clear[hidden] { display: none; }
         input:not([type="search"]), select { padding: 0 10px; }
         select { min-width: 160px; padding-right: 28px; }
         button.action {
@@ -2065,6 +2089,7 @@ class TuevReminderPanel extends HTMLElement {
           <div class="search-wrap">
             <span class="search-icon">⌕</span>
             <input id="filter" type="search" placeholder="Suchen" value="${this._escape(this._filter)}">
+            <button type="button" class="search-clear" id="clear-search" title="Suche leeren" aria-label="Suche leeren" ${String(this._filter || "").trim() ? "" : "hidden"}>×</button>
           </div>
         </section>
 
@@ -2106,10 +2131,19 @@ class TuevReminderPanel extends HTMLElement {
       });
     }
 
-    const clearFiltersButton = this.shadowRoot.querySelector("#clear-filters");
-    if (clearFiltersButton) {
-      clearFiltersButton.addEventListener("click", () => this._resetListFilters());
+    const clearSearchButton = this.shadowRoot.querySelector("#clear-search");
+    if (clearSearchButton) {
+      clearSearchButton.addEventListener("click", () => {
+        this._filter = "";
+        this._openMenuIndex = null;
+        this._openMenuEntryId = null;
+        this._renderPreservingListUiState();
+      });
     }
+
+    this.shadowRoot.querySelectorAll("#clear-filters").forEach((button) => {
+      button.addEventListener("click", () => this._resetListFilters());
+    });
 
     this.shadowRoot.querySelectorAll("button[data-status-chip]").forEach((button) => {
       button.addEventListener("click", () => {
