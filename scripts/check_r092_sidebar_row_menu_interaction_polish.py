@@ -8,7 +8,7 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 
 required = [
-    '"version": "0.1.0-r105"',
+    '"version": "0.1.0-r108"',
 ]
 for marker in required:
     if marker not in manifest:

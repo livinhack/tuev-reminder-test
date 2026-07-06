@@ -1,10 +1,30 @@
-# TÜV Reminder – r105 Sidebar Validation Focus Fallback
+# TÜV Reminder r108
 
-Current working package: `0.1.0-r105` / `r105`. Current working build: **Reminder r105**.
+Arbeitsstand r108 verfeinert den Dirty-State im Sidebar-Formular: Die **Ungespeichert**-Markierung im Modal-Kopf aktualisiert sich jetzt live auch bei Eingaben, die das Formular nicht komplett neu rendern. Dadurch erscheint und verschwindet die Markierung direkt, wenn Änderungen entstehen oder wieder auf den gespeicherten Stand zurückgesetzt werden.
 
-r105 keeps the accepted r100/r097 form layout and the r089/r091 compact Kennzeichen fallback. It refines r104 validation navigation: clickable validation messages still jump to the related field, but now carry section metadata and fall back to the surrounding form card if a conditional target field is not currently rendered.
+Layoutreferenzen bleiben unverändert: r100/r097-Formularaufbau mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Card b355 bleibt nur Kompatibilitätskontext; keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte. Kalenderkontext bleibt `calendar.tuev_reminder`, der Erinnerungsvorlauf bleibt `reminder_offset_days`.
 
-## r105 highlights
+---
+
+# TÜV Reminder r107
+
+Arbeitsstand r107 korrigiert die Live-Bindung der anklickbaren Validierungsmeldungen im Sidebar-Formular. Nach Eingaben, die die Validierungsbox ohne komplettes Re-Render aktualisieren, bleiben die Links weiterhin klickbar und springen zum passenden Feld beziehungsweise zur passenden Formular-Karte.
+
+Layoutreferenzen bleiben unverändert: r100/r097-Formularaufbau mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Keine Release-Schritte.
+
+---
+
+# TÜV Reminder r107 (vorheriger Kontext)
+
+Arbeitsstand r107 ergänzt im Sidebar-Formular eine kompakte **Ungespeichert**-Markierung im Modal-Kopf, sobald lokale Änderungen vorhanden sind. Layoutreferenzen bleiben unverändert: r100/r097-Formularaufbau und r089/r091-Kennzeichenfallback. Keine Release-Schritte.
+
+# TÜV Reminder – r106 Sidebar Validation Focus Fallback
+
+Current working package: `0.1.0-r107` / `r107`. Current working build: **Reminder r107**.
+
+r106 keeps the accepted r100/r097 form layout and the r089/r091 compact Kennzeichen fallback. It refines r104 validation navigation: clickable validation messages still jump to the related field, but now carry section metadata and fall back to the surrounding form card if a conditional target field is not currently rendered.
+
+## r106 highlights
 
 - Validation message buttons now include field and section targets.
 - Field focus still scrolls to the input/select and selects text inputs where useful.

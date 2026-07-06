@@ -3,8 +3,8 @@ root = Path(__file__).resolve().parents[1]
 panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text()
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text()
 version = (root / 'REMINDER_VERSION.txt').read_text().strip()
-assert '"version": "0.1.0-r105"' in manifest
-assert version == 'r105'
+assert '"version": "0.1.0-r108"' in manifest
+assert version == 'r108'
 for needle in [
     '_validationTargetForError(error)',
     '_validationItemHtml(error)',
@@ -18,4 +18,4 @@ for needle in [
 assert 'side-season-card' in panel
 assert 'r097 right preview card preserved' in panel
 assert 'renderer-state="text"' in panel
-print('r105 sidebar form validation focus check OK')
+print('r106 sidebar form validation focus check OK')

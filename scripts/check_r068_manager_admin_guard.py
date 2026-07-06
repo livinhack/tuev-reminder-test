@@ -9,8 +9,8 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r105"
-assert read("REMINDER_VERSION.txt").strip() == "r105"
+assert manifest["version"] == "0.1.0-r108"
+assert read("REMINDER_VERSION.txt").strip() == "r108"
 
 panel = read("custom_components/tuev_reminder/panel.py")
 assert "require_admin=True" not in panel

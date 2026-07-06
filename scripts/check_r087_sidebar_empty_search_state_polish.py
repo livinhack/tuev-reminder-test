@@ -17,8 +17,8 @@ def require(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
-require(manifest.get("version") == "0.1.0-r105", "manifest version must be r087")
-require(version == "r105", "REMINDER_VERSION must be r087")
+require(manifest.get("version") == "0.1.0-r108", "manifest version must be r087")
+require(version == "r108", "REMINDER_VERSION must be r087")
 require("_emptyFilterStateHtml()" in panel, "dedicated filtered-empty renderer is required")
 require("Keine Treffer für" in panel, "search-empty title must include the search term")
 require("Keine Fahrzeuge mit Status" in panel, "status-empty title must name the status filter")

@@ -3,8 +3,8 @@ root = Path(__file__).resolve().parents[1]
 panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text()
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text()
 version = (root / 'REMINDER_VERSION.txt').read_text().strip()
-assert '"version": "0.1.0-r105"' in manifest
-assert version == 'r105'
+assert '"version": "0.1.0-r108"' in manifest
+assert version == 'r108'
 for needle in [
     '_validationSectionForTarget(name)',
     'data-validation-section=',
@@ -23,4 +23,4 @@ for needle in [
 ]:
     assert needle in panel, f'missing {needle}'
 assert 'validation focus falls back to sections when conditional fields are hidden' in panel
-print('r105 sidebar validation focus fallback check OK')
+print('r106 sidebar validation focus fallback check OK')

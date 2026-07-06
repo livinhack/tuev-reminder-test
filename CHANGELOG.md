@@ -1,4 +1,39 @@
-# r105 – Sidebar Validation Focus Fallback
+# Changelog
+
+## r108 – Sidebar Dirty Pill Live Sync
+
+- Dirty-State **Ungespeichert** im Formular-Kopf aktualisiert sich jetzt live ohne komplettes Formular-Re-Render.
+- Wenn eine Änderung wieder auf den gespeicherten Wert zurückgesetzt wird, verschwindet die Markierung direkt.
+- Validierungslink-Rebind aus r107 bleibt erhalten.
+- r100/r097-Formularaufbau bleibt unverändert.
+- r089/r091-Kennzeichenfallback bleibt unverändert.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+---
+
+## r107 – Sidebar Validation Link Rebind
+
+- Korrigiert die Live-Aktualisierung der anklickbaren Validierungsmeldungen.
+- Wenn Formularwerte ohne komplettes Re-Render aktualisiert werden, bleiben die neuen Validierungslinks weiterhin klickbar.
+- Feld-/Section-Fokus aus r104/r105 bleibt erhalten.
+- Dirty-State aus r106 bleibt erhalten.
+- r100/r097-Formularaufbau bleibt unverändert.
+- r089/r091-Kennzeichenfallback bleibt unverändert.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+---
+
+## r106 – Sidebar Form Dirty State Hint
+
+- Modal-Kopf zeigt eine kompakte **Ungespeichert**-Markierung, sobald das Formular lokale Änderungen enthält.
+- Dirty-Guard bleibt unverändert.
+- r100/r097-Formularaufbau bleibt unverändert.
+- r089/r091-Kennzeichenfallback bleibt unverändert.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+---
+
+# r106 – Sidebar Validation Focus Fallback
 
 - Kept r104 validation-message click-to-focus behavior.
 - Added section metadata to validation links.

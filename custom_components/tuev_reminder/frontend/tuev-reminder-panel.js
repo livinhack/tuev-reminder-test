@@ -1,5 +1,5 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card; form fields expose inline invalid state for validation parity; validation messages can focus the related field; validation focus falls back to sections when conditional fields are hidden
+  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card; form fields expose inline invalid state for validation parity; validation messages can focus the related field; validation focus falls back to sections when conditional fields are hidden; modal header shows unsaved changes state; validation links remain bound after live form updates; unsaved-state pill updates live without full form rerender
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -1012,13 +1012,6 @@ class TuevReminderPanel extends HTMLElement {
       if (node) node.textContent = value;
     });
 
-    this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
-      });
-    });
-
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       const invalid = this._fieldInvalid(field.dataset.field, clean);
       if (invalid) {
@@ -1046,6 +1039,12 @@ class TuevReminderPanel extends HTMLElement {
       validation.classList.toggle("has-errors", errors.length > 0);
       validation.classList.toggle("ok", errors.length === 0);
       validation.innerHTML = this._validationHtml(errors);
+      this._bindValidationLinks();
+    }
+
+    const dirtyPill = this.shadowRoot.querySelector("[data-dirty-state]");
+    if (dirtyPill) {
+      dirtyPill.hidden = this._saving || !this._formDirty();
     }
 
     const saveButton = this.shadowRoot.querySelector("#save-create, #save-update");
@@ -1090,6 +1089,18 @@ class TuevReminderPanel extends HTMLElement {
     }
     const section = this._validationSectionForTarget(target);
     return `<li><button type="button" class="validation-link" data-validation-target="${this._escape(target)}" data-validation-section="${this._escape(section)}" aria-label="Zum Feld springen: ${label}" title="Zum passenden Feld springen">${label}</button></li>`;
+  }
+
+  _bindValidationLinks() {
+    if (!this.shadowRoot) return;
+    this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
+      if (button.dataset.validationBound === "true") return;
+      button.dataset.validationBound = "true";
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
+      });
+    });
   }
 
   _focusValidationTarget(name, sectionName = "") {
@@ -1312,6 +1323,7 @@ class TuevReminderPanel extends HTMLElement {
     const isDetail = this._view === "detail";
     const clean = this._scrubFormForKind();
     const errors = this._formValidation();
+    const dirty = this._formDirty();
     const { seasonal, green, change } = this._formKindFlags(clean.plate_kind);
     const plateKinds = this._metadata?.plate_kinds || [
       { value: "standard", label: "Standard" },
@@ -1327,7 +1339,10 @@ class TuevReminderPanel extends HTMLElement {
         <div class="form-shell vehicle-form-shell">
         <div class="form-head">
           <div>
-            <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
+            <div class="form-title-row">
+              <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
+              <span class="dirty-pill" data-dirty-state aria-label="Ungespeicherte Änderungen" ${dirty && !this._saving ? "" : "hidden"}>Ungespeichert</span>
+            </div>
             <p>${isDetail ? "Fahrzeugdaten bearbeiten und speichern." : "Fahrzeugdaten eintragen und speichern."}</p>
           </div>
         </div>
@@ -2066,6 +2081,25 @@ class TuevReminderPanel extends HTMLElement {
           margin-bottom: 18px;
         }
         .form-head p { margin: 0; color: var(--secondary-text-color); }
+        .form-title-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .dirty-pill {
+          display: inline-flex;
+          align-items: center;
+          min-height: 22px;
+          padding: 2px 9px;
+          border: 1px solid color-mix(in srgb, var(--warning-color, var(--state-icon-active-color)) 38%, var(--divider-color));
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--warning-color, var(--state-icon-active-color)) 11%, transparent);
+          color: var(--warning-color, var(--state-icon-active-color));
+          font-size: 12px;
+          font-weight: 700;
+          line-height: 1.2;
+        }
         .delete-shell { width: min(520px, 100%); }
         .delete-card p:first-child { margin-top: 0; }
         .delete-preview { margin: 12px 0 16px; text-align: right; }
@@ -2562,12 +2596,7 @@ class TuevReminderPanel extends HTMLElement {
       });
     });
 
-    this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
-      });
-    });
+    this._bindValidationLinks();
 
     this.shadowRoot.querySelectorAll("[data-field]").forEach((field) => {
       if (field.tagName === "SELECT") {

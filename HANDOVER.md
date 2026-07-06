@@ -1,10 +1,115 @@
-# Handover – r105 Sidebar Validation Focus Fallback
+# Handover – TÜV Reminder r108
 
-Current working build: **Reminder r105**.
+## Stand
+
+Basis: r107 (`tuev-reminder-r107-sidebar-validation-link-rebind.zip`).
+
+r108 korrigiert/ergänzt die Live-Aktualisierung der **Ungespeichert**-Markierung im Anlegen-/Bearbeiten-Dialog. Bisher konnte die Markierung bei Feldänderungen ohne komplettes Formular-Re-Render stehen bleiben oder fehlen. Jetzt wird der Dirty-Pill in `_syncFormSummary()` direkt synchronisiert.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Validierungslink-Rebind aus r107 bleibt erhalten.
+- Card b355 bleibt nur Kompatibilitätskontext; `calendar.tuev_reminder` und `reminder_offset_days` bleiben unverändert.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `docs/REMINDER_R108_SIDEBAR_DIRTY_PILL_LIVE_SYNC.md`
+- `scripts/check_r108_sidebar_dirty_pill_live_sync.py`
+
+## Testfokus in HA
+
+1. Fahrzeug bearbeiten, ein Feld ändern → **Ungespeichert** muss sofort erscheinen.
+2. Änderung wieder exakt auf den alten Wert zurücksetzen → **Ungespeichert** muss ohne Schließen/Neuöffnen verschwinden.
+3. Mehrere Felder ändern, Validierungsbox live aktualisieren lassen → Dirty-State und Validierungslinks müssen weiter funktionieren.
+4. Saisonkennzeichen prüfen: Überblick rechts unverändert, Saisonkarte separat darunter.
+5. Kennzeichenfallback in der Liste muss weiterhin wie r089/r091 aussehen.
+
+---
+
+## Vorheriger vollständiger Handover-Kontext aus r107
+
+# Handover – TÜV Reminder r107
+
+## Stand
+
+Basis: r106 (`tuev-reminder-r106-sidebar-form-dirty-state-hint.zip`).
+
+r107 korrigiert die Validierungslinks im Anlegen-/Bearbeiten-Formular: Nach Live-Änderungen am Formular wird die Validierungsbox neu aufgebaut. Die dabei neu erzeugten Links bleiben jetzt zuverlässig gebunden und springen weiterhin zum passenden Feld oder fallbackmäßig zur passenden Formular-Karte.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Dirty-State aus r106 bleibt erhalten.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `docs/REMINDER_R107_SIDEBAR_VALIDATION_LINK_REBIND.md`
+- `scripts/check_r107_sidebar_validation_link_rebind.py`
+
+## Testfokus in HA
+
+1. Fahrzeug anlegen/bearbeiten.
+2. Ungültige Werte erzeugen, rechts auf Validierungsmeldung klicken → Fokus muss springen.
+3. Danach ein Feld ändern, sodass die Validierungsbox live neu aufgebaut wird.
+4. Wieder auf eine Validierungsmeldung klicken → Fokus muss weiterhin springen.
+5. Saisonkennzeichen prüfen: Überblick rechts unverändert, Saisonkarte separat darunter.
+6. Kennzeichenfallback in der Liste muss weiterhin wie r089/r091 aussehen.
+
+
+---
+
+## Vorheriger vollständiger Handover-Kontext aus r106
+
+# Handover – TÜV Reminder r106
+
+## Stand
+
+Basis: r106 (`tuev-reminder-r106-sidebar-validation-focus-fallback.zip`).
+
+r106 ergänzt einen sichtbaren, aber kompakten Dirty-State im Anlegen-/Bearbeiten-Modal: Sobald das Formular vom gespeicherten Snapshot abweicht, erscheint im Modal-Kopf **Ungespeichert**.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `docs/REMINDER_R106_SIDEBAR_FORM_DIRTY_STATE_HINT.md`
+- `scripts/check_r106_sidebar_form_dirty_state_hint.py`
+
+## Testfokus in HA
+
+1. Fahrzeug bearbeiten, ein Feld ändern → **Ungespeichert** muss im Modal-Kopf erscheinen.
+2. Änderung zurücknehmen oder speichern → Markierung muss verschwinden.
+3. Schließen mit Änderungen → bestehender Dirty-Guard muss weiter erscheinen.
+4. Saisonkennzeichen prüfen → Überblick rechts unverändert, Saisonkarte separat darunter.
+5. Kennzeichenfallback in der Liste muss weiterhin wie r089/r091 aussehen.
+
+---
+
+# Handover – r106 Sidebar Validation Focus Fallback
+
+Current working build: **Reminder r106**.
 
 Base: r104 (`tuev-reminder-r104-sidebar-form-validation-focus.zip`).
 
-Implemented in r105:
+Implemented in r106:
 
 - Kept the accepted r100/r097 form layout.
 - Kept the right grey overview card unchanged.
@@ -22,7 +127,7 @@ Validation:
 - `python3 scripts/run_all_checks.py`
 - `node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
 
-Next entry point: continue from **r105** for further Sidebar function/visual work. No release steps unless explicitly requested.
+Next entry point: continue from **r106** for further Sidebar function/visual work. No release steps unless explicitly requested.
 
 ---
 

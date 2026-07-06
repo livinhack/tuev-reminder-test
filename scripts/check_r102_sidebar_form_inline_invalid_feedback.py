@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Guard r105 inline invalid state in Sidebar create/edit form."""
+"""Guard r106 inline invalid state in Sidebar create/edit form."""
 from pathlib import Path
 import json
 
 ROOT = Path(__file__).resolve().parents[1]
 js = (ROOT / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text(encoding='utf-8')
 manifest = json.loads((ROOT / 'custom_components/tuev_reminder/manifest.json').read_text(encoding='utf-8'))
-assert manifest['version'] == '0.1.0-r105'
-assert (ROOT / 'REMINDER_VERSION.txt').read_text(encoding='utf-8').strip() == 'r105'
+assert manifest['version'] == '0.1.0-r108'
+assert (ROOT / 'REMINDER_VERSION.txt').read_text(encoding='utf-8').strip() == 'r108'
 
 # Form fields should expose real invalid state, not only the right-side validation summary.
 for needle in [
