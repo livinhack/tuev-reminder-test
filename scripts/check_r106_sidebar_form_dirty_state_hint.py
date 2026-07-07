@@ -3,8 +3,8 @@ root = Path(__file__).resolve().parents[1]
 panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text()
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text()
 version = (root / 'REMINDER_VERSION.txt').read_text().strip()
-assert '"version": "0.1.0-r108"' in manifest
-assert version == 'r108'
+assert '"version": "0.1.0-r114"' in manifest
+assert version == 'r114'
 for needle in [
     'const dirty = this._formDirty();',
     'form-title-row',

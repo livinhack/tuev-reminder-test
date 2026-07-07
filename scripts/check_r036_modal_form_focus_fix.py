@@ -17,9 +17,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if manifest.get("version") != "0.1.0-r108":
-        fail("manifest version must be 0.1.0-r108")
-    if VERSION.read_text(encoding="utf-8").strip() != "r108":
+    if manifest.get("version") != "0.1.0-r114":
+        fail("manifest version must be 0.1.0-r114")
+    if VERSION.read_text(encoding="utf-8").strip() != "r114":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = PANEL.read_text(encoding="utf-8")

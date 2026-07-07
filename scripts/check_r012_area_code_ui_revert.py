@@ -14,8 +14,8 @@ def assert_true(condition, message):
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert_true(manifest.get("version") == "0.1.0-r108", "manifest version must be r023")
-assert_true(read("REMINDER_VERSION.txt").strip() == "r108", "REMINDER_VERSION must be r025")
+assert_true(manifest.get("version") == "0.1.0-r114", "manifest version must be r023")
+assert_true(read("REMINDER_VERSION.txt").strip() == "r114", "REMINDER_VERSION must be r025")
 
 const_py = read("custom_components/tuev_reminder/const.py")
 config_flow = read("custom_components/tuev_reminder/config_flow.py")

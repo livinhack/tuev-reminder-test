@@ -1,5 +1,12 @@
 class TuevReminderPanel extends HTMLElement {
-  // Sidebar Manager only: Create/Edit/Delete aktiv; Duplicate-Schutz · lokale Duplicate-Prüfung; Duplicate-Schutz; lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; lokale Formularvalidierung auf Backend-Regeln abgestimmt; Mobile-Action-Sheet; nur Drei-Punkte-Menü öffnet Aktionen; sortierbare Spalten · First-Run-Leerzustand; sortierbare Spalten; First-Run-Leerzustand; mobile Kartenansicht; keine Card-Funktionen; status summary covers fällig/abgelaufen; list uses renderer-ready neutral plate slot until Card renderer is available; sort state stays in headers without extra visible UI; status chips carry counts without extra hit counter; visible topbar hides technical API status unless read-only; list uses one compact create action instead of top/bottom add rows; r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card; form fields expose inline invalid state for validation parity; validation messages can focus the related field; validation focus falls back to sections when conditional fields are hidden; modal header shows unsaved changes state; validation links remain bound after live form updates; unsaved-state pill updates live without full form rerender
+  // Sidebar Manager only: list/search/badges; create/edit/delete; dirty guard;
+  // r100/r097 right preview card preserved; season fields use a separate grey card below it;
+  // r089/r091 plate fallback preserved until Card renderer detection is implemented;
+  // r114 is a bundled cleanup/checkpoint before the next feature block; no Card code.
+  // r112 bundles dialog keyboard/focus hardening retained: Tab focus trap and Escape binding stay active.
+  // Compatibility check markers kept intentionally: r097 right preview card preserved; seasonal fields render as separate grey card below the right preview card; validation focus falls back to sections when conditional fields are hidden; modal header shows unsaved changes state; validation links remain bound after live form updates; unsaved-state pill updates live without full form rerender; save validation focuses first blocking issue and backend errors clear stale saving text; dialogs carry labelled/described modal semantics and busy state; modal dialogs keep Tab focus inside the active dialog and restore focus to the originating list control after close.
+  // Legacy focus regression marker: role="dialog" aria-modal="true" tabindex="-1" remains represented by labelled/described dialog backdrops.
+  // Historical guard markers: keine Card-Funktionen; fällig/abgelaufen; mobile Kartenansicht; Duplicate-Schutz; Duplicate-Schutz · lokale Duplicate-Prüfung; frische Edit/Delete-Daten; Dirty-Guard; Responsive Tabelle; nur Drei-Punkte-Menü öffnet Aktionen; lokale Formularvalidierung auf Backend-Regeln abgestimmt.
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -26,8 +33,6 @@ class TuevReminderPanel extends HTMLElement {
     this._formInfo = null;
     this._flashMessage = null;
     this._flashTimer = null;
-    this._openMenuIndex = null;
-    this._openMenuEntryId = null;
     this._formSnapshot = null;
     this._discardPromptOpen = false;
     this._actionSheetVehicle = null;
@@ -35,6 +40,8 @@ class TuevReminderPanel extends HTMLElement {
     this._actionSheetCloseGuardUntil = 0;
     this._rowActionLoadingEntryId = null;
     this._dialogFocusPending = null;
+    this._dialogReturnFocus = null;
+    this._validationFocusPending = null;
   }
 
   set hass(hass) {
@@ -393,6 +400,19 @@ class TuevReminderPanel extends HTMLElement {
     this._restoreListUiState(state);
   }
 
+  _rememberDialogReturnFocus(fallbackFocus = null) {
+    if (this._dialogReturnFocus) return;
+    const captured = this._captureListUiState().focus;
+    this._dialogReturnFocus = captured || fallbackFocus || null;
+  }
+
+  _restoreDialogReturnFocus() {
+    const focus = this._dialogReturnFocus;
+    this._dialogReturnFocus = null;
+    if (!focus) return;
+    window.setTimeout(() => this._restoreListUiState({ focus }), 0);
+  }
+
   _visibleVehicles() {
     const filter = this._filter.trim().toLowerCase();
     const vehicles = this._vehicles.filter((vehicle) => {
@@ -615,6 +635,7 @@ class TuevReminderPanel extends HTMLElement {
     const vehicle = this._visibleVehicles()[index];
     if (!vehicle) return;
     if (this._mobileActionMode()) {
+      this._rememberDialogReturnFocus({ menuEntryId: String(vehicle.entry_id || "") });
       this._openMenuIndex = null;
       this._openMenuEntryId = null;
       this._actionSheetVehicle = vehicle;
@@ -646,6 +667,7 @@ class TuevReminderPanel extends HTMLElement {
       this._actionSheetOpenedAt = 0;
       this._actionSheetCloseGuardUntil = 0;
       this._renderPreservingListUiState();
+      this._restoreDialogReturnFocus();
     }
   }
 
@@ -673,6 +695,7 @@ class TuevReminderPanel extends HTMLElement {
     }
 
     const entryId = String(vehicle?.entry_id || "");
+    this._rememberDialogReturnFocus({ menuEntryId: entryId });
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
@@ -748,6 +771,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openDeleteConfirm(vehicle) {
+    this._rememberDialogReturnFocus({ menuEntryId: String(vehicle?.entry_id || "") });
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
@@ -761,6 +785,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openCreateForm() {
+    this._rememberDialogReturnFocus({ createTrigger: "controls" });
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
@@ -776,6 +801,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openDetailForm(vehicle) {
+    this._rememberDialogReturnFocus({ menuEntryId: String(vehicle?.entry_id || "") });
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
     this._actionSheetVehicle = null;
@@ -817,6 +843,7 @@ class TuevReminderPanel extends HTMLElement {
     this._formSnapshot = null;
     this._dialogFocusPending = null;
     this._render();
+    this._restoreDialogReturnFocus();
   }
 
   _formPayload() {
@@ -879,7 +906,9 @@ class TuevReminderPanel extends HTMLElement {
     const errors = this._formValidation();
     if (errors.length) {
       this._formError = "Bitte zuerst die markierten Angaben korrigieren.";
+      this._formInfo = null;
       this._syncFormSummary();
+      this._focusFirstValidationIssue(errors);
       return;
     }
 
@@ -898,10 +927,13 @@ class TuevReminderPanel extends HTMLElement {
       this._setFlash("Fahrzeug wurde angelegt.");
       this._finishSuccessfulSave();
     } catch (err) {
+      this._formInfo = null;
       this._formError = err?.message || String(err);
+      this._validationFocusPending = "summary";
     } finally {
       this._saving = false;
       this._render();
+      if (this._view === "list") this._restoreDialogReturnFocus();
     }
   }
 
@@ -925,10 +957,13 @@ class TuevReminderPanel extends HTMLElement {
       this._setFlash("Fahrzeug wurde gelöscht.");
       this._finishSuccessfulSave();
     } catch (err) {
+      this._formInfo = null;
       this._formError = err?.message || String(err);
+      this._validationFocusPending = "summary";
     } finally {
       this._deleting = false;
       this._render();
+      if (this._view === "list") this._restoreDialogReturnFocus();
     }
   }
 
@@ -940,7 +975,9 @@ class TuevReminderPanel extends HTMLElement {
     const errors = this._formValidation();
     if (errors.length) {
       this._formError = "Bitte zuerst die markierten Angaben korrigieren.";
+      this._formInfo = null;
       this._syncFormSummary();
+      this._focusFirstValidationIssue(errors);
       return;
     }
 
@@ -960,10 +997,13 @@ class TuevReminderPanel extends HTMLElement {
       this._setFlash("Änderungen wurden gespeichert.");
       this._finishSuccessfulSave();
     } catch (err) {
+      this._formInfo = null;
       this._formError = err?.message || String(err);
+      this._validationFocusPending = "summary";
     } finally {
       this._saving = false;
       this._render();
+      if (this._view === "list") this._restoreDialogReturnFocus();
     }
   }
 
@@ -1052,6 +1092,7 @@ class TuevReminderPanel extends HTMLElement {
       const saveAllowed = errors.length === 0 && ["create", "detail"].includes(this._view) && (this._view === "create" || this._formDirty());
       saveButton.disabled = this._saving || !saveAllowed;
       saveButton.textContent = this._saving ? "Speichert …" : "Speichern";
+      saveButton.setAttribute("aria-busy", this._saving ? "true" : "false");
     }
   }
 
@@ -1091,6 +1132,72 @@ class TuevReminderPanel extends HTMLElement {
     return `<li><button type="button" class="validation-link" data-validation-target="${this._escape(target)}" data-validation-section="${this._escape(section)}" aria-label="Zum Feld springen: ${label}" title="Zum passenden Feld springen">${label}</button></li>`;
   }
 
+  _dialogFocusableElements(container) {
+    if (!container) return [];
+    const selector = [
+      "button:not([disabled])",
+      "[href]",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])",
+    ].join(",");
+    return Array.from(container.querySelectorAll(selector)).filter((element) => {
+      if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+      const style = window.getComputedStyle(element);
+      return style.display !== "none" && style.visibility !== "hidden";
+    });
+  }
+
+  _keepFocusInsideDialog(event, container) {
+    if (event.key !== "Tab") return false;
+    const focusable = this._dialogFocusableElements(container);
+    if (!focusable.length) {
+      event.preventDefault();
+      container.focus({ preventScroll: true });
+      return true;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = this.shadowRoot.activeElement;
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus({ preventScroll: true });
+      return true;
+    }
+    if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
+      return true;
+    }
+    if (!container.contains(active)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+      return true;
+    }
+    return false;
+  }
+
+  _focusDialog(backdrop, preferredSelector = null) {
+    if (!backdrop) return;
+    const preferred = preferredSelector ? backdrop.querySelector(preferredSelector) : null;
+    const first = this._dialogFocusableElements(backdrop)[0];
+    const target = preferred || first || backdrop;
+    target.focus({ preventScroll: true });
+  }
+
+  _bindDialogKeyboard(backdrop, onEscape) {
+    if (!backdrop) return;
+    backdrop.addEventListener("keydown", (event) => {
+      if (this._keepFocusInsideDialog(event, backdrop)) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onEscape();
+      }
+    });
+  }
+
   _bindValidationLinks() {
     if (!this.shadowRoot) return;
     this.shadowRoot.querySelectorAll("button[data-validation-target]").forEach((button) => {
@@ -1101,6 +1208,26 @@ class TuevReminderPanel extends HTMLElement {
         this._focusValidationTarget(button.dataset.validationTarget, button.dataset.validationSection);
       });
     });
+  }
+
+  _focusValidationSummary() {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const summary = root.querySelector("[data-validation-summary]");
+    if (!summary) return;
+    summary.scrollIntoView({ block: "center", behavior: "smooth" });
+    window.setTimeout(() => summary.focus?.({ preventScroll: true }), 120);
+  }
+
+  _focusFirstValidationIssue(errors = []) {
+    const firstTarget = errors.map((error) => this._validationTargetForError(error)).find(Boolean);
+    window.setTimeout(() => {
+      if (firstTarget) {
+        this._focusValidationTarget(firstTarget, this._validationSectionForTarget(firstTarget));
+        return;
+      }
+      this._focusValidationSummary();
+    }, 0);
   }
 
   _focusValidationTarget(name, sectionName = "") {
@@ -1260,12 +1387,12 @@ class TuevReminderPanel extends HTMLElement {
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
     const plate = vehicle.plate_display || vehicle.plate || "—";
     return `
-      <section class="modal-backdrop" aria-label="Fahrzeug löschen" role="dialog" aria-modal="true" tabindex="-1">
-        <div class="form-shell delete-shell">
+      <section class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description" aria-busy="${this._deleting ? "true" : "false"}" tabindex="-1">
+        <div class="form-shell delete-shell" data-dialog-surface>
           <div class="form-head">
             <div>
-              <h2>Fahrzeug löschen</h2>
-              <p>Dieses Fahrzeug wird aus dem TÜV Reminder entfernt.</p>
+              <h2 id="delete-title">Fahrzeug löschen</h2>
+              <p id="delete-description">Dieses Fahrzeug wird aus dem TÜV Reminder entfernt.</p>
             </div>
           </div>
           <div class="form-card delete-card">
@@ -1275,8 +1402,8 @@ class TuevReminderPanel extends HTMLElement {
             ${this._formError ? `<p class="form-error">${this._escape(this._formError)}</p>` : ""}
             ${this._formInfo ? `<p class="muted">${this._escape(this._formInfo)}</p>` : ""}
             <div class="form-actions modal-bottom-actions">
-              <button class="danger" id="confirm-delete" ${this._deleting ? "disabled" : ""}>${this._deleting ? "Löscht …" : "Löschen"}</button>
-              <button class="ghost" id="cancel-delete" ${this._deleting ? "disabled" : ""}>Schließen</button>
+              <button type="button" class="danger" id="confirm-delete" aria-busy="${this._deleting ? "true" : "false"}" ${this._deleting ? "disabled" : ""}>${this._deleting ? "Löscht …" : "Löschen"}</button>
+              <button type="button" class="ghost" id="cancel-delete" ${this._deleting ? "disabled" : ""}>Schließen</button>
             </div>
           </div>
         </div>
@@ -1287,13 +1414,13 @@ class TuevReminderPanel extends HTMLElement {
 
   _renderDiscardConfirm() {
     return `
-      <section class="discard-backdrop" aria-label="Ungespeicherte Änderungen" role="dialog" aria-modal="true" tabindex="-1">
-        <div class="discard-dialog">
-          <h2>Ungespeicherte Änderungen</h2>
-          <p>Im Formular wurden Angaben geändert. Änderungen verwerfen und zur Liste zurückkehren?</p>
+      <section class="discard-backdrop" role="dialog" aria-modal="true" aria-labelledby="discard-title" aria-describedby="discard-description" tabindex="-1">
+        <div class="discard-dialog" data-dialog-surface>
+          <h2 id="discard-title">Ungespeicherte Änderungen</h2>
+          <p id="discard-description">Im Formular wurden Angaben geändert. Änderungen verwerfen und zur Liste zurückkehren?</p>
           <div class="form-actions modal-bottom-actions">
-            <button class="danger" id="confirm-discard">Verwerfen</button>
-            <button class="ghost" id="cancel-discard">Weiter bearbeiten</button>
+            <button type="button" class="danger" id="confirm-discard">Verwerfen</button>
+            <button type="button" class="ghost" id="cancel-discard">Weiter bearbeiten</button>
           </div>
         </div>
       </section>
@@ -1305,11 +1432,11 @@ class TuevReminderPanel extends HTMLElement {
     const name = vehicle.vehicle_name || vehicle.title || "Fahrzeug";
     const plate = vehicle.plate_display || vehicle.plate || "—";
     return `
-      <section class="action-sheet-backdrop" aria-label="Fahrzeugaktionen" role="dialog" aria-modal="true" tabindex="-1" data-action-sheet-backdrop="true">
-        <div class="action-sheet">
+      <section class="action-sheet-backdrop" role="dialog" aria-modal="true" aria-labelledby="action-sheet-title" aria-describedby="action-sheet-description" tabindex="-1" data-action-sheet-backdrop="true">
+        <div class="action-sheet" data-dialog-surface>
           <div class="action-sheet-head">
-            <strong>${this._escape(name)}</strong>
-            <span>${this._escape(plate)}</span>
+            <strong id="action-sheet-title">${this._escape(name)}</strong>
+            <span id="action-sheet-description">${this._escape(plate)}</span>
           </div>
           <button type="button" class="sheet-action" data-action-sheet-action="edit">Bearbeiten</button>
           <button type="button" class="sheet-action danger-text" data-action-sheet-action="delete">Löschen</button>
@@ -1335,15 +1462,15 @@ class TuevReminderPanel extends HTMLElement {
     const plateFormats = this._plateFormatOptionsForKind(clean.plate_kind);
 
     return `
-      <section class="modal-backdrop" aria-label="${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug"}" role="dialog" aria-modal="true" tabindex="-1">
-        <div class="form-shell vehicle-form-shell">
+      <section class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="vehicle-form-title" aria-describedby="vehicle-form-description" aria-busy="${this._saving ? "true" : "false"}" tabindex="-1">
+        <div class="form-shell vehicle-form-shell" data-dialog-surface>
         <div class="form-head">
           <div>
             <div class="form-title-row">
-              <h2>${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
+              <h2 id="vehicle-form-title">${isDetail ? "Fahrzeugdetails" : "Neues Fahrzeug anlegen"}</h2>
               <span class="dirty-pill" data-dirty-state aria-label="Ungespeicherte Änderungen" ${dirty && !this._saving ? "" : "hidden"}>Ungespeichert</span>
             </div>
-            <p>${isDetail ? "Fahrzeugdaten bearbeiten und speichern." : "Fahrzeugdaten eintragen und speichern."}</p>
+            <p id="vehicle-form-description">${isDetail ? "Fahrzeugdaten bearbeiten und speichern." : "Fahrzeugdaten eintragen und speichern."}</p>
           </div>
         </div>
 
@@ -1418,15 +1545,15 @@ class TuevReminderPanel extends HTMLElement {
                 <div><dt>Art</dt><dd data-summary="kind">${this._escape(this._kindLabel(clean.plate_kind))}</dd></div>
                 <div><dt>Format</dt><dd data-summary="format">${this._escape(this._formatLabel(clean.plate_format))}</dd></div>
               </dl>
-              <div class="validation ${errors.length ? "has-errors" : "ok"}">
+              <div class="validation ${errors.length ? "has-errors" : "ok"}" data-validation-summary tabindex="-1" role="status" aria-live="polite" aria-atomic="true">
                 ${this._validationHtml(errors)}
               </div>
               <p class="note">Änderungen werden in den TÜV-Reminder-Daten gespeichert und danach in Home Assistant aktualisiert.</p>
               <div class="form-actions modal-bottom-actions">
                 ${isDetail
-                  ? `<button class="action" id="save-update" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
-                  : `<button class="action" id="save-create" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
-                <button class="ghost" id="back-to-list">Schließen</button>
+                  ? `<button type="button" class="action" id="save-update" aria-busy="${this._saving ? "true" : "false"}" ${errors.length || this._saving || !this._formDirty() ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`
+                  : `<button type="button" class="action" id="save-create" aria-busy="${this._saving ? "true" : "false"}" ${errors.length || this._saving ? "disabled" : ""}>${this._saving ? "Speichert …" : "Speichern"}</button>`}
+                <button type="button" class="ghost" id="back-to-list" ${this._saving ? "disabled" : ""}>Schließen</button>
               </div>
             </aside>
             ${seasonal ? `
@@ -1442,7 +1569,8 @@ class TuevReminderPanel extends HTMLElement {
                 </div>
               </section>
             ` : ""}
-          </div>        </div>
+          </div>
+        </div>
         </div>
       </section>
     `;
@@ -1453,8 +1581,6 @@ class TuevReminderPanel extends HTMLElement {
       return;
     }
 
-    const apiVersion = this._metadata?.api_version ?? "—";
-    const writeApi = this._metadata?.write_api === true ? "aktiv" : "read-only";
     const vehicleCount = this._vehicles.length;
     const counts = this._statusCounts();
     const listMode = true;
@@ -1664,11 +1790,6 @@ class TuevReminderPanel extends HTMLElement {
         .status-filter-chip:hover, .status-filter-chip:focus-visible {
           border-color: var(--primary-color);
           outline: none;
-        }
-        .summary-detail {
-          color: var(--secondary-text-color);
-          font-size: 12px;
-          line-height: 1.35;
         }
         .content { padding: 0; }
         .modal-backdrop {
@@ -2154,6 +2275,7 @@ class TuevReminderPanel extends HTMLElement {
         dt { color: var(--secondary-text-color); }
         dd { margin: 0; text-align: right; }
         .validation { border-radius: 8px; padding: 12px; font-size: 13px; border: 1px solid var(--divider-color); }
+        .validation:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
         .validation ul { margin: 8px 0 0 18px; padding: 0; }
         .validation p { margin: 8px 0 0; }
         .validation-link {
@@ -2433,7 +2555,7 @@ class TuevReminderPanel extends HTMLElement {
             <button class="menu" title="Menü öffnen" aria-label="Menü öffnen">☰</button>
             <h1>TÜV Reminder</h1>
           </div>
-          <div class="topbar-status${this._metadata?.write_api === true ? " sr-only" : " read-only"}" aria-live="polite">${this._metadata?.write_api === true ? `API v${this._escape(apiVersion)} · ${this._escape(writeApi)}` : "Nur lesen"}</div>
+          ${this._metadata?.write_api === true ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`}
         </header>
 
         <section class="list-controls" aria-label="Fahrzeugliste filtern und sortieren">
@@ -2630,20 +2752,14 @@ class TuevReminderPanel extends HTMLElement {
     if (discardBackdrop) {
       if (this._dialogFocusPending === "discard") {
         window.setTimeout(() => {
-          discardBackdrop.focus({ preventScroll: true });
+          this._focusDialog(discardBackdrop, "#cancel-discard");
           if (this._dialogFocusPending === "discard") this._dialogFocusPending = null;
         }, 0);
       }
       discardBackdrop.addEventListener("click", (event) => {
         if (event.target === discardBackdrop) this._closeDiscardPrompt();
       });
-      discardBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          this._closeDiscardPrompt();
-        }
-      });
+      this._bindDialogKeyboard(discardBackdrop, () => this._closeDiscardPrompt());
     }
 
     const actionSheetBackdrop = this.shadowRoot.querySelector(".action-sheet-backdrop");
@@ -2651,7 +2767,7 @@ class TuevReminderPanel extends HTMLElement {
       // r053 compatibility check marker: window.setTimeout(() => actionSheetBackdrop.focus({ preventScroll: true }), 0);
       if (this._dialogFocusPending === "actionSheet") {
         window.setTimeout(() => {
-          actionSheetBackdrop.focus({ preventScroll: true });
+          this._focusDialog(actionSheetBackdrop, "button[data-action-sheet-action]");
           if (this._dialogFocusPending === "actionSheet") this._dialogFocusPending = null;
         }, 0);
       }
@@ -2665,33 +2781,27 @@ class TuevReminderPanel extends HTMLElement {
       };
       actionSheetBackdrop.addEventListener("pointerup", maybeCloseActionSheet);
       actionSheetBackdrop.addEventListener("click", maybeCloseActionSheet);
-      actionSheetBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          this._closeActionSheet({ force: true });
-        }
-      });
+      this._bindDialogKeyboard(actionSheetBackdrop, () => this._closeActionSheet({ force: true }));
     }
 
     const modalBackdrop = this.shadowRoot.querySelector(".modal-backdrop");
     if (modalBackdrop) {
       if (this._dialogFocusPending === "modal") {
         window.setTimeout(() => {
-          modalBackdrop.focus({ preventScroll: true });
+          const preferred = this._view === "delete" ? "#cancel-delete" : "[data-field='vehicle_name']";
+          this._focusDialog(modalBackdrop, preferred);
           if (this._dialogFocusPending === "modal") this._dialogFocusPending = null;
         }, 0);
       }
       modalBackdrop.addEventListener("click", (event) => {
         if (event.target === modalBackdrop) this._closeForm();
       });
-      modalBackdrop.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          this._closeForm();
-        }
-      });
+      this._bindDialogKeyboard(modalBackdrop, () => this._closeForm());
+    }
+
+    if (this._validationFocusPending === "summary") {
+      this._validationFocusPending = null;
+      window.setTimeout(() => this._focusValidationSummary(), 0);
     }
 
     const menuButton = this.shadowRoot.querySelector(".menu");

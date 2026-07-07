@@ -15,9 +15,9 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r108":
-    fail("manifest version must be 0.1.0-r108")
-if read("REMINDER_VERSION.txt").strip() != "r108":
+if manifest.get("version") != "0.1.0-r114":
+    fail("manifest version must be 0.1.0-r114")
+if read("REMINDER_VERSION.txt").strip() != "r114":
     fail("REMINDER_VERSION.txt must be r030")
 
 sensor = read("custom_components/tuev_reminder/sensor.py")

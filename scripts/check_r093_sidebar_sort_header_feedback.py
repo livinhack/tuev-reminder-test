@@ -9,9 +9,9 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 version = VERSION.read_text(encoding="utf-8").strip()
 
-if '"version": "0.1.0-r108"' not in manifest:
-    raise SystemExit("manifest version must be 0.1.0-r108")
-if version != "r108":
+if '"version": "0.1.0-r114"' not in manifest:
+    raise SystemExit("manifest version must be 0.1.0-r114")
+if version != "r114":
     raise SystemExit("REMINDER_VERSION must be r095")
 
 markers = [

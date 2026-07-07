@@ -1,15 +1,71 @@
+# TÜV Reminder r114
+
+## r114 – Sidebar Cleanup Checkpoint Before Next Feature
+
+- Größerer Sammelstand statt weiterer Mini-ZIPs.
+- Version auf `0.1.0-r114` / `r114` aktualisiert.
+- Normale schreibbare Topbar rendert keinen technischen `API v… · aktiv`-Status mehr.
+- Sichtbarer `Nur lesen`-Hinweis bleibt für nicht schreibbare Manager-API erhalten.
+- Kleine Formular-Template-/Markup-Bereinigung.
+- Neuer Guard: `scripts/check_r114_sidebar_cleanup_checkpoint.py`.
+- Bestehende Checks auf r114 synchronisiert und vollständig ausgeführt.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+---
+
+# TÜV Reminder r113
+
+## r113 – Sidebar Dialog Return Focus Cleanup
+
+- Dialog-Auslöser werden vor dem Öffnen gespeichert.
+- Nach Schließen/Speichern/Löschen springt der Fokus wieder in einen sinnvollen Listenkontext.
+- Fahrzeugaktionen bevorzugen den Drei-Punkte-Button der betroffenen Zeile.
+- Fahrzeug-Anlegen bevorzugt das obere Plus als Rücksprungziel.
+- Mobile Action Sheet nutzt denselben Rücksprungmechanismus.
+- Doppelte tote `return payload;`-Zeile entfernt.
+- Gebündelter r113-Regression-Check ergänzt.
+
+---
+
+Arbeitsstand r113 bündelt weitere Sidebar-Dialog-Cleanups auf Basis von r111. Dialoge bekommen einen gemeinsamen Tab-Fokus-Umlauf und zielgerichteteren Initialfokus. r100/r097-Formularlayout, separate Saisonkarte und r089/r091-Kennzeichenfallback bleiben unverändert.
+
+## r113 – Sidebar Dialog Focus Trap Cleanup
+
+- Gemeinsame Dialog-Fokus-Helfer ergänzt.
+- Tab/Shift+Tab bleibt im aktiven Dialog statt in die Liste dahinter zu springen.
+- Initialfokus verbessert: Fahrzeugname im Formular, sicherer Schließen-Button im Löschen-Dialog, „Weiter bearbeiten“ im Dirty-Guard, erste Aktion im Action Sheet.
+- Dialog-Oberflächen mit `data-dialog-surface` markiert.
+- Gebündelter r113-Regression-Check ergänzt.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+# TÜV Reminder r111
+
+Arbeitsstand r111 bündelt weitere Sidebar-Cleanups auf Basis von r110. Dialoge im Anlegen-/Bearbeiten-/Löschen-Flow haben klarere Label-/Beschreibung-Bezüge und Busy-State-Markierungen. Sichtbar bleibt der akzeptierte Stand: r100/r097-Rechtslayout mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+## r110 – Sidebar Bundled Cleanup Checks
+
+- Bündelt mehrere kleinere Formular-/Validierungs-Cleanups statt weiterer Mini-ZIPs.
+- Bereinigt Frontend-Kommentar und doppelte State-Initialisierung.
+- Ergänzt Live-Status-/Busy-Attribute für Validierungsbox und Speichern-Button.
+- Deaktiviert Schließen während des Speicherns zusätzlich sichtbar im UI.
+- Ergänzt Regression-Check für r100/r097-Layout, r089/r091-Kennzeichenfallback, Suche/Badges, Single-Create-Action, Dirty-State und Validierungsfokus.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
 # Changelog
 
-## r108 – Sidebar Dirty Pill Live Sync
+## r109 – Sidebar Save/Error Focus Cleanup
 
-- Dirty-State **Ungespeichert** im Formular-Kopf aktualisiert sich jetzt live ohne komplettes Formular-Re-Render.
-- Wenn eine Änderung wieder auf den gespeicherten Wert zurückgesetzt wird, verschwindet die Markierung direkt.
-- Validierungslink-Rebind aus r107 bleibt erhalten.
+- Speichern mit ungültigen Formularwerten fokussiert jetzt direkt den ersten blockierenden Fehler beziehungsweise das zugehörige Feld.
+- Backend-/Speicherfehler löschen den vorherigen „wird gespeichert …“-Hinweis, damit Fehler- und Ladezustand nicht gleichzeitig sichtbar bleiben.
+- Nach Backend-/Speicherfehlern springt der Fokus in die Validierungs-/Statusbox rechts.
+- Die Validierungsbox ist fokussierbar und bekommt einen sichtbaren Fokusrahmen.
+- Dirty-State-Live-Sync aus r108 bleibt erhalten.
 - r100/r097-Formularaufbau bleibt unverändert.
 - r089/r091-Kennzeichenfallback bleibt unverändert.
 - Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
 
 ---
+
 
 ## r107 – Sidebar Validation Link Rebind
 

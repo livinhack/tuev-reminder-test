@@ -1,3 +1,221 @@
+# Handover – TÜV Reminder r114
+
+## Kurzstand
+
+r114 ist der gebündelte Cleanup-/Checkstand nach r113 und vor dem nächsten Featureblock. Mehrere kleine Aufräumarbeiten, Versionssynchronisierung und Regression-Checks wurden zusammengefasst.
+
+## Basis
+
+- r113: `tuev-reminder-r113-sidebar-dialog-return-focus-cleanup.zip`
+
+## Geänderte Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `scripts/check_r096_sidebar_topbar_technical_status_cleanup.py`
+- `scripts/check_r114_sidebar_cleanup_checkpoint.py`
+- bestehende Checkskripte durch Versionssynchronisierung auf r114
+- `README.md`
+- `CHANGELOG.md`
+- `HANDOVER.md`
+- `docs/REMINDER_R114_SIDEBAR_CLEANUP_CHECKPOINT.md`
+
+## Änderungen
+
+- Version auf `0.1.0-r114` / `r114` gesetzt.
+- Topbar endgültig vom normalen technischen Status befreit:
+  - kein gerendertes `API v… · aktiv` mehr im schreibbaren Normalzustand
+  - sichtbarer `Nur lesen`-Hinweis bleibt bei nicht schreibbarer API
+- Kleine Markup-Bereinigung im Formular-Template.
+- Neuer r114-Checkpoint-Guard prüft die festgelegten Fixpunkte und blockiert bekannte Rückfälle.
+
+## Unveränderte Fixpunkte
+
+- r100/r097-Rechtslayout bleibt Referenz.
+- Saisonkarte bleibt separat unter der rechten Überblick-Karte.
+- r089/r091-Kennzeichenfallback bleibt kompakter dunkler Textslot.
+- Suche/Badges ohne sichtbaren Trefferzähler.
+- Single-Create-Action oben.
+- Dirty-State, Validierungslinks, Field-/Section-Invalid-Markierungen, Save/Error-Focus.
+- Dialog-Focus-Trap und Return-Focus aus r112/r113 bleiben erhalten.
+- Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+## Interne Checks
+
+```bash
+python3 scripts/run_all_checks.py
+node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
+```
+
+## Nächster sinnvoller Featureblock
+
+Nach r114 kann wieder ein echter Funktionsblock begonnen werden, z. B. Card-Erkennung/Renderer-Anbindung oder ein neuer klar abgegrenzter Sidebar-Featurebereich. Keine weiteren Cleanup-Mini-ZIPs nötig, sofern HA-Test von r114 unauffällig ist.
+
+---
+
+# Handover – TÜV Reminder r113
+
+## Kurzstand r113
+
+r113 baut auf r112 auf und bündelt weitere Dialog-/Fokus-Cleanups. Die sichtbare Oberfläche soll praktisch gleich bleiben. Neu ist vor allem, dass Dialoge ihren Auslöser merken und nach dem Schließen wieder einen sinnvollen Fokuspunkt in der Liste herstellen.
+
+## Geänderte Dateien r113
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `docs/REMINDER_R113_SIDEBAR_DIALOG_RETURN_FOCUS_CLEANUP.md`
+- `scripts/check_r113_sidebar_dialog_return_focus_cleanup.py`
+
+---
+
+## Stand
+
+Basis: r111 (`tuev-reminder-r111-sidebar-dialog-accessibility-cleanup.zip`).
+
+r113 bündelt weitere Dialog-/Keyboard-Robustheit. Es ist bewusst ein Sammelstand und kein Mini-Release-Schritt. Die bestehenden Dialoge bleiben optisch gleich, bekommen aber einen Fokus-Umlauf für Tab/Shift+Tab und einen klareren Initialfokus.
+
+## Änderungen
+
+- Gemeinsame Dialog-Fokus-Helfer in `tuev-reminder-panel.js` ergänzt:
+  - `_dialogFocusableElements()`
+  - `_keepFocusInsideDialog()`
+  - `_focusDialog()`
+  - `_bindDialogKeyboard()`
+- Tab/Shift+Tab bleibt innerhalb des aktiven Dialogs:
+  - Anlegen/Bearbeiten
+  - Löschen
+  - Ungespeicherte-Änderungen-Dialog
+  - Mobile Action Sheet
+- Initialfokus pro Dialog verbessert:
+  - Fahrzeugdialog: Fahrzeugname
+  - Löschdialog: Schließen
+  - Dirty-Guard: Weiter bearbeiten
+  - Action Sheet: erste Aktion
+- `data-dialog-surface` als stabile Dialogstruktur-Markierung ergänzt.
+- Neuer Check: `scripts/check_r113_sidebar_dialog_focus_trap.py`.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Suche/Badges ohne sichtbaren Trefferzähler bleiben unverändert.
+- Single-Create-Action aus r097 bleibt unverändert.
+- Dirty-State, Validierungslinks, Field-/Section-Invalid-Markierungen und Save/Error-Focus bleiben erhalten.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `HANDOVER.md`
+- `CHANGELOG.md`
+- `docs/REMINDER_R113_SIDEBAR_DIALOG_FOCUS_TRAP.md`
+- `scripts/check_r113_sidebar_dialog_focus_trap.py`
+
+## Testfokus in HA
+
+1. Anlegen/Bearbeiten öffnen und per Tab/Shift+Tab durchlaufen: Fokus darf nicht in die Liste dahinter springen.
+2. Escape im Fahrzeugdialog prüfen: Dirty-Guard muss bei Änderungen wie bisher greifen.
+3. Dirty-Guard öffnen und per Tab/Shift+Tab prüfen.
+4. Mobile Action Sheet öffnen: Tab/Escape/Außenklick prüfen.
+5. Löschen öffnen: Initialfokus, Tab-Umlauf, Escape und Löschablauf prüfen.
+6. Fixpunkte prüfen: r100/r097-Saisonkarte, r089/r091-Kennzeichenfallback, Suche/Badges, Sortierung, Drei-Punkte-Menü.
+
+# TÜV Reminder r111
+
+Arbeitsstand r111 bündelt weitere Sidebar-Cleanups auf Basis von r110. Dialoge im Anlegen-/Bearbeiten-/Löschen-Flow haben klarere Label-/Beschreibung-Bezüge und Busy-State-Markierungen. Sichtbar bleibt der akzeptierte Stand: r100/r097-Rechtslayout mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+# Handover – TÜV Reminder r110
+
+## Stand
+
+Basis: r109 (`tuev-reminder-r109-sidebar-save-error-focus-cleanup.zip`).
+
+r110 ist bewusst als gebündelter Cleanup-/Check-Stand angelegt, nicht als Mini-Einzelschritt. Der Stand fasst mehrere kleinere Formular- und Validierungsbereinigungen zusammen und ergänzt einen Regression-Guard für die aktuell akzeptierten UI-Fixpunkte.
+
+## Änderungen
+
+- Frontend-Kopfkommentar und doppelte State-Initialisierung bereinigt.
+- Validierungs-/Statusbox im Formular ist jetzt als Live-Status markiert (`role="status"`, `aria-live="polite"`, `aria-atomic="true"`).
+- Speichern-Button trägt `aria-busy` und synchronisiert den Zustand auch bei Live-Formularupdates.
+- Schließen-Button im Anlegen-/Bearbeiten-Dialog ist während des Speicherns deaktiviert; `_closeForm()` blockt diesen Zustand weiterhin zusätzlich ab.
+- Neuer gebündelter r110-Check prüft die Fixpunkte aus r097/r100, r089/r091 und r102–r109 gemeinsam.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Suche/Badges ohne sichtbaren Trefferzähler bleiben unverändert.
+- Single-Create-Action aus r097 bleibt unverändert.
+- Dirty-State, Validierungslinks, Field-/Section-Invalid-Markierungen und Save/Error-Focus bleiben erhalten.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+- Card b355 bleibt nur Kompatibilitätskontext; `calendar.tuev_reminder` und `reminder_offset_days` bleiben unverändert.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `README.md`
+- `HANDOVER.md`
+- `CHANGELOG.md`
+- `docs/REMINDER_R110_SIDEBAR_BUNDLED_CLEANUP_CHECKS.md`
+- `scripts/check_r110_sidebar_bundled_cleanup_checks.py`
+
+## Testfokus in HA
+
+1. Anlegen/Bearbeiten öffnen: r100/r097-Rechtslayout prüfen, Saisonkarte nur separat unter der rechten Überblick-Karte.
+2. Ungültige Werte erzeugen: Feld- und Kartenmarkierungen, anklickbare Validierungslinks und Fokus-Sprung prüfen.
+3. Speichern klicken: bei ungültigen Werten Fokus zum ersten Fehler; beim Speichern Schließen-Button deaktiviert und Speichern zeigt Busy-Zustand.
+4. Dirty-State prüfen: Änderung → **Ungespeichert**, Wert zurück → verschwindet.
+5. Liste prüfen: Suche/Badges ohne `X/X Treffer`, Single-Create-Plus, Sortierheader, Drei-Punkte-Menü/mobile Action Sheet.
+6. Kennzeichenfallback in der Liste muss weiterhin wie r089/r091 aussehen.
+
+---
+
+# Handover – TÜV Reminder r109
+
+## Stand
+
+Basis: r108 (`tuev-reminder-r108-sidebar-dirty-pill-live-sync.zip`).
+
+r109 räumt die Speicher-/Fehlerzustände im Anlegen-/Bearbeiten-Dialog auf. Validierungsfehler beim Speichern führen jetzt direkt zum ersten betroffenen Feld. Backend-/Speicherfehler entfernen den alten Ladehinweis und fokussieren die rechte Validierungs-/Statusbox, damit nicht gleichzeitig „wird gespeichert …“ und ein Fehlerzustand sichtbar bleiben.
+
+## Wichtig
+
+- r100/r097-Rechtslayout bleibt Referenz: Überblick-Karte unverändert, Saisonkarte separat darunter.
+- r089/r091-Kennzeichenfallback bleibt Referenz: kompakter dunkler Textslot, kein r090-Plain-Fallback.
+- Dirty-State-Live-Sync aus r108 bleibt erhalten.
+- Validierungslink-Rebind aus r107 bleibt erhalten.
+- Card b355 bleibt nur Kompatibilitätskontext; `calendar.tuev_reminder` und `reminder_offset_days` bleiben unverändert.
+- Kein Release, keine Card-Dateien, keine Card-Erkennung, kein Card-Renderer.
+
+## Dateien
+
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js`
+- `custom_components/tuev_reminder/manifest.json`
+- `REMINDER_VERSION.txt`
+- `docs/REMINDER_R109_SIDEBAR_SAVE_ERROR_FOCUS.md`
+- `scripts/check_r109_sidebar_save_error_focus.py`
+
+## Testfokus in HA
+
+1. Anlegen/Bearbeiten öffnen, Pflichtfeld leeren oder ungültige Werte setzen, dann Speichern klicken → Fokus muss zum ersten blockierenden Feld springen.
+2. Einen Backend-/Speicherfehler provozieren, soweit möglich → rechts darf kein alter „wird gespeichert …“-Text neben dem Fehler stehen.
+3. Nach einem Fehler muss Speichern wieder bedienbar sein, sobald die Angaben gültig sind.
+4. Dirty-State **Ungespeichert** aus r108 weiter prüfen: Wert ändern → erscheint; Wert zurücksetzen → verschwindet.
+5. Saisonkennzeichen prüfen: Überblick rechts unverändert, Saisonkarte separat darunter.
+6. Kennzeichenfallback in der Liste muss weiterhin wie r089/r091 aussehen.
+
+
+---
+
+## Vorheriger vollständiger Kontext
+
 # Handover – TÜV Reminder r108
 
 ## Stand

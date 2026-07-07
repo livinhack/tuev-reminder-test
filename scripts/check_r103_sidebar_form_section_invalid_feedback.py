@@ -5,8 +5,8 @@ panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text(encoding='utf-8')
 version = (root / 'REMINDER_VERSION.txt').read_text(encoding='utf-8').strip()
 
-assert '"version": "0.1.0-r108"' in manifest
-assert version == 'r108'
+assert '"version": "0.1.0-r114"' in manifest
+assert version == 'r114'
 assert '_sectionInvalidClass(names, clean = this._scrubFormForKind())' in panel
 assert 'data-form-section="vehicle"' in panel
 assert 'data-form-section="due"' in panel

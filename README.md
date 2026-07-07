@@ -1,10 +1,64 @@
-# TÜV Reminder r108
+# TÜV Reminder r114
 
-Arbeitsstand r108 verfeinert den Dirty-State im Sidebar-Formular: Die **Ungespeichert**-Markierung im Modal-Kopf aktualisiert sich jetzt live auch bei Eingaben, die das Formular nicht komplett neu rendern. Dadurch erscheint und verschwindet die Markierung direkt, wenn Änderungen entstehen oder wieder auf den gespeicherten Stand zurückgesetzt werden.
+Arbeitsstand **r114** ist ein gebündelter Cleanup-/Checkstand auf Basis von r113. Ziel war ausdrücklich, alle naheliegenden Checks und kleine Aufräumarbeiten bis zum nächsten echten Featureblock zusammenzufassen, statt weitere Mini-ZIPs zu erzeugen.
+
+## r114 Highlights
+
+- Version auf `0.1.0-r114` / `r114` aktualisiert.
+- Normale schreibbare Topbar rendert keinen technischen `API v… · aktiv`-Status mehr; sichtbar bleibt nur `Nur lesen`, falls die Manager-API nicht schreibbar ist.
+- Kleine Template-/Markup-Bereinigung im Formularbereich.
+- Neuer gebündelter r114-Checkpoint-Guard ergänzt.
+- Alle bestehenden Regression-Guards auf den neuen Arbeitsstand synchronisiert.
+
+Fixpunkte bleiben unverändert: r100/r097-Rechtslayout mit separater Saisonkarte, r089/r091-Kennzeichenfallback als kompakter dunkler Textslot, Suche/Badges ohne sichtbaren Trefferzähler, Single-Create-Action oben, Dirty-State, Validierungslinks, Save/Error-Focus, Dialog-Focus-Trap und Return-Focus. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+## r114 HA-Testfokus
+
+- Sidebar-Liste: Suche, Such-X, Status-Badges, Sortierung, Drei-Punkte-Menü.
+- Kennzeichenfallback rechts: weiterhin kompakter dunkler Textslot.
+- Formular: r100/r097-Überblick rechts unverändert; Saisonkarte separat darunter.
+- Formularvalidierung: Feld-/Section-Markierung, Validierungslinks, Fokus-Sprung.
+- Dirty-State und Schließen/Speichern/Abbrechen.
+- Dialoge per Tastatur: Tab-Falle und Fokus-Rücksprung nach dem Schließen.
+
+---
+
+# TÜV Reminder r113
+
+Arbeitsstand r113 bündelt weitere Sidebar-Dialog-Cleanups auf Basis von r112. Schwerpunkt ist der Fokus-Rücksprung nach geschlossenen Dialogen: Anlegen/Bearbeiten, Löschen und Mobile Action Sheet merken ihren Auslöser und setzen den Fokus nach dem Schließen wieder sinnvoll in die Liste zurück.
+
+Unverändert bleiben die akzeptierten Fixpunkte: r100/r097-Rechtslayout mit separater Saisonkarte und r089/r091-Kennzeichenfallback als kompakter dunkler Textslot. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+## r113 Testfokus
+
+- Fahrzeug über oberes Plus anlegen, schließen/speichern → Fokus soll wieder sinnvoll oben/in der Liste landen.
+- Zeilenmenü öffnen, Bearbeiten/Löschen starten, schließen/speichern → Fokus soll wieder zur passenden Fahrzeugzeile bzw. zum Drei-Punkte-Button zurückkehren.
+- Smartphone Action Sheet öffnen und schließen → Fokus darf nicht verloren gehen.
+
+---
+
+Arbeitsstand r113 bündelt weitere Sidebar-Dialog-Cleanups auf Basis von r111. Fokus liegt auf robuster Tastaturbedienung: aktive Dialoge halten Tab/Shift+Tab jetzt innerhalb des jeweiligen Dialogs, Escape nutzt eine gemeinsame Bindung, und der Initialfokus ist pro Dialog sinnvoller gesetzt. Sichtbar bleiben die akzeptierten Fixpunkte: r100/r097-Rechtslayout mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+# TÜV Reminder r111
+
+Arbeitsstand r111 bündelt weitere Sidebar-Cleanups auf Basis von r110. Dialoge im Anlegen-/Bearbeiten-/Löschen-Flow haben klarere Label-/Beschreibung-Bezüge und Busy-State-Markierungen. Sichtbar bleibt der akzeptierte Stand: r100/r097-Rechtslayout mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte.
+
+# TÜV Reminder r110
+
+Arbeitsstand r110 bündelt mehrere Sidebar-Cleanups statt weiterer Mini-Stände. Der akzeptierte r100/r097-Formularaufbau bleibt erhalten: die rechte hellgraue Überblick-Karte bleibt unverändert, die Saisonkarte erscheint separat darunter. Der r089/r091-Kennzeichenfallback bleibt ebenfalls unverändert.
+
+Gebündelt wurden: aufgeräumter Frontend-Kommentar/State-Initialisierung, zugänglichere Validierungsbox mit Live-Status, Busy-Zustand am Speichern-Button, gesperrter Schließen-Button während des Speicherns und ein zusätzlicher Regression-Check für die festgelegten Fixpunkte. Card b355 bleibt nur Kompatibilitätskontext; keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte. Kalenderkontext bleibt `calendar.tuev_reminder`, der Erinnerungsvorlauf bleibt `reminder_offset_days`.
+
+---
+
+# TÜV Reminder r109
+
+Arbeitsstand r109 räumt die Speicher-/Fehlerzustände im Sidebar-Formular auf. Wenn „Speichern“ mit ungültigen Angaben ausgelöst wird, springt der Fokus jetzt direkt zum ersten blockierenden Feld. Wenn ein Backend-/Speicherfehler zurückkommt, verschwindet der alte „wird gespeichert …“-Hinweis und der Fokus geht in die rechte Validierungs-/Statusbox.
 
 Layoutreferenzen bleiben unverändert: r100/r097-Formularaufbau mit separater Saisonkarte und r089/r091-Kennzeichenfallback. Card b355 bleibt nur Kompatibilitätskontext; keine Card-Erkennung, kein Card-Renderer, keine Release-Schritte. Kalenderkontext bleibt `calendar.tuev_reminder`, der Erinnerungsvorlauf bleibt `reminder_offset_days`.
 
 ---
+
 
 # TÜV Reminder r107
 

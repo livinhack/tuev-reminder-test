@@ -3,8 +3,8 @@ root = Path(__file__).resolve().parents[1]
 panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text()
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text()
 version = (root / 'REMINDER_VERSION.txt').read_text().strip()
-assert '"version": "0.1.0-r108"' in manifest
-assert version == 'r108'
+assert '"version": "0.1.0-r114"' in manifest
+assert version == 'r114'
 for needle in [
     'validation links remain bound after live form updates',
     '_bindValidationLinks() {',
@@ -22,4 +22,4 @@ for needle in [
 assert panel.count('_bindValidationLinks();') >= 2
 assert '0.1.0-r106' not in manifest
 assert 'X/X Treffer' not in panel
-print('r108 sidebar validation link rebind check OK')
+print('r112 sidebar validation link rebind check OK')
