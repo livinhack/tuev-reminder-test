@@ -1,3 +1,43 @@
+# Handover – TÜV Reminder r116
+
+## Kurzstand
+
+r116 baut auf r115 auf (Branch `claude/r115-backend-hardening`) und fasst ausschließlich zeilengleiche Hilfsfunktionen in `helpers.py` zusammen. Verhalten unverändert.
+
+## Zusammengeführt (vorher Kopien)
+
+| Funktion in `helpers.py` | vorher |
+|---|---|
+| `coerce_bool` | 5× (`__init__`, `calendar`, `config_flow`, `manager`, `sensor`) |
+| `int_or_default` | 3× (`calendar`, `config_flow`, `manager`) |
+| `reminder_offset_days_from_values` | 3× unter drei Namen |
+| `season_duration`, `is_valid_season_range` | je 2× (`config_flow`, `manager`) |
+| `legacy_suffix_flags` | 5× |
+| `suffix_flags_from_values` | 4× (Logik gleich; r007-Kommentar übernommen) |
+| `suffix_summary_from_flags` | 2× unter zwei Namen |
+
+## Bewusst nicht zusammengeführt
+
+- Kennzeichen-Ableitungen in `sensor.py`, `calendar.py`, `manager.py` (Art, grün, Saison, Wechselkennzeichen).
+- Titel des Eintrags: `__init__._entry_title_from_values` und `manager._entry_title_from_values` verhalten sich bei grünen bzw. Wechselkennzeichen unterschiedlich – inhaltliche Entscheidung offen.
+
+## Absicherung
+
+- `tests/test_shared_helpers.py` vor dem Umbau geschrieben und gegen alle alten Kopien ausgeführt (216 Fälle grün auf r115).
+- AST-Vergleich r115 ↔ r116: nur die verschobenen Funktionen entfernt, alle anderen Funktionen/Klassen identisch.
+- `pyflakes` ohne Befund.
+
+## Tests
+
+```bash
+pip install -r requirements_test.txt
+pytest
+find . -name __pycache__ -type d -not -path './.git/*' -exec rm -rf {} +
+python3 scripts/run_all_checks.py
+```
+
+---
+
 # Handover – TÜV Reminder r115
 
 ## Kurzstand

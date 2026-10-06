@@ -25,20 +25,22 @@ manifest = read("custom_components/tuev_reminder/manifest.json")
 readme = read("README.md")
 handover = read("HANDOVER.md")
 
-assert_contains(manifest, '"version": "0.1.0-r115"', "manifest r014 version")
+assert_contains(manifest, '"version": "0.1.0-r116"', "manifest r014 version")
 
 # NONE must not be interpreted as E and must not be appended to displayed plates.
 assert_contains(helpers, "suffix_text == PLATE_SUFFIX_NONE.upper()", "NONE display guard")
-for module, label in [(config_flow, "config_flow"), (sensor, "sensor"), (init, "init"), (calendar, "calendar")]:
-    assert_contains(module, "_legacy_suffix_flags", f"{label} legacy suffix helper")
-    assert_contains(module, "legacy_suffix in {PLATE_SUFFIX_E, \"HE\", \"EH\"}", f"{label} exact E legacy match")
+# r116: the legacy suffix helper exists once in helpers.py; modules import it.
+assert_contains(helpers, "def legacy_suffix_flags(", "shared legacy suffix helper")
+assert_contains(helpers, "legacy_suffix in {PLATE_SUFFIX_E, \"HE\", \"EH\"}", "helpers exact E legacy match")
+assert_contains(helpers, "plate_suffix=\"E\" can never be cleared", "r007 canonical-boolean comment kept")
+for module, label in [(helpers, "helpers"), (config_flow, "config_flow"), (sensor, "sensor"), (init, "init"), (calendar, "calendar")]:
     assert_not_contains(module, "PLATE_SUFFIX_E in legacy_suffix", f"{label} no substring E legacy match")
 
 # Stored boolean suffix flags must be canonical so unchecked boxes can clear old values.
-assert_contains(config_flow, "if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values", "canonical config suffix booleans")
+assert_contains(helpers, "if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values", "canonical config suffix booleans (r116: shared in helpers.py)")
 assert_contains(sensor, "if CONF_PLATE_SUFFIX_H in self.data or CONF_PLATE_SUFFIX_E in self.data", "canonical sensor suffix booleans")
-assert_contains(init, "if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values", "canonical init title suffix booleans")
-assert_contains(calendar, "if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values", "canonical calendar suffix booleans")
+assert_contains(init, "suffix_flags_from_values as _suffix_flags_from_values", "init uses shared canonical suffix helper (r116)")
+assert_contains(calendar, "suffix_flags_from_values as _suffix_flags_from_values", "calendar uses shared canonical suffix helper (r116)")
 
 # Green plates must not expose or keep H/E in this flow.
 assert_contains(config_flow, "def _suffix_allowed_for_kind", "green suffix gate helper")

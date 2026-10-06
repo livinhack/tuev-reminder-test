@@ -3,11 +3,85 @@ import re
 from datetime import date, timedelta
 
 from .const import (
+    CONF_PLATE_SUFFIX,
+    CONF_PLATE_SUFFIX_E,
+    CONF_PLATE_SUFFIX_H,
+    CONF_REMINDER_OFFSET_DAYS,
+    DEFAULT_REMINDER_OFFSET_DAYS,
+    PLATE_SUFFIX_E,
+    PLATE_SUFFIX_H,
     PLATE_SUFFIX_NONE,
     STATUS_VALID,
     STATUS_DUE,
     STATUS_EXPIRED,
 )
+
+
+# ---------------------------------------------------------------------------
+# r116: shared helpers. Before r116 each of these existed as identical copies
+# in several modules (__init__, calendar, config_flow, manager, sensor). The
+# modules now import them from here under their previous names. Plate-specific
+# derivations (kind, colour, season, change plate, entry title) intentionally
+# stay in their modules.
+# ---------------------------------------------------------------------------
+
+
+def coerce_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
+    return bool(value)
+
+
+def int_or_default(value: object, default: int) -> int:
+    try:
+        if value is None:
+            return default
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def reminder_offset_days_from_values(values: dict) -> int:
+    value = int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
+    return min(365, max(0, value))
+
+
+def season_duration(start_month: int, end_month: int) -> int:
+    return (end_month - start_month) % 12 + 1
+
+
+def is_valid_season_range(start_month: int, end_month: int) -> bool:
+    duration = season_duration(start_month, end_month)
+    return 2 <= duration <= 11
+
+
+def legacy_suffix_flags(value: object) -> tuple[bool, bool]:
+    legacy_suffix = str(value or "").strip().upper()
+    return (
+        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
+        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
+    )
+
+
+def suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
+    """Return canonical H/E flags, keeping legacy summary values readable."""
+    # r007: stored boolean fields are canonical when present. Do not OR them
+    # with the legacy summary afterwards, otherwise an old value such as
+    # plate_suffix="E" can never be cleared in the edit dialog. Also avoid the
+    # previous substring bug where "none" accidentally contained "E".
+    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
+        return (
+            coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
+            coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
+        )
+    return legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
+
+
+def suffix_summary_from_flags(suffix_h: bool, suffix_e: bool) -> str:
+    suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}"
+    return suffix or PLATE_SUFFIX_NONE
 
 
 def current_year() -> int:

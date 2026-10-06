@@ -1,3 +1,16 @@
+# TÜV Reminder r116
+
+## r116 – Shared Helpers
+
+- Zeilengleiche Hilfsfunktionen aus `__init__`, `calendar`, `config_flow`, `manager`, `sensor` nach `helpers.py` verschoben; Module importieren sie unter den bisherigen Namen.
+- r007-Kommentar (kanonische H/E-Häkchen, kein „none“-Substring-Fehler) an der gemeinsamen Funktion erhalten.
+- Durch den Umbau ungenutzte Konstanten-Importe entfernt.
+- AST-Vergleich: alle übrigen Funktionen/Klassen strukturell identisch zu r115.
+- Neue Tests `tests/test_shared_helpers.py`.
+- String-Checks r004/r007/r067 prüfen die verschobenen Regeln jetzt in `helpers.py`; übrige Checks auf r116 synchronisiert.
+
+---
+
 # TÜV Reminder r115
 
 ## r115 – Backend Hardening
