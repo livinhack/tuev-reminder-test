@@ -17,9 +17,6 @@ from .const import (
     CONF_INTERVAL,
     CONF_PLATE_KIND,
     CONF_PLATE_FORMAT,
-    CONF_PLATE_SUFFIX,
-    CONF_PLATE_SUFFIX_H,
-    CONF_PLATE_SUFFIX_E,
     CONF_PLATE_COLOR_MODE,
     CONF_SEASONAL,
     CONF_SEASON_START_MONTH,
@@ -28,7 +25,6 @@ from .const import (
     CONF_CHANGE_PLATE_COMMON_TEXT,
     CONF_CHANGE_PLATE_VEHICLE_DIGIT,
     CONF_CHANGE_PLATE_VEHICLE_TEXT,
-    CONF_REMINDER_OFFSET_DAYS,
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
@@ -45,7 +41,6 @@ from .const import (
     PLATE_FORMAT_TWO_LINE,
     PLATE_FORMAT_SMALL_TWO_LINE,
     PLATE_FORMAT_MOTORCYCLE,
-    DEFAULT_REMINDER_OFFSET_DAYS,
     SIGNAL_VEHICLE_VALUES_UPDATED,
 )
 
@@ -57,6 +52,11 @@ from .helpers import (
     get_reminder_date,
     get_status,
     normalize_plate_text,
+)
+from .helpers import ( # r116: shared helpers (formerly local copies)
+    coerce_bool as _coerce_bool,
+    reminder_offset_days_from_values as _reminder_offset_days,
+    suffix_flags_from_values as _suffix_flags_from_values,
 )
 
 
@@ -95,46 +95,6 @@ def _format_month(value: object) -> str:
         return f"{int(value):02d}"
     except (TypeError, ValueError):
         return str(value or "")
-
-
-def _coerce_bool(value: object) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
-    return bool(value)
-
-
-def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
-    legacy_suffix = str(value or "").strip().upper()
-    return (
-        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
-        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
-    )
-
-
-def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
-    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
-        return (
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
-        )
-    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
-
-
-def _int_or_default(value: object, default: int) -> int:
-    try:
-        if value is None:
-            return default
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
-
-def _reminder_offset_days(values: dict) -> int:
-    value = _int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
-    return min(365, max(0, value))
 
 
 def _plate_from_values(values: dict) -> str:

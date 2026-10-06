@@ -14,8 +14,8 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert manifest["version"] == "0.1.0-r115"
-assert version == "r115"
+assert manifest["version"] == "0.1.0-r116"
+assert version == "r116"
 # r115: topbar access state moved into _topbarAccessHtml() (admin toggle / read-only hint)
 assert '${this._topbarAccessHtml()}' in panel
 assert 'return this._canWrite() ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`;' in panel

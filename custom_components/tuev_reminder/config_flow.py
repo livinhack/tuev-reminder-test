@@ -37,18 +37,22 @@ from .const import (
     PLATE_FORMATS,
     LEGACY_PLATE_FORMAT_STANDARD,
     LEGACY_PLATE_FORMAT_CHANGE,
-    PLATE_SUFFIX_NONE,
-    PLATE_SUFFIX_H,
-    PLATE_SUFFIX_E,
     PLATE_COLOR_STANDARD,
     PLATE_COLOR_GREEN,
     CONF_CALENDAR_EVENT_MODE,
     CONF_REMINDER_OFFSET_DAYS,
     CALENDAR_EVENT_MODE_REMINDER_AND_DUE,
-    DEFAULT_REMINDER_OFFSET_DAYS,
 )
 from .helpers import build_change_plate_text, build_plate_with_suffix, normalize_plate_text
 from .manager import entry_title_from_vehicle_values, validate_and_normalize_vehicle_payload
+from .helpers import ( # r116: shared helpers (formerly local copies)
+    suffix_summary_from_flags as _build_suffix_summary,
+    coerce_bool as _coerce_bool,
+    reminder_offset_days_from_values as _derive_reminder_offset_days,
+    int_or_default as _int_or_default,
+    is_valid_season_range as _is_valid_season_range,
+    suffix_flags_from_values as _suffix_flags_from_values,
+)
 
 
 PLATE_KIND_OPTIONS = [
@@ -124,21 +128,6 @@ def _month_select_selector(options=None):
     )
 
 
-def _int_or_default(value: object, default: int) -> int:
-    try:
-        if value is None:
-            return default
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
-
-def _derive_reminder_offset_days(values: dict) -> int:
-    value = _int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
-    return min(365, max(0, value))
-
-
 def _season_end_month_options(start_month: int):
     return [
         {"value": str(month), "label": f"{month:02d}"}
@@ -199,52 +188,9 @@ def _validate_plate_format_for_kind(kind: str, plate_format: str) -> bool:
     return plate_format in _allowed_plate_formats_for_kind(kind)
 
 
-def _season_duration(start_month: int, end_month: int) -> int:
-    return (end_month - start_month) % 12 + 1
-
-
-def _is_valid_season_range(start_month: int, end_month: int) -> bool:
-    duration = _season_duration(start_month, end_month)
-    return 2 <= duration <= 11
-
-
-def _coerce_bool(value: object) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
-    return bool(value)
-
-
-def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
-    legacy_suffix = str(value or "").strip().upper()
-    return (
-        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
-        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
-    )
-
-
-def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
-    # r007: stored boolean fields are canonical when present. Do not OR them
-    # with the legacy summary afterwards, otherwise an old value such as
-    # plate_suffix="E" can never be cleared in the edit dialog. Also avoid the
-    # previous substring bug where "none" accidentally contained "E".
-    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
-        return (
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
-        )
-    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
-
-
 def _suffix_allowed_for_kind(kind: str) -> bool:
     # User decision: green plates do not expose H/E in this flow.
     return kind not in {PLATE_KIND_GREEN, PLATE_KIND_GREEN_SEASONAL}
-
-
-def _build_suffix_summary(suffix_h: bool, suffix_e: bool) -> str:
-    suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}"
-    return suffix or PLATE_SUFFIX_NONE
 
 
 def _user_schema(defaults: dict):

@@ -20,8 +20,8 @@ readme = README.read_text(encoding="utf-8")
 handover = HANDOVER.read_text(encoding="utf-8")
 doc = DOC.read_text(encoding="utf-8")
 
-assert manifest["version"] == "0.1.0-r115"
-assert version == "r115"
+assert manifest["version"] == "0.1.0-r116"
+assert version == "r116"
 for text, label in [(readme, "README"), (handover, "HANDOVER")]:
     assert "Reminder r114" in text or "TÜV Reminder r114" in text, f"Missing r114 marker in {label}"
     assert "Card-Erkennung" in text, f"Missing no Card detection note in {label}"

@@ -19,9 +19,6 @@ from .const import (
     CONF_MONTH,
     CONF_YEAR,
     CONF_INTERVAL,
-    CONF_PLATE_SUFFIX,
-    CONF_PLATE_SUFFIX_H,
-    CONF_PLATE_SUFFIX_E,
     PLATE_SUFFIX_NONE,
     PLATE_SUFFIX_H,
     PLATE_SUFFIX_E,
@@ -35,6 +32,9 @@ from .helpers import build_plate_with_suffix
 from .manager_api import async_register_manager_api
 from .panel import async_register_manager_panel
 from .settings import async_load_settings
+from .helpers import ( # r116: shared helpers (formerly local copies)
+    suffix_flags_from_values as _suffix_flags_from_values,
+)
 
 PLATFORMS = ["sensor"]
 
@@ -44,31 +44,6 @@ CALENDAR_PLATFORM_LOADED_KEY = "calendar_platform_loaded"
 MANAGER_API_REGISTERED_KEY = "manager_api_registered"
 MANAGER_PANEL_REGISTERED_KEY = "manager_panel_registered"
 LOADED_VALUES_KEY = "loaded_entry_values"
-
-
-def _coerce_bool(value: object) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
-    return bool(value)
-
-
-def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
-    legacy_suffix = str(value or "").strip().upper()
-    return (
-        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
-        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
-    )
-
-
-def _suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
-    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
-        return (
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
-        )
-    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
 
 
 def _entry_title_from_values(values: dict, fallback: str = "Fahrzeug") -> str:

@@ -50,7 +50,8 @@ for step in ["async_step_user", "async_step_plate", "async_step_due"]:
 
 assert_contains(config_flow, "_plate_kind_flags", "derived plate kind flags")
 assert_contains(config_flow, "_is_valid_season_range", "season validation helper")
-assert_contains(config_flow, "2 <= duration <= 11", "2-11 month season rule")
+# r116: season rule lives in helpers.py (shared, formerly copied per module)
+assert_contains(helpers, "2 <= duration <= 11", "2-11 month season rule")
 assert_contains(config_flow, "len(vehicle_digit) != 1", "vehicle-specific digit validation")
 assert_contains(config_flow, "not vehicle_digit.isdigit()", "vehicle-specific digit must be numeric")
 assert_contains(config_flow, "build_change_plate_text", "change-plate full plate build")
@@ -76,7 +77,7 @@ for text, label in [(strings, "strings"), (translations_de, "German translations
     ]:
         assert_contains(text, key, label)
 
-assert_contains(manifest, '"version": "0.1.0-r115"', "manifest version")
+assert_contains(manifest, '"version": "0.1.0-r116"', "manifest version")
 assert_contains(readme, "Reminder r009", "README r012 documentation")
 assert_contains(handover, "Reminder r009", "handover r012 documentation")
 assert_contains(readme, "Leerzeichen", "README spacing decision")

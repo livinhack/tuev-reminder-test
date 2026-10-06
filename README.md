@@ -1,3 +1,22 @@
+# TÜV Reminder r116
+
+Arbeitsstand **r116** fasst zeilengleiche Hilfsfunktionen zusammen, die bisher in mehreren Modulen kopiert vorlagen. Kein geändertes Verhalten, keine sichtbare Änderung.
+
+## r116 Highlights
+
+- Version auf `0.1.0-r116` / `r116` aktualisiert.
+- Gemeinsam in `helpers.py` (vorher 2–5 Kopien): `coerce_bool`, `int_or_default`, `reminder_offset_days_from_values`, `season_duration`, `is_valid_season_range`, `legacy_suffix_flags`, `suffix_flags_from_values` (inkl. r007-Erklärkommentar), `suffix_summary_from_flags`.
+- Module importieren diese unter ihren bisherigen Namen; Aufrufstellen unverändert.
+- Bewusst getrennt geblieben: Kennzeichen-Ableitungen (Art, grün, Saison, Wechselkennzeichen) in Sensor/Kalender/Manager sowie die zwei unterschiedlichen Titel-Funktionen.
+- Netto 108 Zeilen weniger im Integrationscode.
+- Neue Tests `tests/test_shared_helpers.py` (211 Fälle), vor dem Umbau gegen alle alten Kopien grün; insgesamt 241 Tests.
+
+## r116 HA-Testfokus
+
+- Normaler Betrieb wie r115: Sensoren, Kalender, Sidebar anlegen/bearbeiten (inkl. H/E-Kennzeichen, Saison), Config-Flow „Integration hinzufügen“.
+
+---
+
 # TÜV Reminder r115
 
 Arbeitsstand **r115** härtet das Backend auf Basis von r114. Schwerpunkt: umschaltbarer Schreibzugriff in der Sidebar, kein Flackern des Sensors bei Datumsänderungen, korrekter Kalenderzustand und erste echte Funktionstests (`pytest`).

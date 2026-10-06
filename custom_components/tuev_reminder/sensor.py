@@ -60,24 +60,11 @@ from .helpers import (
     is_blurred,
     normalize_plate_text,
 )
+from .helpers import ( # r116: shared helpers (formerly local copies)
+    coerce_bool as _coerce_bool,
+    legacy_suffix_flags as _legacy_suffix_flags,
+)
 
-
-
-
-def _coerce_bool(value: object) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
-    return bool(value)
-
-
-def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
-    legacy_suffix = str(value or "").strip().upper()
-    return (
-        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
-        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
-    )
 
 async def async_setup_entry(
     hass: HomeAssistant,

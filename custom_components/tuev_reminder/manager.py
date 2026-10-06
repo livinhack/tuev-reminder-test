@@ -49,9 +49,6 @@ from .const import (
     PLATE_KIND_SEASONAL,
     PLATE_KIND_STANDARD,
     PLATE_KINDS,
-    PLATE_SUFFIX_E,
-    PLATE_SUFFIX_H,
-    PLATE_SUFFIX_NONE,
 )
 from .helpers import (
     current_year,
@@ -64,6 +61,14 @@ from .helpers import (
     get_status,
     is_blurred,
     normalize_plate_text,
+)
+from .helpers import ( # r116: shared helpers (formerly local copies)
+    coerce_bool as _coerce_bool,
+    int_or_default as _int_or_default,
+    is_valid_season_range as _is_valid_season_range,
+    reminder_offset_days_from_values,
+    suffix_flags_from_values,
+    suffix_summary_from_flags,
 )
 
 MANAGER_API_VERSION = 5
@@ -124,46 +129,6 @@ def merged_entry_values(entry: ConfigEntry) -> dict:
     }
 
 
-def _coerce_bool(value: object) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "h", "e"}
-    return bool(value)
-
-
-def _int_or_default(value: object, default: int) -> int:
-    try:
-        if value is None:
-            return default
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
-def _legacy_suffix_flags(value: object) -> tuple[bool, bool]:
-    legacy_suffix = str(value or "").strip().upper()
-    return (
-        legacy_suffix in {PLATE_SUFFIX_H, "HE", "EH"},
-        legacy_suffix in {PLATE_SUFFIX_E, "HE", "EH"},
-    )
-
-
-def suffix_flags_from_values(values: dict) -> tuple[bool, bool]:
-    """Return canonical H/E flags, keeping legacy summary values readable."""
-    if CONF_PLATE_SUFFIX_H in values or CONF_PLATE_SUFFIX_E in values:
-        return (
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_H, False)),
-            _coerce_bool(values.get(CONF_PLATE_SUFFIX_E, False)),
-        )
-    return _legacy_suffix_flags(values.get(CONF_PLATE_SUFFIX))
-
-
-def suffix_summary_from_flags(suffix_h: bool, suffix_e: bool) -> str:
-    suffix = f"{PLATE_SUFFIX_H if suffix_h else ''}{PLATE_SUFFIX_E if suffix_e else ''}"
-    return suffix or PLATE_SUFFIX_NONE
-
-
 def derive_plate_kind(values: dict) -> str:
     configured = values.get(CONF_PLATE_KIND)
     if configured in PLATE_KINDS:
@@ -214,11 +179,6 @@ def derive_change_plate_enabled(values: dict, kind: str) -> bool:
     )
 
 
-def reminder_offset_days_from_values(values: dict) -> int:
-    value = _int_or_default(values.get(CONF_REMINDER_OFFSET_DAYS), DEFAULT_REMINDER_OFFSET_DAYS)
-    return min(365, max(0, value))
-
-
 def plate_parts_from_values(values: dict, kind: str | None = None) -> dict:
     """Return display/base plate parts for manager and Card-facing APIs."""
     kind = kind or derive_plate_kind(values)
@@ -260,16 +220,6 @@ def plate_parts_from_values(values: dict, kind: str | None = None) -> dict:
         "change_plate_vehicle_digit": vehicle_digit,
         "change_plate_vehicle_text": vehicle_digit,
     }
-
-
-
-def _season_duration(start_month: int, end_month: int) -> int:
-    return (end_month - start_month) % 12 + 1
-
-
-def _is_valid_season_range(start_month: int, end_month: int) -> bool:
-    duration = _season_duration(start_month, end_month)
-    return 2 <= duration <= 11
 
 
 def _entry_title_from_values(values: dict) -> str:
