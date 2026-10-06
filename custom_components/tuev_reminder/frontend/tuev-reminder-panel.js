@@ -28,6 +28,7 @@ class TuevReminderPanel extends HTMLElement {
     this._selectedVehicle = null;
     this._form = this._defaultForm();
     this._saving = false;
+    this._settingsSaving = false;
     this._deleting = false;
     this._formError = null;
     this._formInfo = null;
@@ -192,6 +193,46 @@ class TuevReminderPanel extends HTMLElement {
       return String(value || "").toUpperCase();
     }
     return value;
+  }
+
+  _canWrite() {
+    // r115: `write_api` is resolved per user in the backend from the
+    // integration setting `write_access` (all users / admins only).
+    return this._metadata?.write_api === true;
+  }
+
+  _topbarAccessHtml() {
+    if (this._metadata?.can_manage_settings === true) {
+      const adminOnly = this._metadata?.write_access === "admin";
+      return `<label class="topbar-setting" title="Wenn aktiv, dürfen nur Administratoren Fahrzeuge anlegen, ändern oder löschen. Alle anderen sehen die Liste nur lesend.">
+            <input type="checkbox" id="write-access-admin" ${adminOnly ? "checked" : ""} ${this._settingsSaving ? "disabled" : ""}>
+            <span>Nur Admins ändern</span>
+          </label>`;
+    }
+    return this._canWrite() ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`;
+  }
+
+  async _setWriteAccess(writeAccess) {
+    if (!this._hass || this._settingsSaving) return;
+    this._settingsSaving = true;
+    this._renderPreservingListUiState();
+    try {
+      const metadata = await this._hass.connection.sendMessagePromise({
+        type: "tuev_reminder/manager/settings/update",
+        write_access: writeAccess,
+      });
+      if (metadata) this._metadata = metadata;
+      this._setFlash(
+        writeAccess === "admin"
+          ? "Nur Administratoren dürfen jetzt Fahrzeuge ändern."
+          : "Alle Benutzer dürfen jetzt Fahrzeuge ändern."
+      );
+    } catch (err) {
+      this._setFlash("Einstellung konnte nicht gespeichert werden.", "error");
+    } finally {
+      this._settingsSaving = false;
+      this._renderPreservingListUiState();
+    }
   }
 
   _escape(value) {
@@ -632,6 +673,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openRowMenu(index) {
+    if (!this._canWrite()) return;
     const vehicle = this._visibleVehicles()[index];
     if (!vehicle) return;
     if (this._mobileActionMode()) {
@@ -690,7 +732,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   async _handleRowAction(action, vehicle) {
-    if (this._rowActionLoadingEntryId) {
+    if (!this._canWrite() || this._rowActionLoadingEntryId) {
       return;
     }
 
@@ -785,6 +827,7 @@ class TuevReminderPanel extends HTMLElement {
   }
 
   _openCreateForm() {
+    if (!this._canWrite()) return;
     this._rememberDialogReturnFocus({ createTrigger: "controls" });
     this._openMenuIndex = null;
     this._openMenuEntryId = null;
@@ -1279,8 +1322,8 @@ class TuevReminderPanel extends HTMLElement {
       return `
         <div class="state state-card first-run-state">
           <strong>Noch keine Fahrzeuge</strong>
-          <p>Lege dein erstes Fahrzeug für die TÜV-Erinnerung an.</p>
-          <button type="button" class="empty-create" data-create-trigger="empty" title="Erstes Fahrzeug anlegen" aria-label="Erstes Fahrzeug anlegen">+</button>
+          ${this._canWrite() ? `<p>Lege dein erstes Fahrzeug für die TÜV-Erinnerung an.</p>
+          <button type="button" class="empty-create" data-create-trigger="empty" title="Erstes Fahrzeug anlegen" aria-label="Erstes Fahrzeug anlegen">+</button>` : `<p>Fahrzeuge können nur von Administratoren angelegt werden.</p>`}
         </div>
       `;
     }
@@ -1319,7 +1362,7 @@ class TuevReminderPanel extends HTMLElement {
                 <td class="status-cell" data-label="Status"><span class="status-pill status-${this._escape(this._statusClass(vehicle.status))}">${this._escape(this._statusLabel(vehicle.status))}</span></td>
                 <td class="preview-cell" data-label="Kennzeichen"><div class="row-end-stack"><div class="plate-render-slot" data-plate-render-slot="text" data-renderer-state="text" title="Kennzeichen"><span class="plate-text-slot">${this._escape(vehicle.plate_display || vehicle.plate || "—")}</span></div></div></td>
                 <td class="menu-cell">
-                  <button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-haspopup="menu" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>
+                  ${this._canWrite() ? `<button type="button" class="row-menu" data-menu-index="${index}" data-menu-entry-id="${this._escape(vehicle.entry_id || "")}" title="Aktionen öffnen" aria-label="Aktionen für Fahrzeug öffnen" aria-haspopup="menu" aria-expanded="${this._openMenuEntryId === vehicle.entry_id ? "true" : "false"}" ${this._rowActionLoadingEntryId === vehicle.entry_id ? 'disabled aria-busy="true"' : ""}><span aria-hidden="true">${this._rowActionLoadingEntryId === vehicle.entry_id ? "…" : "⋮"}</span></button>` : ""}
                   ${this._openMenuEntryId === vehicle.entry_id ? `
                     <div class="row-action-menu" role="menu" aria-label="Fahrzeugaktionen">
                       <button type="button" data-row-action="edit" data-action-index="${index}" data-action-entry-id="${this._escape(vehicle.entry_id || "")}" role="menuitem">Bearbeiten</button>
@@ -1628,6 +1671,22 @@ class TuevReminderPanel extends HTMLElement {
         h3:first-child { margin-top: 0; }
         .topbar-status { color: var(--secondary-text-color); font-size: 12px; white-space: nowrap; }
         .topbar-status.read-only { color: var(--error-color, #db4437); font-weight: 600; }
+        .topbar-setting {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--secondary-text-color);
+          font-size: 12px;
+          white-space: nowrap;
+          cursor: pointer;
+        }
+        .topbar-setting input {
+          width: 16px;
+          height: 16px;
+          margin: 0;
+          padding: 0;
+          accent-color: var(--primary-color);
+        }
         .list-controls {
           display: ${listMode ? "grid" : "none"};
           grid-template-columns: minmax(260px, 420px) minmax(0, 1fr) auto;
@@ -2555,7 +2614,7 @@ class TuevReminderPanel extends HTMLElement {
             <button class="menu" title="Menü öffnen" aria-label="Menü öffnen">☰</button>
             <h1>TÜV Reminder</h1>
           </div>
-          ${this._metadata?.write_api === true ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`}
+          ${this._topbarAccessHtml()}
         </header>
 
         <section class="list-controls" aria-label="Fahrzeugliste filtern und sortieren">
@@ -2570,9 +2629,9 @@ class TuevReminderPanel extends HTMLElement {
             ${this._summaryChips(counts)}
             <span class="sr-only" aria-live="polite">${this._escape(this._sortSummaryLabel())}</span>
           </div>
-          <div class="list-create-control" aria-label="Fahrzeug hinzufügen">
+          ${this._canWrite() ? `<div class="list-create-control" aria-label="Fahrzeug hinzufügen">
             <button class="action icon-action" data-create-trigger="controls" title="Neues Fahrzeug anlegen" aria-label="Neues Fahrzeug anlegen">+</button>
-          </div>
+          </div>` : ""}
         </section>
 
         ${this._flashMessage ? `<section class="flash ${this._escape(this._flashMessage.tone || "success")}" role="status">${this._escape(this._flashMessage.message)}</section>` : ""}
@@ -2603,6 +2662,13 @@ class TuevReminderPanel extends HTMLElement {
     const clearSearchButton = this.shadowRoot.querySelector("#clear-search");
     if (clearSearchButton) {
       clearSearchButton.addEventListener("click", () => this._clearSearchFilter());
+    }
+
+    const writeAccessToggle = this.shadowRoot.querySelector("#write-access-admin");
+    if (writeAccessToggle) {
+      writeAccessToggle.addEventListener("change", (event) => {
+        this._setWriteAccess(event.target.checked ? "admin" : "all");
+      });
     }
 
     this.shadowRoot.querySelectorAll("#clear-empty-search").forEach((button) => {

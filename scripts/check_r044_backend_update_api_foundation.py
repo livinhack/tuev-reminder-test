@@ -18,9 +18,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r114":
+    if manifest.get("version") != "0.1.0-r115":
         fail("manifest version must be 0.1.0-r114")
-    if read("REMINDER_VERSION.txt").strip() != "r114":
+    if read("REMINDER_VERSION.txt").strip() != "r115":
         fail("REMINDER_VERSION.txt must be r053")
 
     manager = read("custom_components/tuev_reminder/manager.py")
@@ -44,7 +44,7 @@ def main() -> None:
         "entry_title_from_vehicle_values(normalized)",
         "hass.config_entries.async_update_entry(",
         "options=normalized",
-        "await hass.config_entries.async_reload(entry.entry_id)",
+        "hass.config_entries.async_update_entry(",  # r115: reload decided by the update listener
         '"updated": True',
         "websocket_api.async_register_command(hass, websocket_manager_vehicle_update)",
     ]:

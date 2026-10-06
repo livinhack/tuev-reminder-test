@@ -18,9 +18,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r114":
+    if manifest.get("version") != "0.1.0-r115":
         fail("manifest version must be 0.1.0-r114")
-    if read("REMINDER_VERSION.txt").strip() != "r114":
+    if read("REMINDER_VERSION.txt").strip() != "r115":
         fail("REMINDER_VERSION.txt must be r053")
 
     manager = read("custom_components/tuev_reminder/manager.py")
@@ -33,7 +33,7 @@ def main() -> None:
         "MANAGER_API_VERSION = 5",
         "def validate_and_normalize_vehicle_payload(",
         "def entry_title_from_vehicle_values(",
-        '"write_api": True',
+        '"write_api": can_write',  # r115: write access resolved per user
         '"write_api_version": 5',
         '"tuev_reminder/manager/vehicles/create"',
     ]:

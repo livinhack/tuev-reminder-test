@@ -10,6 +10,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import discovery
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .const import (
     DOMAIN,
@@ -27,10 +28,13 @@ from .const import (
     SERVICE_CONFIRM_PASSED,
     SERVICE_SET_DUE_DATE,
     ATTR_PASSED_DATE,
+    SIGNAL_VEHICLE_VALUES_UPDATED,
+    LIVE_UPDATE_KEYS,
 )
 from .helpers import build_plate_with_suffix
 from .manager_api import async_register_manager_api
 from .panel import async_register_manager_panel
+from .settings import async_load_settings
 
 PLATFORMS = ["sensor"]
 
@@ -39,6 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 CALENDAR_PLATFORM_LOADED_KEY = "calendar_platform_loaded"
 MANAGER_API_REGISTERED_KEY = "manager_api_registered"
 MANAGER_PANEL_REGISTERED_KEY = "manager_panel_registered"
+LOADED_VALUES_KEY = "loaded_entry_values"
 
 
 def _coerce_bool(value: object) -> bool:
@@ -138,11 +143,13 @@ async def _async_store_updated_options(
     entry: ConfigEntry,
     updated_values: dict,
 ) -> None:
+    # r115: no explicit reload here. The update listener decides whether a
+    # reload is needed (see _async_update_listener). Before r115 this caused
+    # two reloads per change and the sensor became `unavailable` twice.
     hass.config_entries.async_update_entry(
         entry,
         options=updated_values,
     )
-    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -152,6 +159,8 @@ async def async_setup(hass: HomeAssistant, config: dict):
         hass.async_create_task(
             discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)
         )
+
+    await async_load_settings(hass)
 
     if not hass.data[DOMAIN].get(MANAGER_API_REGISTERED_KEY):
         async_register_manager_api(hass)
@@ -231,7 +240,39 @@ async def async_setup(hass: HomeAssistant, config: dict):
     return True
 
 
+def _loaded_snapshot(entry: ConfigEntry) -> dict:
+    return {
+        "title": entry.title,
+        "values": _merged_entry_values(entry),
+    }
+
+
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    """React to stored entry changes.
+
+    r115: if only date-related values changed (HU month/year, interval,
+    reminder offset), the entities read them live from the entry. A state
+    refresh is enough, so the sensor never becomes `unavailable`. Any other
+    change (name, plate, kind, format, season, ...) affects device/entity
+    names or the entry title and still triggers a full reload.
+    """
+    loaded = hass.data.setdefault(DOMAIN, {}).setdefault(LOADED_VALUES_KEY, {})
+    previous = loaded.get(entry.entry_id)
+    current = _loaded_snapshot(entry)
+
+    if previous is not None and previous["title"] == current["title"]:
+        old_values = previous["values"]
+        new_values = current["values"]
+        changed_keys = {
+            key
+            for key in set(old_values) | set(new_values)
+            if old_values.get(key) != new_values.get(key)
+        }
+        if changed_keys and changed_keys <= LIVE_UPDATE_KEYS:
+            loaded[entry.entry_id] = current
+            async_dispatcher_send(hass, SIGNAL_VEHICLE_VALUES_UPDATED, entry.entry_id)
+            return
+
     await hass.config_entries.async_reload(entry.entry_id)
 
 
@@ -247,8 +288,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    hass.data.setdefault(DOMAIN, {}).setdefault(LOADED_VALUES_KEY, {})[
+        entry.entry_id
+    ] = _loaded_snapshot(entry)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unloaded:
+        hass.data.get(DOMAIN, {}).get(LOADED_VALUES_KEY, {}).pop(entry.entry_id, None)
+    return unloaded

@@ -54,6 +54,7 @@ from .const import (
     PLATE_SUFFIX_NONE,
 )
 from .helpers import (
+    current_year,
     build_change_plate_text,
     build_plate_with_suffix,
     get_due_date,
@@ -398,7 +399,7 @@ def vehicle_record_from_entry(entry: ConfigEntry, entity_id: str | None = None) 
     plate_parts = plate_parts_from_values(values, kind)
 
     month = _int_or_default(values.get(CONF_MONTH), 1)
-    year = _int_or_default(values.get(CONF_YEAR), 2026)
+    year = _int_or_default(values.get(CONF_YEAR), current_year())
     interval = _int_or_default(values.get(CONF_INTERVAL), 2)
     reminder_offset_days = reminder_offset_days_from_values(values)
 
@@ -464,18 +465,32 @@ def vehicle_record_by_entry_id(hass: HomeAssistant, entry_id: str) -> dict | Non
     return vehicle_record_from_entry(entry, entity_id=_sensor_entity_id_for_entry(hass, entry.entry_id))
 
 
-def manager_metadata() -> dict:
-    """Return static metadata that a future Manager UI can render without guessing."""
+def manager_metadata(
+    can_write: bool = True,
+    write_access: str = "all",
+    can_manage_settings: bool = False,
+) -> dict:
+    """Return metadata that the Manager UI can render without guessing.
+
+    r115: ``write_api`` reflects whether the *calling user* may use the write
+    commands. ``write_access`` is the integration setting (``all`` = every
+    authenticated user as decided in r069, ``admin`` = admins only).
+    """
     return {
         "api_version": MANAGER_API_VERSION,
         "storage_model": "config_entries",
-        "write_api": True,
+        "write_api": can_write,
         "write_api_version": 5,
-        "requires_admin": False,
+        "write_access": write_access,
+        "requires_admin": write_access == "admin",
+        "can_manage_settings": can_manage_settings,
         "write_commands": [
             "tuev_reminder/manager/vehicles/create",
             "tuev_reminder/manager/vehicles/update",
             "tuev_reminder/manager/vehicles/delete",
+        ],
+        "settings_commands": [
+            "tuev_reminder/manager/settings/update",
         ],
         "manager_panel_ready": True,
         "plate_kinds": PLATE_KIND_OPTIONS,

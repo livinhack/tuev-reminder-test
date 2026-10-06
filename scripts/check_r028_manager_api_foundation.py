@@ -17,10 +17,10 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r114":
+if manifest.get("version") != "0.1.0-r115":
     fail("manifest version must be 0.1.0-r028")
 
-if read("REMINDER_VERSION.txt").strip() != "r114":
+if read("REMINDER_VERSION.txt").strip() != "r115":
     fail("REMINDER_VERSION.txt must be r028")
 
 init_py = read("custom_components/tuev_reminder/__init__.py")
@@ -33,7 +33,7 @@ required_manager_functions = [
     "def vehicle_record_from_entry(",
     "def manager_metadata(",
     "MANAGER_API_VERSION = 5",
-    "\"write_api\": True",
+    "\"write_api\": can_write",  # r115: write access resolved per user
     "\"manager_panel_ready\":",
 ]
 for marker in required_manager_functions:

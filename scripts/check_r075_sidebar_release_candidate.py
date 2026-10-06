@@ -34,8 +34,8 @@ doc = read("docs/REMINDER_R075_SIDEBAR_RELEASE_CANDIDATE.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R075.md")
 
 require(manifest["domain"] == "tuev_reminder", "manifest domain must stay tuev_reminder")
-require(manifest["version"] == "0.1.0-r114", "manifest version must be r083")
-require(version == "r114", "REMINDER_VERSION must be r085")
+require(manifest["version"] == "0.1.0-r115", "manifest version must be r083")
+require(version == "r115", "REMINDER_VERSION must be r085")
 require(set(["http", "frontend", "panel_custom"]).issubset(set(manifest.get("dependencies", []))), "Sidebar dependencies missing")
 require(manifest.get("config_flow") is True, "config_flow must remain enabled")
 
@@ -56,7 +56,8 @@ for rel in [
 
 require('require_admin=False' in panel_py, "Sidebar panel must stay available to all authenticated users")
 require('"requires_admin": False' in panel_py, "Panel config should advertise non-admin manager access")
-require('"requires_admin": False' in manager, "Manager metadata should advertise non-admin access")
+require('"requires_admin": write_access == "admin"' in manager,  # r115: setting-driven, default all users
+        "Manager metadata should advertise non-admin access")
 require('connection.require_admin' not in manager_api, "Manager WebSocket API must not require admin in r075")
 
 for command in [

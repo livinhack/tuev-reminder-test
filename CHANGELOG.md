@@ -1,3 +1,23 @@
+# TÜV Reminder r115
+
+## r115 – Backend Hardening
+
+- Neue integrationsweite Einstellung `write_access` (`all` | `admin`, Standard `all` wie r069), gespeichert in `.storage/tuev_reminder.settings` (`settings.py`).
+- Neuer WebSocket-Befehl `tuev_reminder/manager/settings/update` (nur Admins).
+- `vehicles/create|update|delete` prüfen `write_access` im Backend; bei `admin` werden Nicht-Admins mit `unauthorized` abgewiesen.
+- `manager/metadata` meldet `write_api` pro Benutzer sowie `write_access`, `requires_admin` und `can_manage_settings`.
+- Panel: Schalter „Nur Admins ändern“ in der Kopfzeile für Admins; Nicht-Admins ohne Schreibrecht sehen „Nur lesen“ ohne Plus und Zeilenmenü.
+- Doppelten Reload entfernt (Service-Handler und Manager-Update riefen zusätzlich zum Update-Listener `async_reload` auf).
+- Update-Listener: Änderungen nur an `month`, `year`, `interval`, `reminder_offset_days` → Zustand neu schreiben per Dispatcher-Signal statt Reload; sonst genau ein Reload.
+- Kalender-`event` liefert laufenden/nächsten Termin; vergangene Termine werden übersprungen. Kalender aktualisiert sich bei Datenänderung sofort.
+- Sensor `should_poll = False`.
+- Fallback-Jahr `current_year()` statt `2026` (Sensor, Kalender, Manager).
+- Panel-`module_url` mit `?v=<manifest-version>`.
+- Neue pytest-Tests unter `tests/`, `requirements_test.txt`, `pytest.ini`.
+- Bestehende String-Checks auf r115 synchronisiert.
+
+---
+
 # TÜV Reminder r114
 
 ## r114 – Sidebar Cleanup Checkpoint Before Next Feature

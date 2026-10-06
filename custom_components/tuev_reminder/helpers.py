@@ -10,6 +10,14 @@ from .const import (
 )
 
 
+def current_year() -> int:
+    """Return the current year as fallback for entries without a stored year.
+
+    r115: replaces the former hard-coded fallback year 2026.
+    """
+    return date.today().year
+
+
 def get_due_date(year: int, month: int) -> date:
     """Return the last day of the due month."""
     last_day = calendar.monthrange(year, month)[1]

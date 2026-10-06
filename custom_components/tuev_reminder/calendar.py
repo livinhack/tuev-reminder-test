@@ -2,7 +2,9 @@ from datetime import timedelta
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.util import dt as dt_util
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -44,9 +46,11 @@ from .const import (
     PLATE_FORMAT_SMALL_TWO_LINE,
     PLATE_FORMAT_MOTORCYCLE,
     DEFAULT_REMINDER_OFFSET_DAYS,
+    SIGNAL_VEHICLE_VALUES_UPDATED,
 )
 
 from .helpers import (
+    current_year,
     build_change_plate_text,
     build_plate_with_suffix,
     get_due_date,
@@ -246,9 +250,33 @@ class TuevReminderCalendar(CalendarEntity):
             model="Integration",
         )
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        @callback
+        def _values_updated(_entry_id: str) -> None:
+            self.async_write_ha_state()
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, SIGNAL_VEHICLE_VALUES_UPDATED, _values_updated
+            )
+        )
+
     @property
     def event(self):
-        events = self._build_all_events()
+        """Return the current or next upcoming event.
+
+        r115: before, this returned the earliest event even if it was in the
+        past. Home Assistant then scheduled no state changes and the calendar
+        state stayed `off`.
+        """
+        today = dt_util.now().date()
+        events = [
+            event
+            for event in self._build_all_events()
+            if event.end > today
+        ]
 
         if not events:
             return None
@@ -289,7 +317,7 @@ class TuevReminderCalendar(CalendarEntity):
         vehicle_name = data.get(CONF_VEHICLE_NAME, entry.title)
         plate = _plate_from_values(data)
         month = int(data.get(CONF_MONTH, 1))
-        year = int(data.get(CONF_YEAR, 2026))
+        year = int(data.get(CONF_YEAR, current_year()))
         interval = int(data.get(CONF_INTERVAL, 2))
         offset_days = _reminder_offset_days(data)
 

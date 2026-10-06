@@ -15,9 +15,9 @@ def fail(message: str) -> None:
 
 def main() -> None:
     manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-    if manifest.get("version") != "0.1.0-r114":
+    if manifest.get("version") != "0.1.0-r115":
         fail("manifest version must be 0.1.0-r114")
-    if read("REMINDER_VERSION.txt").strip() != "r114":
+    if read("REMINDER_VERSION.txt").strip() != "r115":
         fail("REMINDER_VERSION.txt must be r053")
 
     panel = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
@@ -46,7 +46,7 @@ def main() -> None:
     for marker in [
         'WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"',
         "def websocket_manager_vehicle_update(",
-        "await hass.config_entries.async_reload(entry.entry_id)",
+        "hass.config_entries.async_update_entry(",  # r115: reload decided by the update listener
     ]:
         if marker not in manager_api:
             fail(f"manager_api.py missing {marker!r}")

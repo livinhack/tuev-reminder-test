@@ -1,3 +1,71 @@
+# Handover – TÜV Reminder r115
+
+## Kurzstand
+
+r115 härtet das Backend auf Basis von r114. Sichtbar neu ist nur der Schalter „Nur Admins ändern“ in der Sidebar-Kopfzeile (nur für Admins). Standardverhalten wie r069: alle angemeldeten Benutzer dürfen Fahrzeuge verwalten. Erstmals echte Funktionstests mit einer HA-Testumgebung.
+
+## Basis
+
+- r114 (GitHub `main`, Commit `r114`)
+
+## Geänderte Dateien
+
+- `custom_components/tuev_reminder/__init__.py` – Reload-Entscheidung im Update-Listener, kein expliziter Reload mehr in den Services
+- `custom_components/tuev_reminder/const.py` – `SIGNAL_VEHICLE_VALUES_UPDATED`, `LIVE_UPDATE_KEYS`
+- `custom_components/tuev_reminder/sensor.py` – kein Polling, Dispatcher-Abo, Fallback-Jahr
+- `custom_components/tuev_reminder/calendar.py` – `event` ohne vergangene Termine, Dispatcher-Abo, Fallback-Jahr
+- `custom_components/tuev_reminder/helpers.py` – `current_year()`
+- `custom_components/tuev_reminder/settings.py` – neu: Einstellung `write_access` (`all`/`admin`) in `.storage/tuev_reminder.settings`
+- `custom_components/tuev_reminder/manager.py` – `manager_metadata(can_write, write_access, can_manage_settings)`, Fallback-Jahr
+- `custom_components/tuev_reminder/manager_api.py` – Schreibprüfung nach `write_access`, Befehl `settings/update` (Admin), kein zweiter Reload
+- `custom_components/tuev_reminder/panel.py` – `?v=<Version>` an der Panel-URL
+- `custom_components/tuev_reminder/frontend/tuev-reminder-panel.js` – `_canWrite()`, `_topbarAccessHtml()`, Schalter „Nur Admins ändern“, Nur-Lesen-Modus
+- `tests/`, `requirements_test.txt`, `pytest.ini` – neu
+- Versionsdateien, README, CHANGELOG, HANDOVER, `docs/REMINDER_R115_BACKEND_HARDENING.md`, String-Checks (Versionssynchronisierung)
+
+## Verhalten Reload (gemessen in HA 2026.2)
+
+| Aktion | r114 | r115 |
+|---|---|---|
+| bestanden / Fälligkeit setzen | 2 Reloads, 2× `unavailable` | kein Reload, kein `unavailable` |
+| Sidebar: nur HU-Datum geändert | 2 Reloads | kein Reload |
+| Sidebar: Name/Kennzeichen geändert | 2 Reloads | 1 Reload |
+
+Hinweis: Bei Alt-Einträgen, deren gespeicherte Werte noch nicht vollständig normalisiert sind, kann die erste Sidebar-Änderung einmalig einen Reload auslösen. Danach greift der Pfad ohne Reload.
+
+## Unveränderte Fixpunkte
+
+- Sidebar-Layout r100/r097, Saisonkarte, r089/r091-Kennzeichenfallback, Suche/Badges, Dirty-State, Validierung, Dialog-Fokus.
+- Card/Reminder-Trennung. Keine Card-Erkennung, kein Card-Renderer.
+- Services `confirm_passed` / `set_due_date` bleiben für alle Benutzer nutzbar (Card im Haushalt), unabhängig von `write_access`.
+- r069-Entscheidung bleibt Standard: Sidebar für alle angemeldeten Benutzer. Der in r069 als „spätere Option“ genannte Admin-Modus ist jetzt als Schalter umgesetzt.
+
+## Offene Befunde (nicht in r115)
+
+- Kalender-Entity heißt bei Neuinstallation `calendar.tuv_reminder`; Metadaten/Doku nennen `calendar.tuev_reminder`.
+- Doppelte Hilfsfunktionen in mehreren Modulen (nur zeilengleiche zusammenführen; Kennzeichenlogik getrennt halten).
+- Zwei getrennte Validierungen (Config-Flow / Sidebar), Duplikatprüfung fehlt im Config-Flow, `interval` dort als Text gespeichert.
+- Sidebar rendert bei jedem `hass`-Update neu und zeigt Änderungen aus Card/Service erst nach Neuladen.
+- Toter Config-Flow-Schritt `season_end`.
+- String-Checks unter `scripts/` sind Textprüfungen, keine Funktionstests.
+
+## Tests
+
+```bash
+pip install -r requirements_test.txt
+pytest
+# pytest legt __pycache__ an; vor run_all_checks (Paket-Hygiene-Check) entfernen:
+find . -name __pycache__ -type d -not -path './.git/*' -exec rm -rf {} +
+python3 scripts/run_all_checks.py
+node --check custom_components/tuev_reminder/frontend/tuev-reminder-panel.js
+```
+
+## Nächster Featureblock
+
+Card-/Renderer-Erkennung in der Sidebar (ursprünglich als r115 geplant) verschiebt sich auf r116 oder später.
+
+---
+
 # Handover – TÜV Reminder r114
 
 ## Kurzstand
