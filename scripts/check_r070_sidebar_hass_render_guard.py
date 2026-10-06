@@ -11,8 +11,8 @@ def read(relative: str) -> str:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r114"
-assert read("REMINDER_VERSION.txt").strip() == "r114"
+assert manifest["version"] == "0.1.0-r115"
+assert read("REMINDER_VERSION.txt").strip() == "r115"
 
 panel_js = read("custom_components/tuev_reminder/frontend/tuev-reminder-panel.js")
 assert "const firstHass = !this._hass;" in panel_js

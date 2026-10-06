@@ -9,6 +9,13 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .const import CONF_VEHICLE_NAME, CONF_REMINDER_OFFSET_DAYS
+from .settings import (
+    SETTING_WRITE_ACCESS,
+    WRITE_ACCESS_OPTIONS,
+    async_set_write_access,
+    get_write_access,
+    user_can_write,
+)
 from .manager import (
     entry_title_from_vehicle_values,
     manager_metadata,
@@ -25,6 +32,30 @@ WS_TYPE_VEHICLE_GET = "tuev_reminder/manager/vehicles/get"
 WS_TYPE_VEHICLE_CREATE = "tuev_reminder/manager/vehicles/create"
 WS_TYPE_VEHICLE_UPDATE = "tuev_reminder/manager/vehicles/update"
 WS_TYPE_VEHICLE_DELETE = "tuev_reminder/manager/vehicles/delete"
+WS_TYPE_SETTINGS_UPDATE = "tuev_reminder/manager/settings/update"
+
+WRITE_DENIED_MESSAGE = "Nur Administratoren dürfen Fahrzeuge anlegen, ändern oder löschen."
+
+
+def _deny_write_if_needed(hass: HomeAssistant, connection, msg) -> bool:
+    """Send an unauthorized error and return True if the user may not write.
+
+    r115: write access depends on the integration setting `write_access`
+    (all users by default, as decided in r069; optionally admins only).
+    """
+    if user_can_write(hass, connection.user):
+        return False
+    connection.send_error(msg["id"], websocket_api.ERR_UNAUTHORIZED, WRITE_DENIED_MESSAGE)
+    return True
+
+
+def _metadata_for(hass: HomeAssistant, connection) -> dict:
+    user = connection.user
+    return manager_metadata(
+        can_write=user_can_write(hass, user),
+        write_access=get_write_access(hass),
+        can_manage_settings=bool(user and user.is_admin),
+    )
 
 
 _FIELD_ERROR_MESSAGES = {
@@ -101,8 +132,8 @@ def _duplicate_vehicle_errors(
 )
 @websocket_api.async_response
 async def websocket_manager_metadata(hass: HomeAssistant, connection, msg) -> None:
-    """Return static manager metadata and UI capabilities."""
-    connection.send_result(msg["id"], manager_metadata())
+    """Return manager metadata and the UI capabilities of the calling user."""
+    connection.send_result(msg["id"], _metadata_for(hass, connection))
 
 
 @websocket_api.websocket_command(
@@ -141,6 +172,8 @@ async def websocket_manager_vehicle_get(hass: HomeAssistant, connection, msg) ->
 @websocket_api.async_response
 async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg) -> None:
     """Create a TÜV Reminder vehicle ConfigEntry from manager form data."""
+    if _deny_write_if_needed(hass, connection, msg):
+        return
     field_errors, normalized = validate_and_normalize_vehicle_payload(msg.get("vehicle") or {})
     duplicate_errors = _duplicate_vehicle_errors(hass, normalized)
     if field_errors or duplicate_errors:
@@ -201,6 +234,8 @@ async def websocket_manager_vehicle_create(hass: HomeAssistant, connection, msg)
 @websocket_api.async_response
 async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg) -> None:
     """Update an existing TÜV Reminder vehicle ConfigEntry from manager form data."""
+    if _deny_write_if_needed(hass, connection, msg):
+        return
     entry = hass.config_entries.async_get_entry(msg["entry_id"])
     if entry is None or entry.domain != DOMAIN:
         connection.send_error(msg["id"], "not_found", "TÜV Reminder vehicle not found")
@@ -221,7 +256,8 @@ async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg)
         title=entry_title_from_vehicle_values(normalized),
         options=normalized,
     )
-    await hass.config_entries.async_reload(entry.entry_id)
+    # r115: the entry update listener reloads only when needed (see
+    # __init__._async_update_listener); no second explicit reload here.
 
     connection.send_result(
         msg["id"],
@@ -242,6 +278,8 @@ async def websocket_manager_vehicle_update(hass: HomeAssistant, connection, msg)
 @websocket_api.async_response
 async def websocket_manager_vehicle_delete(hass: HomeAssistant, connection, msg) -> None:
     """Delete an existing TÜV Reminder vehicle ConfigEntry from the manager UI."""
+    if _deny_write_if_needed(hass, connection, msg):
+        return
     entry = hass.config_entries.async_get_entry(msg["entry_id"])
     if entry is None or entry.domain != DOMAIN:
         connection.send_error(msg["id"], "not_found", "TÜV Reminder vehicle not found")
@@ -259,6 +297,20 @@ async def websocket_manager_vehicle_delete(hass: HomeAssistant, connection, msg)
     )
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): WS_TYPE_SETTINGS_UPDATE,
+        vol.Required(SETTING_WRITE_ACCESS): vol.In(WRITE_ACCESS_OPTIONS),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def websocket_manager_settings_update(hass: HomeAssistant, connection, msg) -> None:
+    """Change integration-wide manager settings (admins only)."""
+    await async_set_write_access(hass, msg[SETTING_WRITE_ACCESS])
+    connection.send_result(msg["id"], _metadata_for(hass, connection))
+
+
 def async_register_manager_api(hass: HomeAssistant) -> None:
     """Register the manager WebSocket API commands once."""
     websocket_api.async_register_command(hass, websocket_manager_metadata)
@@ -267,3 +319,4 @@ def async_register_manager_api(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, websocket_manager_vehicle_create)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_update)
     websocket_api.async_register_command(hass, websocket_manager_vehicle_delete)
+    websocket_api.async_register_command(hass, websocket_manager_settings_update)

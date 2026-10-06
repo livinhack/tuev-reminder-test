@@ -14,9 +14,11 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert manifest["version"] == "0.1.0-r114"
-assert version == "r114"
-assert '${this._metadata?.write_api === true ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`}' in panel
+assert manifest["version"] == "0.1.0-r115"
+assert version == "r115"
+# r115: topbar access state moved into _topbarAccessHtml() (admin toggle / read-only hint)
+assert '${this._topbarAccessHtml()}' in panel
+assert 'return this._canWrite() ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`;' in panel
 assert 'API v${this._escape(apiVersion)} · ${this._escape(writeApi)}' not in panel
 assert '<div class="version">API v' not in panel
 assert '.topbar-status.read-only' in panel

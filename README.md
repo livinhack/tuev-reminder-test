@@ -1,3 +1,30 @@
+# TÜV Reminder r115
+
+Arbeitsstand **r115** härtet das Backend auf Basis von r114. Schwerpunkt: umschaltbarer Schreibzugriff in der Sidebar, kein Flackern des Sensors bei Datumsänderungen, korrekter Kalenderzustand und erste echte Funktionstests (`pytest`).
+
+## r115 Highlights
+
+- Version auf `0.1.0-r115` / `r115` aktualisiert.
+- Neue Einstellung „Nur Admins ändern“ (Schalter in der Sidebar-Kopfzeile, nur für Admins sichtbar). Standard bleibt wie in r069: alle angemeldeten Benutzer dürfen Fahrzeuge verwalten. Ist der Schalter aktiv, sehen Nicht-Admins die Liste nur lesend; das Backend lehnt ihre Schreibbefehle ab.
+- Datumsänderungen (bestanden, Fälligkeit setzen, HU-Datum in der Sidebar) ohne Reload: Sensor wird nicht mehr `unavailable`.
+- Andere Änderungen (Name, Kennzeichen, Art, Format, Saison) laden das Fahrzeug genau einmal neu statt zweimal.
+- Kalender liefert den laufenden/nächsten Termin statt eines vergangenen; der Kalenderzustand schaltet dadurch wieder korrekt.
+- Sensor ohne 30-s-Polling; Zustand wird beim Anlegen, um 00:01 Uhr und bei Datenänderung geschrieben.
+- Fallback-Jahr ist das laufende Jahr statt fest 2026.
+- Panel-JS wird mit `?v=<Version>` geladen; kein künstliches Versionieren gegen Browser-Cache mehr nötig.
+- Neue Tests unter `tests/` (30 Stück), lokal: `pip install -r requirements_test.txt` und `pytest`.
+
+## r115 HA-Testfokus
+
+- Card: „bestanden“ bestätigen → Fahrzeug darf während der Animation nicht kurz „nicht verfügbar“ werden.
+- Sidebar als Admin: Anlegen, HU-Datum ändern, Name ändern, Löschen.
+- Sidebar als Admin: Schalter „Nur Admins ändern“ in der Kopfzeile ein-/ausschalten, Hinweis erscheint.
+- Sidebar mit Nicht-Admin-Benutzer: Schalter aus → wie bisher alles möglich; Schalter an → „Nur lesen“, kein Plus, kein Drei-Punkte-Menü.
+- Kalender `TÜV Reminder`: Zustand und nächster Termin plausibel.
+- Nach dem Update ohne Browser-Cache-Leeren: neues Panel wird geladen.
+
+---
+
 # TÜV Reminder r114
 
 Arbeitsstand **r114** ist ein gebündelter Cleanup-/Checkstand auf Basis von r113. Ziel war ausdrücklich, alle naheliegenden Checks und kleine Aufräumarbeiten bis zum nächsten echten Featureblock zusammenzufassen, statt weitere Mini-ZIPs zu erzeugen.

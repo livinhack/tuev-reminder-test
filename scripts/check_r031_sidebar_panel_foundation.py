@@ -17,9 +17,9 @@ def fail(message: str) -> None:
 
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r114":
+if manifest.get("version") != "0.1.0-r115":
     fail("manifest version must be 0.1.0-r114")
-if read("REMINDER_VERSION.txt").strip() != "r114":
+if read("REMINDER_VERSION.txt").strip() != "r115":
     fail("REMINDER_VERSION.txt must be r031")
 
 required_dependencies = {"http", "frontend", "panel_custom"}
@@ -45,7 +45,7 @@ for marker in [
     "frontend.async_register_built_in_panel(",
     'component_name="custom"',
     'frontend_url_path=PANEL_URL_PATH',
-    '"module_url": PANEL_JS_URL',
+    '"module_url": module_url',  # r115: versioned panel URL (?v=<version>)
     '"write_api": True',
 ]:
     if marker not in panel_py:

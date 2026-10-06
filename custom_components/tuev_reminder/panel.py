@@ -6,6 +6,7 @@ from pathlib import Path
 from homeassistant.components import frontend
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
+from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN
 
@@ -25,6 +26,11 @@ async def async_register_manager_panel(hass: HomeAssistant) -> None:
     domain_data = hass.data.setdefault(DOMAIN, {})
     if domain_data.get(PANEL_REGISTERED_KEY):
         return
+
+    # r115: append the integration version so browsers load the new panel JS
+    # after an update instead of a cached old copy.
+    integration = await async_get_integration(hass, DOMAIN)
+    module_url = f"{PANEL_JS_URL}?v={integration.version}"
 
     frontend_dir = Path(__file__).parent / "frontend"
     await hass.http.async_register_static_paths(
@@ -47,7 +53,7 @@ async def async_register_manager_panel(hass: HomeAssistant) -> None:
         config={
             "_panel_custom": {
                 "name": PANEL_CUSTOM_ELEMENT,
-                "module_url": PANEL_JS_URL,
+                "module_url": module_url,
                 "embed_iframe": False,
                 "trust_external_script": False,
             },

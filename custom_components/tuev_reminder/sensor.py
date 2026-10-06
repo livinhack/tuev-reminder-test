@@ -1,6 +1,7 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_change
@@ -46,7 +47,9 @@ from .const import (
     DEFAULT_REMINDER_OFFSET_DAYS,
 )
 
+from .const import SIGNAL_VEHICLE_VALUES_UPDATED
 from .helpers import (
+    current_year,
     build_change_plate_text,
     build_plate_with_suffix,
     get_due_date,
@@ -99,12 +102,31 @@ async def async_setup_entry(
 
 
 class TuevSensor(SensorEntity):
+    # r115: no 30 s polling. The state only changes at midnight (listener
+    # above) or when the stored values change (dispatcher signal below). HA
+    # writes the initial state immediately when the entity is added.
+    _attr_should_poll = False
+
     def __init__(self, entry: ConfigEntry):
         self.entry = entry
 
         self._attr_unique_id = f"{entry.entry_id}_tuev"
         self._attr_translation_key = "tuev_status"
         self._attr_icon = "mdi:car-clock"
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        @callback
+        def _values_updated(entry_id: str) -> None:
+            if entry_id == self.entry.entry_id:
+                self.async_write_ha_state()
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, SIGNAL_VEHICLE_VALUES_UPDATED, _values_updated
+            )
+        )
 
     @property
     def data(self):
@@ -190,7 +212,7 @@ class TuevSensor(SensorEntity):
 
     @property
     def year(self):
-        return int(self.data.get(CONF_YEAR, 2026))
+        return int(self.data.get(CONF_YEAR, current_year()))
 
     @property
     def interval(self):

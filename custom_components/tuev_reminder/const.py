@@ -80,6 +80,19 @@ STATUS_VALID = "valid"
 STATUS_DUE = "due"
 STATUS_EXPIRED = "expired"
 
+# r115: dispatcher signal sent with the config entry id when only values that
+# entities read live from the entry changed. Entities refresh their state
+# instead of the entry being reloaded.
+SIGNAL_VEHICLE_VALUES_UPDATED = f"{DOMAIN}_vehicle_values_updated"
+LIVE_UPDATE_KEYS = frozenset(
+    {
+        CONF_MONTH,
+        CONF_YEAR,
+        CONF_INTERVAL,
+        CONF_REMINDER_OFFSET_DAYS,
+    }
+)
+
 SERVICE_CONFIRM_PASSED = "confirm_passed"
 SERVICE_SET_DUE_DATE = "set_due_date"
 ATTR_PASSED_DATE = "passed_date"

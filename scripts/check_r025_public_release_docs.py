@@ -20,8 +20,8 @@ changelog = read("CHANGELOG.md")
 install = read("docs/REMINDER_R028_PUBLIC_RELEASE_ASSET_BUILDER.md")
 compat = read("docs/COMPAT_CARD_B355_REMINDER_R028.md")
 
-assert version == "r114"
-assert manifest["version"] == "0.1.0-r114"
+assert version == "r115"
+assert manifest["version"] == "0.1.0-r115"
 
 for text, label in [
     (readme, "README"),

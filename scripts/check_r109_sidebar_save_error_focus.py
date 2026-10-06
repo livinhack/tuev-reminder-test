@@ -13,8 +13,8 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = MANIFEST.read_text(encoding="utf-8")
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert '"version": "0.1.0-r114"' in manifest
-assert version == "r114"
+assert '"version": "0.1.0-r115"' in manifest
+assert version == "r115"
 assert "save validation focuses first blocking issue and backend errors clear stale saving text" in panel
 assert "_focusFirstValidationIssue(errors);" in panel
 assert "_focusValidationSummary()" in panel

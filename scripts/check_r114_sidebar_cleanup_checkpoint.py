@@ -14,8 +14,8 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert manifest["version"] == "0.1.0-r114"
-assert version == "r114"
+assert manifest["version"] == "0.1.0-r115"
+assert version == "r115"
 assert "r114 is a bundled cleanup/checkpoint before the next feature block" in panel
 
 # Accepted visual/UI anchors must remain untouched.
@@ -55,5 +55,7 @@ for forbidden in [
 ]:
     assert forbidden not in panel, f"Stale r114 cleanup target still present: {forbidden}"
 
-assert '${this._metadata?.write_api === true ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`}' in panel
+# r115: topbar access state moved into _topbarAccessHtml() (admin toggle / read-only hint)
+assert '${this._topbarAccessHtml()}' in panel
+assert 'return this._canWrite() ? "" : `<div class="topbar-status read-only" aria-live="polite">Nur lesen</div>`;' in panel
 print("r114 sidebar cleanup/checkpoint guard OK")
