@@ -1,3 +1,15 @@
+# TÜV Reminder r117
+
+## r117 – Kalender ohne Gerät
+
+- `TuevReminderCalendar` liefert kein `device_info` mehr; ungenutzter Import `DeviceInfo` und Konstante `CALENDAR_MANAGER_DEVICE_ID` entfernt.
+- Grund: Der Kalender wird per `discovery.async_load_platform` ohne Config-Entry geladen. HA warnt bei Geräten an solchen Entities und lehnt sie ab 2027.8 ab.
+- `unique_id`/Entity-ID unverändert.
+- Checks r018/r020 verlangen das Kalendergerät nicht mehr; r022 prüft dessen Fehlen. Übrige Checks auf r117 synchronisiert.
+- Neuer Test `tests/test_entities.py::test_calendar_has_no_device`.
+
+---
+
 # TÜV Reminder r116
 
 ## r116 – Shared Helpers

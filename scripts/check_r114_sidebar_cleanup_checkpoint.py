@@ -14,8 +14,8 @@ panel = PANEL.read_text(encoding="utf-8")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 version = VERSION.read_text(encoding="utf-8").strip()
 
-assert manifest["version"] == "0.1.0-r116"
-assert version == "r116"
+assert manifest["version"] == "0.1.0-r117"
+assert version == "r117"
 assert "r114 is a bundled cleanup/checkpoint before the next feature block" in panel
 
 # Accepted visual/UI anchors must remain untouched.

@@ -15,8 +15,8 @@ def assert_not_contains(text: str, needle: str, label: str):
         raise AssertionError(f"Unexpected {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r116"
-assert read("REMINDER_VERSION.txt").strip() == "r116"
+assert manifest["version"] == "0.1.0-r117"
+assert read("REMINDER_VERSION.txt").strip() == "r117"
 
 init = read("custom_components/tuev_reminder/__init__.py")
 calendar = read("custom_components/tuev_reminder/calendar.py")
@@ -29,8 +29,6 @@ audit = read("docs/REMINDER_R020_RELEASE_READINESS_AUDIT.md")
 # r017 runtime boundary must remain intact.
 assert_contains(init, 'PLATFORMS = ["sensor"]', "vehicle entries forward sensors only")
 assert_contains(init, 'discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)', "integration-level calendar load")
-assert_contains(calendar, 'CALENDAR_MANAGER_DEVICE_ID = "calendar_manager"', "manager calendar device id")
-assert_contains(calendar, 'identifiers={(DOMAIN, CALENDAR_MANAGER_DEVICE_ID)}', "manager device info")
 assert_contains(calendar, 'for entry in self.hass.config_entries.async_entries(DOMAIN):', "calendar builds from all entries")
 assert_not_contains(calendar, 'calendar_owner_entry_id', "old vehicle owner key")
 assert_not_contains(calendar, 'async_setup_entry(', "calendar must not be forwarded as vehicle-entry platform")

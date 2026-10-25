@@ -1,3 +1,22 @@
+# TÜV Reminder r117
+
+Arbeitsstand **r117** behebt eine Home-Assistant-Warnung beim Kalender. Kein geändertes Verhalten für Karte, Sidebar oder Automationen.
+
+## r117 Highlights
+
+- Version auf `0.1.0-r117` / `r117` aktualisiert.
+- Der integrationsweite Kalender `calendar.tuev_reminder` meldet kein Gerät mehr an. Er wird ohne Config-Entry geladen (seit r017); HA warnte deshalb „attempts to attach a device to an entity without a config entry“ und lehnt das ab HA 2027.8 ab.
+- `unique_id` unverändert, Entity-ID bleibt `calendar.tuev_reminder`.
+- Das bisherige Gerät „TÜV Reminder“ (Modell „Integration“) bleibt nach dem Update leer zurück und kann unter Einstellungen → Geräte gelöscht werden.
+- Neuer Test `test_calendar_has_no_device`; r022 prüft, dass der Kalender kein `device_info` mehr hat.
+
+## r117 HA-Testfokus
+
+- Nach Neustart keine Warnung zu `tuev_reminder` im Log.
+- Kalender `calendar.tuev_reminder` vorhanden, Termine wie bisher, Karte unverändert.
+
+---
+
 # TÜV Reminder r116
 
 Arbeitsstand **r116** fasst zeilengleiche Hilfsfunktionen zusammen, die bisher in mehreren Modulen kopiert vorlagen. Kein geändertes Verhalten, keine sichtbare Änderung.

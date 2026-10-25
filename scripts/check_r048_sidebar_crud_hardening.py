@@ -14,9 +14,9 @@ def fail(message: str) -> None:
     raise SystemExit(f"r053 sidebar CRUD hardening check failed: {message}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-if manifest.get("version") != "0.1.0-r116":
+if manifest.get("version") != "0.1.0-r117":
     fail("manifest version must be 0.1.0-r114")
-if read("REMINDER_VERSION.txt").strip() != "r116":
+if read("REMINDER_VERSION.txt").strip() != "r117":
     fail("REMINDER_VERSION.txt must be r053")
 
 api = read("custom_components/tuev_reminder/manager_api.py")

@@ -15,8 +15,8 @@ def assert_not_contains(text: str, needle: str, label: str):
         raise AssertionError(f"Unexpected {label}: {needle}")
 
 manifest = json.loads(read("custom_components/tuev_reminder/manifest.json"))
-assert manifest["version"] == "0.1.0-r116"
-assert read("REMINDER_VERSION.txt").strip() == "r116"
+assert manifest["version"] == "0.1.0-r117"
+assert read("REMINDER_VERSION.txt").strip() == "r117"
 
 init = read("custom_components/tuev_reminder/__init__.py")
 calendar = read("custom_components/tuev_reminder/calendar.py")
@@ -27,7 +27,6 @@ doc = read("docs/REMINDER_R020_V3_STABILIZED_CHECKPOINT.md")
 
 assert_contains(init, 'PLATFORMS = ["sensor"]', "vehicle entries only forward sensor platform")
 assert_contains(init, 'discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)', "integration-level calendar load")
-assert_contains(calendar, 'CALENDAR_MANAGER_DEVICE_ID = "calendar_manager"', "detached manager calendar device")
 assert_contains(calendar, 'TÜV/HU Erinnerung', "reminder event")
 assert_contains(calendar, 'TÜV/HU fällig', "due event")
 assert_contains(config_flow, "CONF_REMINDER_OFFSET_DAYS", "offset option")

@@ -29,7 +29,7 @@ init = read("custom_components/tuev_reminder/__init__.py")
 calendar = read("custom_components/tuev_reminder/calendar.py")
 services = read("custom_components/tuev_reminder/services.yaml")
 
-assert version in {"r022", "r023", "r024", "r025", "r026", "r027", "r028", "r075", "r081", "r083", "r114", "r114", "r115", "r116"}
+assert version in {"r022", "r023", "r024", "r025", "r026", "r027", "r028", "r075", "r081", "r083", "r114", "r114", "r115", "r116", "r117"}
 assert manifest["version"] == f"0.1.0-{version}"
 assert manifest["domain"] == "tuev_reminder"
 assert manifest["config_flow"] is True
@@ -51,9 +51,9 @@ for text, label in [(readme, "README"), (handover, "HANDOVER"), (compat_doc, "co
 
 assert_contains(init, 'PLATFORMS = ["sensor"]', "vehicle entries forward sensors only")
 assert_contains(init, 'discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)', "integration-level calendar load")
-assert_contains(calendar, 'CALENDAR_MANAGER_DEVICE_ID = "calendar_manager"', "detached calendar manager device")
 assert_contains(calendar, "TÜV/HU Erinnerung", "reminder event summary")
 assert_contains(calendar, "TÜV/HU fällig", "due event summary")
+assert_not_contains(calendar, "def device_info", "detached calendar must not attach a device (no config entry, HA 2027.8)")
 assert_not_contains(calendar, "local_calendar", "no local calendar runtime sync")
 assert_contains(services, "confirm_passed", "confirm passed service")
 assert_contains(services, "set_due_date", "set due date service")

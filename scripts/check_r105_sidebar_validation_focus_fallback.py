@@ -3,8 +3,8 @@ root = Path(__file__).resolve().parents[1]
 panel = (root / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text()
 manifest = (root / 'custom_components/tuev_reminder/manifest.json').read_text()
 version = (root / 'REMINDER_VERSION.txt').read_text().strip()
-assert '"version": "0.1.0-r116"' in manifest
-assert version == 'r116'
+assert '"version": "0.1.0-r117"' in manifest
+assert version == 'r117'
 for needle in [
     '_validationSectionForTarget(name)',
     'data-validation-section=',

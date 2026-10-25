@@ -30,9 +30,9 @@ for needle in forbidden:
     if needle in text:
         raise SystemExit(f"Forbidden legacy marker still present: {needle}")
 
-if '0.1.0-r116' not in manifest:
-    raise SystemExit('manifest version was not bumped to 0.1.0-r116')
-if version != 'r116':
+if '0.1.0-r117' not in manifest:
+    raise SystemExit('manifest version was not bumped to 0.1.0-r117')
+if version != 'r117':
     raise SystemExit(f'REMINDER_VERSION.txt should be r095, got {version!r}')
 
 print("r093 Sidebar renderer-ready plate slot check passed.")

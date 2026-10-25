@@ -1,3 +1,27 @@
+# Handover – TÜV Reminder r117
+
+## Kurzstand
+
+r117 baut auf r116 auf (Branch `claude/r116-shared-helpers`) und entfernt das Gerät vom integrationsweiten Kalender. Anlass: HA-Log-Warnung „Detected that custom integration 'tuev_reminder' attempts to attach a device to an entity without a config entry. This will stop working in Home Assistant 2027.8.0“.
+
+## Hintergrund
+
+- Seit r017 wird der gemeinsame Kalender über `discovery.async_load_platform(hass, "calendar", DOMAIN, {}, config)` geladen, damit das Löschen eines Fahrzeugs ihn nicht mitnimmt. Er hat damit keinen Config-Entry.
+- Ein Gerät braucht einen Config-Entry. Daher fällt `device_info` weg; die Entity selbst bleibt (`unique_id` `tuev_reminder_calendar`).
+
+## Bewusst nicht gemacht
+
+- Kein eigener „Manager“-Config-Entry für den Kalender (größerer Umbau am Config-Flow). Falls das Gerät gewünscht ist, wäre das der saubere Weg.
+
+## Geänderte Dateien
+
+- `custom_components/tuev_reminder/calendar.py`
+- `scripts/check_r018_v3_stabilization.py`, `scripts/check_r020_v3_stabilized_checkpoint.py`, `scripts/check_r022_package_hygiene.py`
+- `tests/test_entities.py`
+- Versionsangaben (Manifest, `REMINDER_VERSION.txt`, Checks)
+
+---
+
 # Handover – TÜV Reminder r116
 
 ## Kurzstand

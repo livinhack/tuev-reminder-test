@@ -5,7 +5,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util import dt as dt_util
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
@@ -61,7 +60,6 @@ from .helpers import ( # r116: shared helpers (formerly local copies)
 
 
 CALENDAR_ENTITY_ADDED_KEY = "calendar_entity_added"
-CALENDAR_MANAGER_DEVICE_ID = "calendar_manager"
 
 
 STATUS_LABELS = {
@@ -200,15 +198,6 @@ class TuevReminderCalendar(CalendarEntity):
         self._attr_name = "TÜV Reminder"
         self._attr_unique_id = f"{DOMAIN}_calendar"
         self._attr_icon = "mdi:calendar-clock"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers={(DOMAIN, CALENDAR_MANAGER_DEVICE_ID)},
-            name="TÜV Reminder",
-            manufacturer="TÜV Reminder",
-            model="Integration",
-        )
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()

@@ -72,3 +72,12 @@ async def test_panel_url_carries_version(hass: HomeAssistant, setup_integration,
     assert module_url.endswith(f"?v={manifest['version']}")
     # r069/r115: the panel stays visible for all users; write access is a setting.
     assert calls[0].kwargs.get("require_admin") is False
+
+
+async def test_calendar_has_no_device(hass: HomeAssistant, setup_integration):
+    """r117: the detached calendar has no config entry, so it must not attach a device.
+
+    Home Assistant warns about this and stops accepting it in 2027.8.
+    """
+    await setup_integration()
+    assert _calendar(hass).device_info is None

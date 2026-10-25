@@ -6,8 +6,8 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 js = (ROOT / 'custom_components/tuev_reminder/frontend/tuev-reminder-panel.js').read_text(encoding='utf-8')
 manifest = json.loads((ROOT / 'custom_components/tuev_reminder/manifest.json').read_text(encoding='utf-8'))
-assert manifest['version'] == '0.1.0-r116'
-assert (ROOT / 'REMINDER_VERSION.txt').read_text(encoding='utf-8').strip() == 'r116'
+assert manifest['version'] == '0.1.0-r117'
+assert (ROOT / 'REMINDER_VERSION.txt').read_text(encoding='utf-8').strip() == 'r117'
 
 # Form fields should expose real invalid state, not only the right-side validation summary.
 for needle in [
